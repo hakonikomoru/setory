@@ -5,14 +5,14 @@ const features = [
     id: "library",
     href: "/library",
     title: "曲庫を管理",
-    body: "MusicBrainz から曲を検索して取り込むか、手入力で登録。配信で歌う曲だけをストックできます。",
+    body: "MusicBrainz から曲を検索して取り込むか、手入力で登録。カラオケ・歌練習・配信で歌う曲をストックできます。",
     accent: "bg-violet-600 text-white",
   },
   {
     id: "builder",
     href: "/builder",
     title: "セトリを組み立て",
-    body: "曲を選んで並べ替え、配信用テキストをコピー。OBS 用 URL で現在曲・次の曲も配信画面に表示できます。",
+    body: "カラオケの曲順、練習プラン、配信セトリを並べ替えてコピー。PC では OBS で現在曲・次の曲も表示できます。",
     accent: "bg-fuchsia-600 text-white",
   },
   {
@@ -37,16 +37,19 @@ export default function Home() {
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl flex-col px-4 py-10">
       <section className="rounded-[2rem] border border-violet-100 bg-white/90 p-8 shadow-xl shadow-violet-100/60 sm:p-12">
         <p className="mb-4 inline-flex rounded-full bg-fuchsia-100 px-4 py-2 text-sm font-bold text-fuchsia-800">
-          歌配信・ライブ向け
+          配信・カラオケ・歌練習
         </p>
         <h1 className="text-4xl font-black tracking-tight text-violet-950 sm:text-5xl">
           Setory
         </h1>
-        <p className="mt-5 max-w-2xl text-base leading-8 text-violet-800/90 sm:text-lg">
-          セットリスト作成に必要な機能をひとつにまとめたWebアプリです。
+        <p className="mt-3 text-xl font-bold text-violet-900 sm:text-2xl">
+          歌うためのセトリ作成
+        </p>
+        <p className="mt-4 max-w-2xl text-base leading-8 text-violet-800/90 sm:text-lg">
+          カラオケの持ち歌リスト、歌練習の曲順づくり、歌配信・ライブのセットリストまで、ひとつのアプリで作れます。
           曲庫の管理、曲順の調整
           <span className="hidden md:inline">、OBS オーバーレイ</span>
-          、配信説明欄向けのコピー出力まで、ブラウザだけで完結します。
+          、コピー用テキストの出力まで、ブラウザだけで完結します。
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link

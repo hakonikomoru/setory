@@ -16,11 +16,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Setory",
   description:
-    "歌配信・ライブ向けのセットリストを、曲庫管理・OBSオーバーレイ・コピー出力まで一気通貫で作れるWebアプリ",
+    "配信・カラオケ・歌練習向けのセトリ作成。曲庫管理・曲順編集・コピー出力、PC では OBS オーバーレイにも対応",
   applicationName: "Setory",
   openGraph: {
     title: "Setory",
-    description: "セットリスト作成に特化したローカル保存型Webアプリ",
+    description:
+      "カラオケ・歌練習・配信のセットリストをブラウザだけで作れるローカル保存型Webアプリ",
     locale: "ja_JP",
     type: "website",
   },

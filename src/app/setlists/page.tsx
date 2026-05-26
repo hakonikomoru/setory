@@ -22,6 +22,9 @@ export default function SetlistsPage() {
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-black text-violet-950">保存したセトリ</h1>
+          <p className="mt-1 text-sm font-semibold text-violet-800">
+            カラオケ・歌練習・配信など、作ったセトリを再利用
+          </p>
           <p className="mt-2 text-sm text-violet-700">
             {data.setlists.length}件保存されています
           </p>

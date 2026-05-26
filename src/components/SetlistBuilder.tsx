@@ -180,7 +180,7 @@ export default function SetlistBuilder({
                   }
                 }}
                 className="rounded-xl border border-violet-200 px-3 py-2"
-                placeholder="誕生日配信、切ない回 など"
+                placeholder="カラオケ練習、誕生日配信、切ない回 など"
               />
             </label>
             <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">

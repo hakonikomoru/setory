@@ -28,6 +28,9 @@ export default function LibraryPage() {
     <PageShell>
       <header className="mb-6">
         <h1 className="text-3xl font-black text-violet-950">曲庫</h1>
+        <p className="mt-1 text-sm font-semibold text-violet-800">
+          カラオケや歌練習で歌う曲を登録・管理します
+        </p>
         <p className="mt-2 text-sm text-violet-700">
           上で曲を取り込み・登録、下（PC では右）で登録曲を検索・編集できます。
         </p>
