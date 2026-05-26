@@ -63,6 +63,41 @@ export default function OverlaySetlistColorPicker({
     onWidthChange(snapOverlaySetlistWidthForSlider(parsed, previewBackgroundMaxWidthPx));
   }
 
+  function handleWidthNumberEdit(raw: string, nativeEvent: Event) {
+    const inputType = nativeEvent instanceof InputEvent ? nativeEvent.inputType : "";
+
+    if (inputType === "increment" || inputType === "decrement") {
+      commitWidthInput(raw);
+      return;
+    }
+
+    const isTextEdit =
+      inputType === "insertText" ||
+      inputType === "insertFromPaste" ||
+      inputType === "insertFromDrop" ||
+      inputType === "deleteContentBackward" ||
+      inputType === "deleteContentForward" ||
+      inputType === "deleteByCut" ||
+      inputType === "deleteContent";
+
+    if (isTextEdit) {
+      setWidthDraft(raw);
+      return;
+    }
+
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      setWidthDraft(raw);
+      return;
+    }
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed)) {
+      setWidthDraft(raw);
+      return;
+    }
+    commitWidthInput(raw);
+  }
+
   function selectThemeDefault() {
     onColorChange(undefined);
   }
@@ -207,7 +242,8 @@ export default function OverlaySetlistColorPicker({
                   (widthCustom && displayWidthPx !== undefined ? String(displayWidthPx) : "")
                 }
                 placeholder="全幅"
-                onChange={(e) => setWidthDraft(e.target.value)}
+                onChange={(e) => handleWidthNumberEdit(e.target.value, e.nativeEvent)}
+                onInput={(e) => handleWidthNumberEdit(e.currentTarget.value, e.nativeEvent)}
                 onBlur={(e) => commitWidthInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") e.currentTarget.blur();
