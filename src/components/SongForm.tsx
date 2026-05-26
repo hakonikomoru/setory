@@ -2,20 +2,14 @@
 
 import { FormEvent, useState } from "react";
 import { createId } from "@/lib/storage";
-import { parseTagsInput } from "@/lib/setlist-engine";
-import type { Song, SongMood } from "@/types/setlist";
+import { formatMoodInput, parseMoodInput } from "@/lib/setlist-engine";
+import type { Song } from "@/types/setlist";
 
 type Props = {
   initial?: Song;
   onSave: (song: Song) => void;
   onCancel?: () => void;
 };
-
-const MOODS: { value: SongMood; label: string }[] = [
-  { value: "upbeat", label: "盛り上がり" },
-  { value: "mid", label: "中間" },
-  { value: "ballad", label: "バラード" },
-];
 
 export default function SongForm({ initial, onSave, onCancel }: Props) {
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -24,8 +18,7 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
     initial ? String(Math.floor(initial.durationSec / 60)) : "4",
   );
   const [seconds, setSeconds] = useState(initial ? String(initial.durationSec % 60) : "0");
-  const [mood, setMood] = useState<SongMood>(initial?.mood ?? "mid");
-  const [tags, setTags] = useState(initial?.tags.join("、") ?? "");
+  const [moodText, setMoodText] = useState(initial ? formatMoodInput(initial.mood) : "");
   const [notes, setNotes] = useState(initial?.notes ?? "");
 
   function handleSubmit(event: FormEvent) {
@@ -34,15 +27,25 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
 
     if (!title.trim() || !artist.trim() || durationSec <= 0) return;
 
-    onSave({
+    const song = {
       id: initial?.id ?? createId("song"),
       title: title.trim(),
       artist: artist.trim(),
       durationSec,
-      mood,
-      tags: parseTagsInput(tags),
+      mood: parseMoodInput(moodText),
+      tags: initial?.tags ?? [],
       notes: notes.trim() || undefined,
-    });
+      createdAt: initial?.createdAt ?? new Date().toISOString(),
+    };
+
+    if (
+      !initial &&
+      !window.confirm(`「${song.title} / ${song.artist}」を曲庫に追加しますか？`)
+    ) {
+      return;
+    }
+
+    onSave(song);
   }
 
   return (
@@ -74,17 +77,17 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <label className="grid gap-1 text-sm font-semibold text-violet-900">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-violet-900">
           尺（分）
           <input
             type="number"
             min={0}
             value={minutes}
             onChange={(e) => setMinutes(e.target.value)}
-            className="rounded-xl border border-violet-200 px-3 py-2"
+            className="w-full min-w-0 rounded-xl border border-violet-200 px-3 py-2"
           />
         </label>
-        <label className="grid gap-1 text-sm font-semibold text-violet-900">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-violet-900">
           尺（秒）
           <input
             type="number"
@@ -92,34 +95,20 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
             max={59}
             value={seconds}
             onChange={(e) => setSeconds(e.target.value)}
-            className="rounded-xl border border-violet-200 px-3 py-2"
+            className="w-full min-w-0 rounded-xl border border-violet-200 px-3 py-2"
           />
         </label>
-        <label className="grid gap-1 text-sm font-semibold text-violet-900">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-violet-900">
           雰囲気
-          <select
-            value={mood}
-            onChange={(e) => setMood(e.target.value as SongMood)}
-            className="rounded-xl border border-violet-200 px-3 py-2"
-          >
-            {MOODS.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+          <input
+            type="text"
+            value={moodText}
+            onChange={(e) => setMoodText(e.target.value)}
+            className="w-full min-w-0 rounded-xl border border-violet-200 px-3 py-2"
+            placeholder="例: バラード"
+          />
         </label>
       </div>
-
-      <label className="grid gap-1 text-sm font-semibold text-violet-900">
-        タグ（カンマ区切り）
-        <input
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          className="rounded-xl border border-violet-200 px-3 py-2"
-          placeholder="アニソン, 定番, 盛り上がり"
-        />
-      </label>
 
       <label className="grid gap-1 text-sm font-semibold text-violet-900">
         メモ

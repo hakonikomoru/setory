@@ -56,20 +56,22 @@ export default function SetlistBuilder({
 
   const persistDraft = useCallback(
     (nextDraft: Setlist) => {
+      if (!embedded) return;
       const saved = { ...nextDraft, updatedAt: new Date().toISOString() };
       onDataChange({
         ...data,
         setlists: [...data.setlists.filter((setlist) => setlist.id !== saved.id), saved],
       });
     },
-    [data, onDataChange],
+    [data, embedded, onDataChange],
   );
 
   const commitDraft = useCallback(
     (patch: Partial<Setlist>) => {
+      if (!embedded) return;
       persistDraft({ ...draftSetlist, ...patch });
     },
-    [draftSetlist, persistDraft],
+    [draftSetlist, embedded, persistDraft],
   );
 
   const selectedSongs = songIds
@@ -145,11 +147,12 @@ export default function SetlistBuilder({
   }
 
   return (
-    <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-      <section className="grid gap-4">
-        <div className="rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-lg shadow-violet-100/40">
+    <div className="grid gap-6">
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
+        <section className="grid gap-4">
           <h2 className="text-xl font-bold text-violet-950">セトリ情報</h2>
-          <div className="mt-4 grid gap-3">
+          <div className="rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-lg shadow-violet-100/40">
+            <div className="grid gap-3">
             <label className="grid gap-1 text-sm font-semibold text-violet-900">
               セトリ名
               <input
@@ -192,8 +195,8 @@ export default function SetlistBuilder({
               />
               曲時間を表示しない（コピー用テキスト・曲順一覧）
             </label>
-          </div>
-          <p className="mt-4 text-sm text-violet-700">
+            </div>
+            <p className="mt-4 text-sm text-violet-700">
             選択中: {selectedSongs.length}曲
             {hideDuration ? null : <> / 合計 {formatDuration(totalSec)}</>}
           </p>
@@ -211,14 +214,14 @@ export default function SetlistBuilder({
               </button>
             )}
             <CopySetlistButton text={exportText} />
+            </div>
           </div>
-        </div>
 
-        <div>
-          <h3 className="mb-3 text-lg font-bold text-violet-950">曲順（ドラッグで並べ替え）</h3>
+          <h3 className="text-lg font-bold text-violet-950">曲順（ドラッグで並べ替え）</h3>
+          <div>
           {selectedSongs.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-violet-200 px-4 py-6 text-center text-sm text-violet-600">
-              右の曲一覧から追加してください。
+              下の登録曲一覧から追加してください。
             </p>
           ) : (
             <ol className="grid gap-2 px-1 py-1">
@@ -291,17 +294,17 @@ export default function SetlistBuilder({
               })}
             </ol>
           )}
-        </div>
+          </div>
 
-        {!embedded ? (
+          {!embedded ? (
           <pre className="overflow-x-auto rounded-2xl bg-violet-950 p-4 text-sm leading-6 text-violet-50">
             {exportText}
           </pre>
-        ) : null}
-      </section>
+          ) : null}
+        </section>
 
-      <section className="grid min-w-0 gap-4">
-        <ExternalSongSearch
+        <section className="grid min-w-0 gap-4">
+          <ExternalSongSearch
           librarySongs={data.songs}
           importTarget="libraryAndSetlist"
           setlistSongIds={songIds}
@@ -309,36 +312,42 @@ export default function SetlistBuilder({
           onImport={(song) => {
             const nextData = upsertSong(data, song);
             const nextIds = songIds.includes(song.id) ? songIds : [...songIds, song.id];
-            onDataChange({
-              ...nextData,
-              setlists: [
-                ...nextData.setlists.filter((s) => s.id !== draftSetlist.id),
-                {
-                  ...draftSetlist,
-                  songIds: nextIds,
-                  updatedAt: new Date().toISOString(),
-                },
-              ],
-            });
             setSongIds(nextIds);
+            if (embedded) {
+              onDataChange({
+                ...nextData,
+                setlists: [
+                  ...nextData.setlists.filter((s) => s.id !== draftSetlist.id),
+                  {
+                    ...draftSetlist,
+                    songIds: nextIds,
+                    updatedAt: new Date().toISOString(),
+                  },
+                ],
+              });
+            } else {
+              onDataChange(nextData);
+            }
           }}
-        />
-        <RegisteredSongsPanel
-          sticky={!embedded}
-          songs={addableLibrarySongs}
-          totalCount={addableSongCount}
-          searchQuery={searchQuery}
-          onSearchQueryChange={setSearchQuery}
-          onAddToSetlist={(songId) => {
-            if (!songIds.includes(songId)) toggleSong(songId);
-          }}
-          emptyLibraryMessage={
-            data.songs.length === 0
-              ? "登録曲がありません。上の検索で取り込むか、曲庫ページで追加してください。"
-              : "登録曲はすべてセトリに追加済みです。左の曲順から外すとここに再表示されます。"
-          }
-        />
-      </section>
+          />
+        </section>
+      </div>
+
+      <RegisteredSongsPanel
+        sticky={false}
+        songs={addableLibrarySongs}
+        totalCount={addableSongCount}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        onAddToSetlist={(songId) => {
+          if (!songIds.includes(songId)) toggleSong(songId);
+        }}
+        emptyLibraryMessage={
+          data.songs.length === 0
+            ? "登録曲がありません。上の検索で取り込むか、曲庫ページで追加してください。"
+            : "登録曲はすべてセトリに追加済みです。左の曲順から外すとここに再表示されます。"
+        }
+      />
     </div>
   );
 }

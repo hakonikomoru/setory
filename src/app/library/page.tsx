@@ -32,12 +32,12 @@ export default function LibraryPage() {
           カラオケや歌練習で歌う曲を登録・管理します
         </p>
         <p className="mt-2 text-sm text-violet-700">
-          上で曲を取り込み・登録、下（PC では右）で登録曲を検索・編集できます。
+          上で曲を取り込み・登録し、下の登録曲一覧で検索・編集できます。
         </p>
       </header>
 
-      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-        <div className="grid min-w-0 gap-6">
+      <div className="grid gap-6">
+        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
           <ExternalSongSearch
             librarySongs={data.songs}
             onImport={(song) => setData(upsertSong(data, song))}
@@ -63,6 +63,7 @@ export default function LibraryPage() {
         </div>
 
         <RegisteredSongsPanel
+          sticky={false}
           songs={filteredSongs}
           totalCount={data.songs.length}
           searchQuery={libraryQuery}

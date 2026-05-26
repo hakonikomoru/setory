@@ -52,17 +52,20 @@ export default function OverlaySettings({
   }
 
   return (
-    <section className="h-full rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 shadow-sm">
-      <h2 className="text-lg font-bold text-violet-950">OBS オーバーレイ</h2>
-      <p className="mt-1 text-sm text-violet-700">
-        配信操作は
-        <a href={controlUrl} className="mx-1 font-semibold text-indigo-700 underline">
-          オーバーレイ操作ページ
-        </a>
-        で行い、OBS には下の URL（左の表示のみ）を登録してください。
-      </p>
+    <div className="flex h-full min-w-0 flex-col gap-3">
+      <header>
+        <h2 className="text-lg font-bold text-violet-950">OBS オーバーレイ</h2>
+        <p className="mt-1 text-sm text-violet-700">
+          配信操作は
+          <a href={controlUrl} className="mx-1 font-semibold text-indigo-700 underline">
+            オーバーレイ操作ページ
+          </a>
+          で行い、OBS には下の URL（左の表示のみ）を登録してください。
+        </p>
+      </header>
 
-      <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
+      <section className="min-h-0 flex-1 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 shadow-sm">
+      <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
         <input
           type="checkbox"
           checked={visible}
@@ -151,6 +154,7 @@ export default function OverlaySettings({
       <p className="mt-3 text-xs text-violet-600">
         OBS ではソースの幅 800〜1000px 程度・背景色を透過にしてください。
       </p>
-    </section>
+      </section>
+    </div>
   );
 }

@@ -173,15 +173,16 @@ export default function ExternalSongSearch({
   }
 
   return (
-    <section
-      className={`rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 shadow-sm ${className}`}
-    >
-      <h2 className="text-lg font-bold text-violet-950">曲を検索して取り込む</h2>
-      <p className="mt-1 text-sm text-violet-700">
-        1回の検索で最大100件。さらに「まとめて200件取得」で追加できます。
-      </p>
+    <section className={`grid gap-3 ${className}`}>
+      <header>
+        <h2 className="text-xl font-bold text-violet-950">曲を検索して取り込む</h2>
+        <p className="mt-1 text-sm text-violet-700">
+          1回の検索で最大100件。さらに「まとめて200件取得」で追加できます。
+        </p>
+      </header>
 
-      <label className="mt-4 grid gap-1 text-sm font-semibold text-violet-900">
+      <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 shadow-sm">
+      <label className="grid gap-1 text-sm font-semibold text-violet-900">
         曲名・アーティストで検索
         <SearchInput
           value={query}
@@ -245,11 +246,11 @@ export default function ExternalSongSearch({
               return (
                 <li
                   key={hit.externalId}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-violet-100 bg-white px-3 py-2"
+                  className="flex min-w-0 items-center gap-2 rounded-xl border border-violet-100 bg-white px-3 py-2"
                 >
-                  <div>
-                    <p className="font-bold text-violet-950">{hit.title}</p>
-                    <p className="text-sm text-violet-700">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold break-words text-violet-950">{hit.title}</p>
+                    <p className="text-sm break-words text-violet-700">
                       {hit.artist}（{formatDuration(hit.durationSec)}）
                       {importTarget === "libraryAndSetlist" && inLibrary && !inSetlist
                         ? " ・ 曲庫に登録済み"
@@ -260,7 +261,7 @@ export default function ExternalSongSearch({
                     type="button"
                     disabled={disabled}
                     onClick={() => handleImport(hit)}
-                    className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
+                    className="shrink-0 self-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold whitespace-nowrap text-white disabled:opacity-40"
                   >
                     {statusLabel}
                   </button>
@@ -288,6 +289,7 @@ export default function ExternalSongSearch({
         </a>
         （CC0 / オープンデータ）
       </p>
+      </div>
     </section>
   );
 }

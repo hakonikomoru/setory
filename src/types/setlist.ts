@@ -12,6 +12,8 @@ export type Song = {
   mood: SongMood;
   tags: string[];
   notes?: string;
+  /** 曲庫への登録日時（ISO 8601） */
+  createdAt: string;
 };
 
 export type Setlist = {

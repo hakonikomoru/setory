@@ -1,4 +1,46 @@
-import type { Setlist, Song } from "@/types/setlist";
+import type { Setlist, Song, SongMood } from "@/types/setlist";
+
+const MOOD_LABELS: Record<SongMood, string> = {
+  upbeat: "盛り上がり",
+  mid: "中間",
+  ballad: "バラード",
+};
+
+export function moodLabel(mood: SongMood): string {
+  return MOOD_LABELS[mood];
+}
+
+export function formatMoodInput(mood: SongMood): string {
+  return MOOD_LABELS[mood];
+}
+
+/** 手入力の雰囲気テキストを SongMood に正規化する */
+export function parseMoodInput(input: string): SongMood {
+  const trimmed = input.trim();
+  if (!trimmed) return "mid";
+
+  const lower = trimmed.toLowerCase();
+  if (
+    trimmed.includes("盛") ||
+    lower.includes("upbeat") ||
+    lower === "up" ||
+    trimmed.includes("テンション")
+  ) {
+    return "upbeat";
+  }
+  if (
+    trimmed.includes("バラ") ||
+    lower.includes("ballad") ||
+    trimmed.includes("切ない") ||
+    trimmed.includes("しっとり")
+  ) {
+    return "ballad";
+  }
+  if (trimmed.includes("中") || lower.includes("mid")) {
+    return "mid";
+  }
+  return "mid";
+}
 
 export function formatDuration(totalSec: number): string {
   const minutes = Math.floor(totalSec / 60);
@@ -63,4 +105,18 @@ export function filterSongsByQuery(songs: Song[], query: string): Song[] {
     const haystack = `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase();
     return tokens.every((token) => haystack.includes(token));
   });
+}
+
+export type SongListSortOrder = "asc" | "desc";
+
+/** 登録日時で並べ替える（同時刻は曲名でタイブレーク） */
+export function sortSongsByCreatedAt(songs: Song[], order: SongListSortOrder): Song[] {
+  const sorted = [...songs].sort((a, b) => {
+    const byTime = a.createdAt.localeCompare(b.createdAt);
+    if (byTime !== 0) return byTime;
+    const byTitle = a.title.localeCompare(b.title, "ja");
+    if (byTitle !== 0) return byTitle;
+    return a.artist.localeCompare(b.artist, "ja");
+  });
+  return order === "desc" ? sorted.reverse() : sorted;
 }

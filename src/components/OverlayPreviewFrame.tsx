@@ -42,7 +42,7 @@ export default function OverlayPreviewFrame({
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col gap-2">
       <div className="shrink-0">
-        <p className="text-sm font-semibold text-violet-900">プレビュー背景</p>
+        <h2 className="text-lg font-bold text-violet-950">プレビュー背景</h2>
         <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="プレビュー背景">
           {BACKDROPS.map((item) => (
             <button

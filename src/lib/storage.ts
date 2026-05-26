@@ -30,10 +30,10 @@ export function loadAppData(): AppData {
     }
     if (!raw) return EMPTY_DATA;
     const parsed = JSON.parse(raw) as AppData;
-    return {
+    return normalizeAppData({
       songs: Array.isArray(parsed.songs) ? parsed.songs : [],
       setlists: Array.isArray(parsed.setlists) ? parsed.setlists : [],
-    };
+    });
   } catch {
     return EMPTY_DATA;
   }
@@ -45,16 +45,37 @@ export function saveAppData(data: AppData) {
   window.dispatchEvent(new CustomEvent(APP_DATA_UPDATED_EVENT));
 }
 
+const LEGACY_SONG_CREATED_AT_BASE_MS = Date.parse("2026-01-01T00:00:00.000Z");
+
+function normalizeSong(song: Song, index: number): Song {
+  if (song.createdAt) return song;
+  return {
+    ...song,
+    createdAt: new Date(LEGACY_SONG_CREATED_AT_BASE_MS + index * 1000).toISOString(),
+  };
+}
+
+export function normalizeAppData(data: AppData): AppData {
+  return {
+    ...data,
+    songs: data.songs.map((song, index) => normalizeSong(song, index)),
+  };
+}
+
 export function seedSampleSongsIfEmpty(data: AppData): AppData {
   if (data.songs.length > 0) return data;
   return { ...data, songs: SAMPLE_SONGS };
 }
 
 export function upsertSong(data: AppData, song: Song): AppData {
-  const exists = data.songs.some((s) => s.id === song.id);
-  const songs = exists
-    ? data.songs.map((s) => (s.id === song.id ? song : s))
-    : [...data.songs, song];
+  const existing = data.songs.find((s) => s.id === song.id);
+  const saved: Song = {
+    ...song,
+    createdAt: existing?.createdAt ?? song.createdAt ?? new Date().toISOString(),
+  };
+  const songs = existing
+    ? data.songs.map((s) => (s.id === song.id ? saved : s))
+    : [...data.songs, saved];
   return { ...data, songs };
 }
 

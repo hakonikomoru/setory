@@ -137,9 +137,10 @@ export default function OverlayControlPanel() {
             />
 
             <div className="flex min-w-0 flex-col gap-6">
-              <section className="shrink-0 overflow-visible rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-sm">
+              <div className="grid shrink-0 gap-3">
                 <h2 className="text-lg font-bold text-violet-950">曲の切り替え</h2>
-                <label className="mt-3 grid gap-1 text-sm font-semibold text-violet-900">
+                <section className="overflow-visible rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-sm">
+                <label className="grid gap-1 text-sm font-semibold text-violet-900">
                   操作するセトリ
                   <select
                     value={selectedId ?? ""}
@@ -217,7 +218,8 @@ export default function OverlayControlPanel() {
                     );
                   })}
                 </ol>
-              </section>
+                </section>
+              </div>
 
               <OverlaySettings
                 setlistId={setlist.id}

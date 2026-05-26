@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { SAMPLE_SONGS } from "@/lib/sample-songs";
-import { filterSongsByQuery, formatSetlistText } from "@/lib/setlist-engine";
+import {
+  filterSongsByQuery,
+  formatMoodInput,
+  formatSetlistText,
+  parseMoodInput,
+  sortSongsByCreatedAt,
+} from "@/lib/setlist-engine";
 import type { Setlist } from "@/types/setlist";
 
 describe("filterSongsByQuery", () => {
@@ -22,6 +28,31 @@ describe("filterSongsByQuery", () => {
           `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase().includes("アニソン"),
       ),
     ).toBe(true);
+  });
+});
+
+describe("sortSongsByCreatedAt", () => {
+  it("sorts by registration time ascending or descending", () => {
+    const songs = [
+      { ...SAMPLE_SONGS[0], id: "a", createdAt: "2026-05-01T00:00:00.000Z" },
+      { ...SAMPLE_SONGS[1], id: "b", createdAt: "2026-05-03T00:00:00.000Z" },
+      { ...SAMPLE_SONGS[2], id: "c", createdAt: "2026-05-02T00:00:00.000Z" },
+    ];
+    expect(sortSongsByCreatedAt(songs, "asc").map((s) => s.id)).toEqual(["a", "c", "b"]);
+    expect(sortSongsByCreatedAt(songs, "desc").map((s) => s.id)).toEqual(["b", "c", "a"]);
+  });
+});
+
+describe("parseMoodInput", () => {
+  it("maps Japanese labels and defaults empty to mid", () => {
+    expect(parseMoodInput("")).toBe("mid");
+    expect(parseMoodInput("盛り上がり")).toBe("upbeat");
+    expect(parseMoodInput("バラード")).toBe("ballad");
+    expect(parseMoodInput("中間")).toBe("mid");
+  });
+
+  it("round-trips known moods for the form", () => {
+    expect(formatMoodInput(parseMoodInput("盛り上がり"))).toBe("盛り上がり");
   });
 });
 

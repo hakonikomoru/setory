@@ -8,6 +8,7 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 258,
     mood: "upbeat",
     tags: ["アニソン", "定番"],
+    createdAt: "2026-01-01T00:00:00.000Z",
   },
   {
     id: "sample-2",
@@ -16,6 +17,7 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 245,
     mood: "upbeat",
     tags: ["アニソン", "定番", "盛り上がり"],
+    createdAt: "2026-01-01T00:00:01.000Z",
   },
   {
     id: "sample-3",
@@ -24,6 +26,7 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 281,
     mood: "ballad",
     tags: ["バラード", "切ない"],
+    createdAt: "2026-01-01T00:00:02.000Z",
   },
   {
     id: "sample-4",
@@ -32,6 +35,7 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 307,
     mood: "mid",
     tags: ["J-POP", "定番"],
+    createdAt: "2026-01-01T00:00:03.000Z",
   },
   {
     id: "sample-5",
@@ -40,6 +44,7 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 238,
     mood: "upbeat",
     tags: ["アニソン", "盛り上がり"],
+    createdAt: "2026-01-01T00:00:04.000Z",
   },
   {
     id: "sample-6",
@@ -48,6 +53,7 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 255,
     mood: "ballad",
     tags: ["バラード", "定番"],
+    createdAt: "2026-01-01T00:00:05.000Z",
   },
   {
     id: "sample-7",
@@ -56,6 +62,7 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 248,
     mood: "mid",
     tags: ["J-POP", "切ない"],
+    createdAt: "2026-01-01T00:00:06.000Z",
   },
   {
     id: "sample-8",
@@ -64,5 +71,6 @@ export const SAMPLE_SONGS: Song[] = [
     durationSec: 357,
     mood: "upbeat",
     tags: ["アニソン", "盛り上がり", "定番"],
+    createdAt: "2026-01-01T00:00:07.000Z",
   },
 ];

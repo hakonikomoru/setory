@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDuration } from "@/lib/setlist-engine";
+import { formatDuration, moodLabel } from "@/lib/setlist-engine";
 import type { Song } from "@/types/setlist";
 
 type Props = {
@@ -11,15 +11,8 @@ type Props = {
   selectedIds?: string[];
   /** セトリ追加向けの1行表示 */
   variant?: "default" | "compact";
-  /** 曲庫右カラム向けの2列カード */
   layout?: "list" | "grid";
 };
-
-const MOOD_LABEL = {
-  upbeat: "盛り上がり",
-  mid: "中間",
-  ballad: "バラード",
-} as const;
 
 export default function SongList({
   songs,
@@ -73,7 +66,7 @@ export default function SongList({
     );
   }
 
-  const listClass = layout === "grid" ? "grid grid-cols-1 gap-2 sm:grid-cols-2" : "grid gap-3";
+  const listClass = layout === "grid" ? "grid grid-cols-1 gap-2 sm:grid-cols-2" : "grid gap-1.5";
 
   return (
     <ul className={listClass}>
@@ -94,20 +87,8 @@ export default function SongList({
                   {song.artist}
                 </p>
                 <p className="mt-1 text-xs text-violet-500">
-                  {formatDuration(song.durationSec)} ・ {MOOD_LABEL[song.mood]}
+                  {formatDuration(song.durationSec)} ・ {moodLabel(song.mood)}
                 </p>
-                {song.tags.length > 0 ? (
-                  <div className="mt-1.5 flex flex-wrap gap-1">
-                    {song.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-700"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
                 {onAddToSetlist ? (
@@ -144,41 +125,31 @@ export default function SongList({
 
         return (
           <li key={song.id} className={cardClass}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-lg font-bold break-words text-violet-950">{song.title}</p>
-                <p className="text-sm break-words text-violet-700">{song.artist}</p>
-                <p className="mt-1 text-xs text-violet-500">
-                  {formatDuration(song.durationSec)} ・ {MOOD_LABEL[song.mood]}
+            <div className="flex min-w-0 items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm leading-snug font-bold break-words text-violet-950">
+                  {song.title}
+                  <span className="font-normal text-violet-700"> / {song.artist}</span>
                 </p>
-                {song.tags.length > 0 ? (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {song.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-700"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
+                <p className="mt-0.5 text-xs text-violet-500">
+                  {formatDuration(song.durationSec)} ・ {moodLabel(song.mood)}
+                </p>
               </div>
-              <div className="flex shrink-0 flex-wrap items-center gap-2 self-start">
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
                 {onAddToSetlist ? (
                   <button
                     type="button"
                     onClick={() => onAddToSetlist(song.id)}
-                    className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-bold text-white"
+                    className="rounded-lg bg-violet-600 px-2.5 py-1 text-xs font-bold text-white"
                   >
-                    {selected ? "追加済み" : "セトリに追加"}
+                    {selected ? "追加済み" : "追加"}
                   </button>
                 ) : null}
                 {onEdit ? (
                   <button
                     type="button"
                     onClick={() => onEdit(song)}
-                    className="rounded-lg border border-violet-200 px-3 py-1.5 text-xs font-semibold"
+                    className="rounded-lg border border-violet-200 px-2 py-1 text-xs font-semibold"
                   >
                     編集
                   </button>
@@ -187,7 +158,7 @@ export default function SongList({
                   <button
                     type="button"
                     onClick={() => onDelete(song.id)}
-                    className="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-700"
+                    className="rounded-lg border border-rose-200 px-2 py-1 text-xs font-semibold text-rose-700"
                   >
                     削除
                   </button>
