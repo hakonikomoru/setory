@@ -215,7 +215,7 @@ export default function SetlistBuilder({
               右の曲一覧から追加してください。
             </p>
           ) : (
-            <ol className="grid max-h-[min(18rem,40vh)] gap-2 overflow-y-auto overscroll-contain px-1 py-1">
+            <ol className="grid gap-2 px-1 py-1">
               {selectedSongs.map((song, index) => {
                 const isCurrent = currentSongId === song.id;
                 return (
