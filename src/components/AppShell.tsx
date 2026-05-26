@@ -7,8 +7,7 @@ import AppNav from "@/components/AppNav";
 function AppShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const hideNav =
-    pathname === "/overlay" && searchParams.get("obs") === "1";
+  const hideNav = pathname === "/overlay" && searchParams.get("obs") === "1";
 
   return (
     <>

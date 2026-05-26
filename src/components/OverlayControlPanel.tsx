@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
-import OverlayDisplay from "@/components/OverlayDisplay";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import OverlayPreviewFrame from "@/components/OverlayPreviewFrame";
 import OverlaySettings from "@/components/OverlaySettings";
 import SetlistBuilder from "@/components/SetlistBuilder";
 import { formatSetlistSongLine } from "@/lib/setlist-engine";
@@ -23,6 +23,12 @@ export default function OverlayControlPanel() {
   const searchParams = useSearchParams();
   const selectedId = searchParams.get("id");
   const { data, setData, ready } = useAppData();
+  const [previewBackgroundMaxWidthPx, setPreviewBackgroundMaxWidthPx] = useState<
+    number | undefined
+  >();
+  const handlePreviewBackgroundWidth = useCallback((widthPx: number) => {
+    setPreviewBackgroundMaxWidthPx(widthPx);
+  }, []);
 
   const setlist = useMemo(
     () => data.setlists.find((item) => item.id === selectedId),
@@ -47,13 +53,21 @@ export default function OverlayControlPanel() {
 
   function patchSetlist(patch: Partial<Setlist>) {
     if (!setlist) return;
-    persistSetlist({ ...setlist, ...patch });
+    const next: Setlist = {
+      ...setlist,
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    };
+    if ("overlaySetlistColor" in patch && patch.overlaySetlistColor === undefined) {
+      delete next.overlaySetlistColor;
+    }
+    if ("overlaySetlistMaxWidthPx" in patch && patch.overlaySetlistMaxWidthPx === undefined) {
+      delete next.overlaySetlistMaxWidthPx;
+    }
+    persistSetlist(next);
   }
 
-  function applyOverlayNavigation(nav: {
-    currentSongId?: string;
-    overlaySuppressNext?: boolean;
-  }) {
+  function applyOverlayNavigation(nav: { currentSongId?: string; overlaySuppressNext?: boolean }) {
     if (!setlist || nav.currentSongId === undefined) return;
     const next: Setlist = {
       ...setlist,
@@ -84,9 +98,7 @@ export default function OverlayControlPanel() {
     persistSetlist(next);
   }
 
-  const canRewind = setlist
-    ? canNavigateOverlayPrev(setlist, data.songs)
-    : false;
+  const canRewind = setlist ? canNavigateOverlayPrev(setlist, data.songs) : false;
 
   if (!ready) {
     return <p className="text-violet-700">読み込み中...</p>;
@@ -111,7 +123,8 @@ export default function OverlayControlPanel() {
       <header>
         <h1 className="text-3xl font-black text-violet-950">オーバーレイ操作</h1>
         <p className="mt-2 text-sm text-violet-700">
-          左が配信表示、右で曲の切り替えと OBS 設定。下段はセトリ編集（右に登録曲一覧）です。
+          上で曲の切り替え、下段左が配信プレビュー・右が OBS
+          設定（高さを揃えています）。その下でセトリ編集です。
         </p>
       </header>
 
@@ -135,84 +148,83 @@ export default function OverlayControlPanel() {
       </label>
 
       {setlist ? (
-        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-2">
-          <div className="min-w-0 py-px xl:sticky xl:top-4">
-            <OverlayDisplay setlist={setlist} songs={data.songs} compact />
-          </div>
+        <div className="grid gap-6">
+          <section className="overflow-visible rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-sm">
+            <h2 className="text-lg font-bold text-violet-950">曲の切り替え</h2>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={!canRewind}
+                title={
+                  overlaySongs.currentIndex === 0 && setlist.overlaySuppressNext !== false
+                    ? "1曲目で NEXT を隠しているときは戻れません"
+                    : overlaySongs.currentIndex === 0
+                      ? "NEXT を隠す"
+                      : undefined
+                }
+                onClick={() => applyOverlayNavigation(navigateOverlayPrev(setlist, data.songs))}
+                className="rounded-xl border border-violet-200 bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
+              >
+                前の曲
+              </button>
+              <button
+                type="button"
+                disabled={overlaySongs.ordered.length === 0}
+                onClick={() => applyOverlayNavigation(navigateOverlayNext(setlist, data.songs))}
+                className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
+              >
+                次の曲
+              </button>
+            </div>
+            <ol className="mt-4 max-h-[min(24rem,50vh)] list-none space-y-2 overflow-y-auto overscroll-contain px-1 py-1">
+              {overlaySongs.ordered.map((song, index) => {
+                const isCurrent = setlist.currentSongId === song.id;
+                return (
+                  <li key={song.id} className="min-w-0 px-px">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentSongId(song.id)}
+                      className={`btn-text-left flex w-full min-w-0 flex-col rounded-xl border px-3 py-2 transition ${
+                        isCurrent
+                          ? "border-violet-500 bg-violet-100 ring-2 ring-violet-400 ring-inset"
+                          : "border-violet-100 bg-violet-50/50 hover:bg-violet-50"
+                      }`}
+                    >
+                      <p className="w-full text-left leading-snug font-bold break-words text-violet-950">
+                        {formatSetlistSongLine(song, index, Boolean(setlist.hideDuration))}
+                        {isCurrent ? (
+                          <span className="ml-2 rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
+                            現在
+                          </span>
+                        ) : null}
+                      </p>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
 
-          <div className="grid min-w-0 gap-6">
-            <section className="overflow-visible rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-sm">
-              <h2 className="text-lg font-bold text-violet-950">曲の切り替え</h2>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  disabled={!canRewind}
-                  title={
-                    overlaySongs.currentIndex === 0 &&
-                    setlist.overlaySuppressNext !== false
-                      ? "1曲目で NEXT を隠しているときは戻れません"
-                      : overlaySongs.currentIndex === 0
-                        ? "NEXT を隠す"
-                        : undefined
-                  }
-                  onClick={() => applyOverlayNavigation(navigateOverlayPrev(setlist, data.songs))}
-                  className="rounded-xl border border-violet-200 bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
-                >
-                  前の曲
-                </button>
-                <button
-                  type="button"
-                  disabled={overlaySongs.ordered.length === 0}
-                  onClick={() => applyOverlayNavigation(navigateOverlayNext(setlist, data.songs))}
-                  className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
-                >
-                  次の曲
-                </button>
-              </div>
-              <ol className="mt-4 max-h-[min(24rem,50vh)] list-none space-y-2 overflow-y-auto overscroll-contain px-1 py-1">
-                {overlaySongs.ordered.map((song, index) => {
-                  const isCurrent = setlist.currentSongId === song.id;
-                  return (
-                    <li key={song.id} className="min-w-0 px-px">
-                      <button
-                        type="button"
-                        onClick={() => setCurrentSongId(song.id)}
-                        className={`btn-text-left flex w-full min-w-0 flex-col rounded-xl border px-3 py-2 transition ${
-                          isCurrent
-                            ? "border-violet-500 bg-violet-100 ring-2 ring-inset ring-violet-400"
-                            : "border-violet-100 bg-violet-50/50 hover:bg-violet-50"
-                        }`}
-                      >
-                        <p className="w-full break-words text-left font-bold leading-snug text-violet-950">
-                          {formatSetlistSongLine(
-                            song,
-                            index,
-                            Boolean(setlist.hideDuration),
-                          )}
-                          {isCurrent ? (
-                            <span className="ml-2 rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
-                              現在
-                            </span>
-                          ) : null}
-                        </p>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            </section>
+          <div className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-2">
+            <OverlayPreviewFrame
+              setlist={setlist}
+              songs={data.songs}
+              onPreviewBackgroundMaxWidthPx={handlePreviewBackgroundWidth}
+            />
 
             <OverlaySettings
               setlistId={setlist.id}
+              setlist={setlist}
               overlayVisible={setlist.overlayVisible ?? true}
               overlayMode={setlist.overlayMode ?? "currentAndNext"}
               overlayTheme={setlist.overlayTheme ?? "simple"}
               obsDisplayUrl={buildObsDisplayUrl(setlist.id)}
+              previewBackgroundMaxWidthPx={previewBackgroundMaxWidthPx}
               onChange={(patch) => patchSetlist(patch)}
             />
           </div>
 
-          <div className="col-span-2 border-t border-violet-200 pt-6">
+          <div className="border-t border-violet-200 pt-6">
             <h2 className="text-lg font-bold text-violet-950">セトリ編集</h2>
             <p className="mt-1 text-sm text-violet-600">
               曲の追加・並べ替え・セトリ名の変更は自動で保存され、左の表示に反映されます。

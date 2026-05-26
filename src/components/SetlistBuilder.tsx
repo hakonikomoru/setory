@@ -34,12 +34,8 @@ export default function SetlistBuilder({
   const [songIds, setSongIds] = useState<string[]>(initialSetlist?.songIds ?? []);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [hideDuration, setHideDuration] = useState(
-    initialSetlist?.hideDuration ?? false,
-  );
-  const [currentSongId, setCurrentSongId] = useState(
-    initialSetlist?.currentSongId,
-  );
+  const [hideDuration, setHideDuration] = useState(initialSetlist?.hideDuration ?? false);
+  const [currentSongId, setCurrentSongId] = useState(initialSetlist?.currentSongId);
 
   const draftSetlist: Setlist = useMemo(
     () => ({
@@ -63,10 +59,7 @@ export default function SetlistBuilder({
       const saved = { ...nextDraft, updatedAt: new Date().toISOString() };
       onDataChange({
         ...data,
-        setlists: [
-          ...data.setlists.filter((setlist) => setlist.id !== saved.id),
-          saved,
-        ],
+        setlists: [...data.setlists.filter((setlist) => setlist.id !== saved.id), saved],
       });
     },
     [data, onDataChange],
@@ -92,11 +85,8 @@ export default function SetlistBuilder({
 
   function toggleSong(songId: string) {
     const removing = songIds.includes(songId);
-    const nextIds = removing
-      ? songIds.filter((id) => id !== songId)
-      : [...songIds, songId];
-    const nextCurrent =
-      removing && currentSongId === songId ? undefined : currentSongId;
+    const nextIds = removing ? songIds.filter((id) => id !== songId) : [...songIds, songId];
+    const nextCurrent = removing && currentSongId === songId ? undefined : currentSongId;
     setSongIds(nextIds);
     if (nextCurrent !== currentSongId) setCurrentSongId(nextCurrent);
     persistDraft({
@@ -203,9 +193,7 @@ export default function SetlistBuilder({
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {embedded ? (
-              <p className="text-sm text-violet-600">
-                曲順・セトリ情報の変更は自動で保存されます
-              </p>
+              <p className="text-sm text-violet-600">曲順・セトリ情報の変更は自動で保存されます</p>
             ) : (
               <button
                 type="button"
@@ -231,69 +219,69 @@ export default function SetlistBuilder({
               {selectedSongs.map((song, index) => {
                 const isCurrent = currentSongId === song.id;
                 return (
-                <li
-                  key={song.id}
-                  draggable
-                  onDragStart={() => setDragIndex(index)}
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={() => handleDrop(index)}
-                  className={`flex items-start gap-3 rounded-xl border px-3 py-2 ${
-                    isCurrent
-                      ? "border-violet-500 bg-violet-100 ring-2 ring-inset ring-violet-400"
-                      : "border-fuchsia-200 bg-fuchsia-50/70"
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="break-words font-bold leading-snug text-violet-950">
-                      {index + 1}. {song.title}
-                      {isCurrent ? (
-                        <span className="ml-2 inline-block rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
-                          現在
-                        </span>
-                      ) : null}
-                    </p>
-                    <p className="mt-0.5 break-words text-sm leading-snug text-violet-700">
-                      {hideDuration
-                        ? song.artist
-                        : `${song.artist}（${formatDuration(song.durationSec)}）`}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-1 self-start">
-                    <button
-                      type="button"
-                      onClick={() => setAsCurrentSong(song.id)}
-                      className={`rounded-lg border px-2 py-1 text-xs font-semibold ${
-                        isCurrent
-                          ? "border-violet-600 bg-violet-600 text-white"
-                          : "border-violet-300 text-violet-800"
-                      }`}
-                    >
-                      {isCurrent ? "歌唱中" : "現在の曲"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => moveSong(index, -1)}
-                      className="rounded-lg border px-2 py-1 text-xs"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => moveSong(index, 1)}
-                      className="rounded-lg border px-2 py-1 text-xs"
-                    >
-                      ↓
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleSong(song.id)}
-                      className="rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700"
-                    >
-                      外す
-                    </button>
-                  </div>
-                </li>
-              );
+                  <li
+                    key={song.id}
+                    draggable
+                    onDragStart={() => setDragIndex(index)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => handleDrop(index)}
+                    className={`flex items-start gap-3 rounded-xl border px-3 py-2 ${
+                      isCurrent
+                        ? "border-violet-500 bg-violet-100 ring-2 ring-violet-400 ring-inset"
+                        : "border-fuchsia-200 bg-fuchsia-50/70"
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="leading-snug font-bold break-words text-violet-950">
+                        {index + 1}. {song.title}
+                        {isCurrent ? (
+                          <span className="ml-2 inline-block rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
+                            現在
+                          </span>
+                        ) : null}
+                      </p>
+                      <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
+                        {hideDuration
+                          ? song.artist
+                          : `${song.artist}（${formatDuration(song.durationSec)}）`}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-1 self-start">
+                      <button
+                        type="button"
+                        onClick={() => setAsCurrentSong(song.id)}
+                        className={`rounded-lg border px-2 py-1 text-xs font-semibold ${
+                          isCurrent
+                            ? "border-violet-600 bg-violet-600 text-white"
+                            : "border-violet-300 text-violet-800"
+                        }`}
+                      >
+                        {isCurrent ? "歌唱中" : "現在の曲"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveSong(index, -1)}
+                        className="rounded-lg border px-2 py-1 text-xs"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveSong(index, 1)}
+                        className="rounded-lg border px-2 py-1 text-xs"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleSong(song.id)}
+                        className="rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700"
+                      >
+                        外す
+                      </button>
+                    </div>
+                  </li>
+                );
               })}
             </ol>
           )}
@@ -314,9 +302,7 @@ export default function SetlistBuilder({
           importLabel="セトリに追加"
           onImport={(song) => {
             const nextData = upsertSong(data, song);
-            const nextIds = songIds.includes(song.id)
-              ? songIds
-              : [...songIds, song.id];
+            const nextIds = songIds.includes(song.id) ? songIds : [...songIds, song.id];
             onDataChange({
               ...nextData,
               setlists: [

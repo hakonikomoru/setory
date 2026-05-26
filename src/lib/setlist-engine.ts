@@ -8,36 +8,23 @@ export function formatDuration(totalSec: number): string {
 
 export function getSongsFromSetlist(setlist: Setlist, songs: Song[]): Song[] {
   const map = new Map(songs.map((song) => [song.id, song]));
-  return setlist.songIds
-    .map((id) => map.get(id))
-    .filter((song): song is Song => Boolean(song));
+  return setlist.songIds.map((id) => map.get(id)).filter((song): song is Song => Boolean(song));
 }
 
 export function getSetlistDuration(setlist: Setlist, songs: Song[]): number {
-  return getSongsFromSetlist(setlist, songs).reduce(
-    (sum, song) => sum + song.durationSec,
-    0,
-  );
+  return getSongsFromSetlist(setlist, songs).reduce((sum, song) => sum + song.durationSec, 0);
 }
 
 /** 保存セトリ・コピー用と同じ 1 行表記（例: `1. 曲名 / アーティスト（3:45）`） */
-export function formatSetlistSongLine(
-  song: Song,
-  index: number,
-  hideDuration: boolean,
-): string {
+export function formatSetlistSongLine(song: Song, index: number, hideDuration: boolean): string {
   const base = `${index + 1}. ${song.title} / ${song.artist}`;
-  return hideDuration
-    ? base
-    : `${base}（${formatDuration(song.durationSec)}）`;
+  return hideDuration ? base : `${base}（${formatDuration(song.durationSec)}）`;
 }
 
 export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
   const ordered = getSongsFromSetlist(setlist, songs);
   const hideDuration = Boolean(setlist.hideDuration);
-  const lines = ordered.map((song, index) =>
-    formatSetlistSongLine(song, index, hideDuration),
-  );
+  const lines = ordered.map((song, index) => formatSetlistSongLine(song, index, hideDuration));
   const total = ordered.reduce((sum, song) => sum + song.durationSec, 0);
   const totalLine = hideDuration
     ? `合計: ${ordered.length}曲`
@@ -73,8 +60,7 @@ export function filterSongsByQuery(songs: Song[], query: string): Song[] {
   if (tokens.length === 0) return songs;
 
   return songs.filter((song) => {
-    const haystack =
-      `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase();
+    const haystack = `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase();
     return tokens.every((token) => haystack.includes(token));
   });
 }

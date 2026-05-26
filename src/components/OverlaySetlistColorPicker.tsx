@@ -1,0 +1,241 @@
+"use client";
+
+import { useState } from "react";
+import {
+  DEFAULT_OVERLAY_SETLIST_MAX_WIDTH_PX,
+  isCustomOverlaySetlistColor,
+  isCustomOverlaySetlistWidth,
+  normalizeHexColor,
+  OVERLAY_SETLIST_PALETTE,
+  OVERLAY_SETLIST_WIDTH_SLIDER_MIN_PX,
+  OVERLAY_SETLIST_WIDTH_SLIDER_STEP_PX,
+  overlaySetlistSliderMaxPx,
+  overlaySetlistWidthLabelPx,
+  overlayWidthPresetsForBackground,
+  resolveOverlaySetlistMaxWidthPx,
+  resolveOverlaySetlistTextColor,
+  snapOverlaySetlistWidthForSlider,
+  themeSetlistTextColor,
+} from "@/lib/overlay-colors";
+import { overlayTheme } from "@/lib/overlay";
+import type { Setlist } from "@/types/setlist";
+
+type Props = {
+  setlist: Setlist;
+  previewBackgroundMaxWidthPx?: number;
+  onColorChange: (color: string | undefined) => void;
+  onWidthChange: (widthPx: number | undefined) => void;
+};
+
+export default function OverlaySetlistColorPicker({
+  setlist,
+  previewBackgroundMaxWidthPx,
+  onColorChange,
+  onWidthChange,
+}: Props) {
+  const theme = overlayTheme(setlist);
+  const themeColor = themeSetlistTextColor(theme);
+  const activeColor = resolveOverlaySetlistTextColor(setlist);
+  const custom = isCustomOverlaySetlistColor(setlist);
+  const pickerValue = custom ? activeColor : themeColor;
+
+  const widthCustom = isCustomOverlaySetlistWidth(setlist);
+  const displayWidthPx = overlaySetlistWidthLabelPx(setlist, previewBackgroundMaxWidthPx);
+  const sliderMaxPx = overlaySetlistSliderMaxPx(previewBackgroundMaxWidthPx);
+  const sliderValue = snapOverlaySetlistWidthForSlider(
+    widthCustom
+      ? (displayWidthPx ?? resolveOverlaySetlistMaxWidthPx(setlist)!)
+      : Math.min(DEFAULT_OVERLAY_SETLIST_MAX_WIDTH_PX, sliderMaxPx),
+    previewBackgroundMaxWidthPx,
+  );
+  const widthPresets = overlayWidthPresetsForBackground(previewBackgroundMaxWidthPx);
+  const [widthDraft, setWidthDraft] = useState<string | null>(null);
+
+  function commitWidthInput(raw: string) {
+    setWidthDraft(null);
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      onWidthChange(undefined);
+      return;
+    }
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed)) return;
+    onWidthChange(snapOverlaySetlistWidthForSlider(parsed, previewBackgroundMaxWidthPx));
+  }
+
+  function selectThemeDefault() {
+    onColorChange(undefined);
+  }
+
+  return (
+    <div className="mt-4 grid gap-4">
+      <fieldset>
+        <legend className="text-sm font-semibold text-violet-900">SETLIST の文字色</legend>
+        <p className="mt-1 text-xs text-violet-600">
+          歌い終わった曲の一覧（SETLIST）とセトリ一覧モードに反映されます。
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            title="見た目に合わせた既定の色"
+            onClick={selectThemeDefault}
+            className={`flex h-9 min-w-[4.5rem] items-center justify-center rounded-lg border px-2 text-xs font-semibold transition ${
+              !custom
+                ? "border-violet-500 bg-violet-100 text-violet-900 ring-2 ring-violet-400"
+                : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50"
+            }`}
+          >
+            既定色
+          </button>
+          {OVERLAY_SETLIST_PALETTE.map((preset) => {
+            const selected = custom && activeColor === preset.color;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                title={preset.label}
+                onClick={() => onColorChange(preset.color)}
+                className={`size-9 rounded-lg border-2 border-white shadow-sm transition hover:scale-105 ${
+                  selected ? "ring-2 ring-violet-500 ring-offset-1" : "border-violet-200/80"
+                }`}
+                style={{ backgroundColor: preset.color }}
+                aria-label={preset.label}
+              />
+            );
+          })}
+        </div>
+        <label className="mt-3 flex flex-wrap items-center gap-3 text-sm font-semibold text-violet-900">
+          <span>カスタム</span>
+          <input
+            type="color"
+            value={pickerValue}
+            onChange={(e) => {
+              const next = normalizeHexColor(e.target.value);
+              if (next) onColorChange(next);
+            }}
+            className="size-10 cursor-pointer rounded-lg border border-violet-200 bg-white p-0.5"
+          />
+          <input
+            type="text"
+            value={custom ? activeColor : ""}
+            placeholder={themeColor}
+            onChange={(e) => {
+              const next = normalizeHexColor(
+                e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`,
+              );
+              if (next) onColorChange(next);
+            }}
+            className="min-w-[6.5rem] flex-1 rounded-lg border border-violet-200 px-2 py-1.5 font-mono text-xs font-normal text-violet-800"
+            spellCheck={false}
+          />
+          {custom ? (
+            <button
+              type="button"
+              onClick={selectThemeDefault}
+              className="rounded-lg border border-violet-200 px-2 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-50"
+            >
+              リセット
+            </button>
+          ) : null}
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend className="text-sm font-semibold text-violet-900">オーバーレイの横幅</legend>
+        <p className="mt-1 text-xs text-violet-600">
+          NOW・NEXT・SETLIST
+          とプレビュー背景ごと調整。ショートカットと数値は左のプレビュー幅を超えません。
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {widthPresets
+            .filter((preset) => preset.widthPx === undefined)
+            .map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => onWidthChange(preset.widthPx)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                  !widthCustom
+                    ? "border-violet-500 bg-violet-100 text-violet-900 ring-2 ring-violet-400"
+                    : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50"
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          {widthCustom ? (
+            <button
+              type="button"
+              onClick={() => onWidthChange(undefined)}
+              className="rounded-lg border border-violet-200 px-3 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-50"
+            >
+              全幅に戻す
+            </button>
+          ) : null}
+          {widthPresets
+            .filter((preset) => preset.widthPx !== undefined)
+            .map((preset) => {
+              const selected = widthCustom && displayWidthPx === preset.widthPx;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => onWidthChange(preset.widthPx)}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                    selected
+                      ? "border-violet-500 bg-violet-100 text-violet-900 ring-2 ring-violet-400"
+                      : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50"
+                  }`}
+                >
+                  {`${preset.label}px`}
+                </button>
+              );
+            })}
+        </div>
+        <label className="mt-3 grid gap-2 text-sm font-semibold text-violet-900">
+          <span className="flex flex-wrap items-center justify-between gap-2">
+            <span>最大幅</span>
+            <span className="flex items-center gap-1 font-normal">
+              <input
+                type="number"
+                inputMode="numeric"
+                min={OVERLAY_SETLIST_WIDTH_SLIDER_MIN_PX}
+                max={sliderMaxPx}
+                step={OVERLAY_SETLIST_WIDTH_SLIDER_STEP_PX}
+                value={
+                  widthDraft ??
+                  (widthCustom && displayWidthPx !== undefined ? String(displayWidthPx) : "")
+                }
+                placeholder="全幅"
+                onChange={(e) => setWidthDraft(e.target.value)}
+                onBlur={(e) => commitWidthInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.currentTarget.blur();
+                }}
+                className="w-[5.5rem] rounded-lg border border-violet-200 px-2 py-1 text-right text-sm font-bold text-violet-800 tabular-nums"
+              />
+              <span className="text-xs text-violet-600">px</span>
+            </span>
+          </span>
+          <input
+            type="range"
+            min={OVERLAY_SETLIST_WIDTH_SLIDER_MIN_PX}
+            max={sliderMaxPx}
+            step={OVERLAY_SETLIST_WIDTH_SLIDER_STEP_PX}
+            value={sliderValue}
+            onChange={(e) => {
+              setWidthDraft(null);
+              onWidthChange(
+                snapOverlaySetlistWidthForSlider(
+                  Number(e.target.value),
+                  previewBackgroundMaxWidthPx,
+                ),
+              );
+            }}
+            className="w-full accent-violet-600"
+          />
+        </label>
+      </fieldset>
+    </div>
+  );
+}

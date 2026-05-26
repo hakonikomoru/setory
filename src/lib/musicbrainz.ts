@@ -1,8 +1,7 @@
 import type { Song } from "@/types/setlist";
 import { createId } from "@/lib/storage";
 
-export const MUSICBRAINZ_USER_AGENT =
-  "Setory/0.1.0 (https://github.com/hakonikomoru/setory)";
+export const MUSICBRAINZ_USER_AGENT = "Setory/0.1.0 (https://github.com/hakonikomoru/setory)";
 
 export type ExternalSongHit = {
   source: "musicbrainz";
@@ -42,9 +41,7 @@ export function recordingLengthToSec(lengthMs?: number): number {
   return Math.max(1, Math.round(lengthMs / 1000));
 }
 
-export function parseMusicBrainzRecordings(
-  payload: MbRecordingSearchResponse,
-): ExternalSongHit[] {
+export function parseMusicBrainzRecordings(payload: MbRecordingSearchResponse): ExternalSongHit[] {
   const recordings = payload.recordings ?? [];
   const seen = new Set<string>();
   const hits: ExternalSongHit[] = [];
@@ -94,9 +91,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function mergeExternalHits(
-  ...groups: ExternalSongHit[][]
-): ExternalSongHit[] {
+export function mergeExternalHits(...groups: ExternalSongHit[][]): ExternalSongHit[] {
   const seen = new Set<string>();
   const hits: ExternalSongHit[] = [];
 

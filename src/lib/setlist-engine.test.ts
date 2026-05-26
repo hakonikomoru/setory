@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SAMPLE_SONGS } from "@/lib/sample-songs";
-import {
-  filterSongsByQuery,
-  formatSetlistText,
-} from "@/lib/setlist-engine";
+import { filterSongsByQuery, formatSetlistText } from "@/lib/setlist-engine";
 import type { Setlist } from "@/types/setlist";
 
 describe("filterSongsByQuery", () => {
@@ -21,12 +18,8 @@ describe("filterSongsByQuery", () => {
     expect(
       byArtistAndTag.every(
         (song) =>
-          `${song.title} ${song.artist} ${song.tags.join(" ")}`
-            .toLowerCase()
-            .includes("yoasobi") &&
-          `${song.title} ${song.artist} ${song.tags.join(" ")}`
-            .toLowerCase()
-            .includes("アニソン"),
+          `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase().includes("yoasobi") &&
+          `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase().includes("アニソン"),
       ),
     ).toBe(true);
   });

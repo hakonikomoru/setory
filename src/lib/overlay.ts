@@ -1,5 +1,13 @@
+import { isOverlayTheme } from "@/lib/overlay-theme";
 import { getSongsFromSetlist } from "@/lib/setlist-engine";
 import type { OverlayMode, OverlayTheme, Setlist, Song } from "@/types/setlist";
+
+export {
+  getOverlayThemeDefinition,
+  OVERLAY_THEME_COLORS,
+  OVERLAY_THEME_OPTIONS,
+  OVERLAY_THEMES,
+} from "@/lib/overlay-theme";
 
 export const DEFAULT_OVERLAY_VISIBLE = true;
 export const DEFAULT_OVERLAY_MODE: OverlayMode = "currentAndNext";
@@ -14,7 +22,9 @@ export function overlayMode(setlist: Setlist): OverlayMode {
 }
 
 export function overlayTheme(setlist: Setlist): OverlayTheme {
-  return setlist.overlayTheme ?? DEFAULT_OVERLAY_THEME;
+  const raw = setlist.overlayTheme;
+  if (raw && isOverlayTheme(raw)) return raw;
+  return DEFAULT_OVERLAY_THEME;
 }
 
 export type OverlaySongContext = {
@@ -28,10 +38,7 @@ export type OverlaySongContext = {
   currentIndex: number;
 };
 
-export function resolveOverlaySongs(
-  setlist: Setlist,
-  songs: Song[],
-): OverlaySongContext {
+export function resolveOverlaySongs(setlist: Setlist, songs: Song[]): OverlaySongContext {
   const ordered = getSongsFromSetlist(setlist, songs);
   const currentIndex = setlist.currentSongId
     ? ordered.findIndex((song) => song.id === setlist.currentSongId)
@@ -39,20 +46,14 @@ export function resolveOverlaySongs(
   const current = currentIndex >= 0 ? ordered[currentIndex] : undefined;
   const past = currentIndex > 0 ? ordered.slice(0, currentIndex) : [];
   const upcoming =
-    currentIndex >= 0 && currentIndex < ordered.length - 1
-      ? ordered.slice(currentIndex + 1)
-      : [];
-  const next =
-    isFirstSongNextSuppressed(setlist, currentIndex) ? undefined : upcoming[0];
+    currentIndex >= 0 && currentIndex < ordered.length - 1 ? ordered.slice(currentIndex + 1) : [];
+  const next = isFirstSongNextSuppressed(setlist, currentIndex) ? undefined : upcoming[0];
 
   return { ordered, past, current, next, upcoming, currentIndex };
 }
 
 /** 1曲目のとき NEXT を隠すか（未指定時も 1曲目では隠す） */
-export function isFirstSongNextSuppressed(
-  setlist: Setlist,
-  currentIndex: number,
-): boolean {
+export function isFirstSongNextSuppressed(setlist: Setlist, currentIndex: number): boolean {
   return currentIndex === 0 && setlist.overlaySuppressNext !== false;
 }
 
@@ -61,10 +62,7 @@ export type OverlayNavigation = {
   overlaySuppressNext?: boolean;
 };
 
-export function navigateOverlayNext(
-  setlist: Setlist,
-  songs: Song[],
-): OverlayNavigation {
+export function navigateOverlayNext(setlist: Setlist, songs: Song[]): OverlayNavigation {
   const { ordered, currentIndex } = resolveOverlaySongs(setlist, songs);
   if (ordered.length === 0) return {};
 
@@ -83,10 +81,7 @@ export function navigateOverlayNext(
   return { currentSongId: ordered[currentIndex + 1].id };
 }
 
-export function navigateOverlayPrev(
-  setlist: Setlist,
-  songs: Song[],
-): OverlayNavigation {
+export function navigateOverlayPrev(setlist: Setlist, songs: Song[]): OverlayNavigation {
   const { ordered, currentIndex } = resolveOverlaySongs(setlist, songs);
   if (ordered.length === 0 || currentIndex < 0) return {};
 
@@ -104,10 +99,7 @@ export function navigateOverlayPrev(
   };
 }
 
-export function canNavigateOverlayPrev(
-  setlist: Setlist,
-  songs: Song[],
-): boolean {
+export function canNavigateOverlayPrev(setlist: Setlist, songs: Song[]): boolean {
   const { ordered, currentIndex } = resolveOverlaySongs(setlist, songs);
   if (ordered.length === 0 || currentIndex < 0) return false;
   if (currentIndex > 0) return true;
@@ -133,50 +125,10 @@ export function buildOverlayUrl(setlistId: string, origin?: string): string {
   return buildObsDisplayUrl(setlistId, origin);
 }
 
-export function advanceCurrentSongId(
-  setlist: Setlist,
-  songs: Song[],
-): string | undefined {
+export function advanceCurrentSongId(setlist: Setlist, songs: Song[]): string | undefined {
   return navigateOverlayNext(setlist, songs).currentSongId;
 }
 
-export function rewindCurrentSongId(
-  setlist: Setlist,
-  songs: Song[],
-): string | undefined {
+export function rewindCurrentSongId(setlist: Setlist, songs: Song[]): string | undefined {
   return navigateOverlayPrev(setlist, songs).currentSongId;
 }
-
-export const OVERLAY_THEME_CLASS: Record<
-  OverlayTheme,
-  { panel: string; label: string; title: string; sub: string }
-> = {
-  simple: {
-    panel:
-      "rounded-2xl border border-white/30 bg-white/92 px-6 py-4 shadow-lg shadow-black/20",
-    label: "text-xs font-bold uppercase tracking-wide text-violet-600",
-    title: "text-2xl font-black leading-tight text-violet-950",
-    sub: "text-lg font-semibold leading-snug text-violet-800",
-  },
-  cute: {
-    panel:
-      "rounded-2xl border-2 border-pink-200 bg-gradient-to-br from-pink-50/95 to-violet-50/95 px-6 py-4 shadow-lg shadow-pink-200/40",
-    label: "text-xs font-bold text-pink-600",
-    title: "text-2xl font-black leading-tight text-pink-900",
-    sub: "text-lg font-semibold leading-snug text-violet-800",
-  },
-  dark: {
-    panel:
-      "rounded-2xl border border-violet-500/40 bg-violet-950/90 px-6 py-4 shadow-lg shadow-black/40",
-    label: "text-xs font-bold uppercase tracking-wide text-violet-300",
-    title: "text-2xl font-black leading-tight text-white",
-    sub: "text-lg font-semibold leading-snug text-violet-100",
-  },
-  komoru: {
-    panel:
-      "rounded-2xl border-2 border-violet-400/60 bg-violet-900/88 px-6 py-4 shadow-lg shadow-violet-900/50",
-    label: "text-xs font-bold text-fuchsia-300",
-    title: "text-2xl font-black leading-tight text-white",
-    sub: "text-lg font-semibold leading-snug text-violet-100",
-  },
-};

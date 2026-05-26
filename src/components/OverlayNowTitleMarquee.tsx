@@ -42,16 +42,10 @@ export default function OverlayNowTitleMarquee({ songId, line, className }: Prop
       const fromPx = trackWidth;
       const toPx = -textWidth;
       const distance = fromPx - toPx;
-      const durationMs = Math.max(
-        MIN_DURATION_MS,
-        (distance / MARQUEE_SPEED_PX_PER_SEC) * 1000,
-      );
+      const durationMs = Math.max(MIN_DURATION_MS, (distance / MARQUEE_SPEED_PX_PER_SEC) * 1000);
 
       animation = text.animate(
-        [
-          { transform: `translateX(${fromPx}px)` },
-          { transform: `translateX(${toPx}px)` },
-        ],
+        [{ transform: `translateX(${fromPx}px)` }, { transform: `translateX(${toPx}px)` }],
         {
           duration: durationMs,
           iterations: Infinity,

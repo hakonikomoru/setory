@@ -17,18 +17,12 @@ export default function AppNav() {
   return (
     <nav className="sticky top-0 z-20 border-b border-violet-200/60 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-        <Link
-          href="/"
-          className="shrink-0 text-lg font-black tracking-tight text-violet-950"
-        >
+        <Link href="/" className="shrink-0 text-lg font-black tracking-tight text-violet-950">
           Setory
         </Link>
         <div className="-mx-1 flex min-w-0 flex-1 justify-end gap-2 overflow-x-auto overscroll-x-contain px-1 pb-0.5">
           {links.map((link) => {
-            const active =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.href);
+            const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             const desktopOnly = "desktopOnly" in link && link.desktopOnly;
             return (
               <Link

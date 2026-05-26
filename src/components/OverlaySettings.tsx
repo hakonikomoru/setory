@@ -1,20 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { buildObsDisplayUrl, buildOverlayControlUrl } from "@/lib/overlay";
+import OverlaySetlistColorPicker from "@/components/OverlaySetlistColorPicker";
+import { buildObsDisplayUrl, buildOverlayControlUrl, OVERLAY_THEME_OPTIONS } from "@/lib/overlay";
 import type { OverlayMode, OverlayTheme, Setlist } from "@/types/setlist";
 
 type Props = {
   setlistId: string;
+  setlist: Setlist;
   overlayVisible: boolean;
   overlayMode: OverlayMode;
   overlayTheme: OverlayTheme;
-  /** 未指定時は buildObsDisplayUrl を使用 */
   obsDisplayUrl?: string;
+  previewBackgroundMaxWidthPx?: number;
   onChange: (patch: {
     overlayVisible?: boolean;
     overlayMode?: OverlayMode;
     overlayTheme?: OverlayTheme;
+    overlaySetlistColor?: string;
+    overlaySetlistMaxWidthPx?: number;
   }) => void;
 };
 
@@ -27,19 +31,14 @@ const MODES: { value: OverlayMode; label: string }[] = [
   { value: "fullSetlist", label: "セトリ一覧" },
 ];
 
-const THEMES: { value: OverlayTheme; label: string }[] = [
-  { value: "simple", label: "シンプル" },
-  { value: "cute", label: "かわいい" },
-  { value: "dark", label: "ダーク" },
-  { value: "komoru", label: "こもる風" },
-];
-
 export default function OverlaySettings({
   setlistId,
+  setlist,
   overlayVisible: visible,
   overlayMode: mode,
   overlayTheme: theme,
   obsDisplayUrl,
+  previewBackgroundMaxWidthPx,
   onChange,
 }: Props) {
   const [copiedObs, setCopiedObs] = useState(false);
@@ -53,7 +52,7 @@ export default function OverlaySettings({
   }
 
   return (
-    <section className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 shadow-sm">
+    <section className="h-full rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 shadow-sm">
       <h2 className="text-lg font-bold text-violet-950">OBS オーバーレイ</h2>
       <p className="mt-1 text-sm text-violet-700">
         配信操作は
@@ -94,25 +93,34 @@ export default function OverlaySettings({
       </fieldset>
 
       <label className="mt-4 grid gap-1 text-sm font-semibold text-violet-900">
-        テーマ
+        オーバーレイの見た目
         <select
           value={theme}
-          onChange={(e) =>
-            onChange({ overlayTheme: e.target.value as OverlayTheme })
-          }
-          className="rounded-xl border border-violet-200 bg-white px-3 py-2"
+          onChange={(e) => onChange({ overlayTheme: e.target.value as OverlayTheme })}
+          className="rounded-xl border border-violet-200 bg-white px-3 py-2 font-normal text-violet-900"
         >
-          {THEMES.map((item) => (
+          {OVERLAY_THEME_OPTIONS.map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}
             </option>
           ))}
         </select>
+        <span className="text-xs font-normal text-violet-600">
+          {OVERLAY_THEME_OPTIONS.find((item) => item.value === theme)?.description}
+          （SETLIST の文字色とは別設定です）
+        </span>
       </label>
+
+      <OverlaySetlistColorPicker
+        setlist={setlist}
+        previewBackgroundMaxWidthPx={previewBackgroundMaxWidthPx}
+        onColorChange={(color) => onChange({ overlaySetlistColor: color })}
+        onWidthChange={(widthPx) => onChange({ overlaySetlistMaxWidthPx: widthPx })}
+      />
 
       <div className="mt-4">
         <p className="text-sm font-semibold text-violet-900">OBS 表示用 URL（透過・操作なし）</p>
-        <code className="mt-1 block break-all rounded-xl bg-white px-3 py-2 text-xs text-violet-800">
+        <code className="mt-1 block rounded-xl bg-white px-3 py-2 text-xs break-all text-violet-800">
           {obsUrl}
         </code>
         <div className="mt-2 flex flex-wrap items-center gap-2">

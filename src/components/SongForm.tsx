@@ -23,17 +23,14 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
   const [minutes, setMinutes] = useState(
     initial ? String(Math.floor(initial.durationSec / 60)) : "4",
   );
-  const [seconds, setSeconds] = useState(
-    initial ? String(initial.durationSec % 60) : "0",
-  );
+  const [seconds, setSeconds] = useState(initial ? String(initial.durationSec % 60) : "0");
   const [mood, setMood] = useState<SongMood>(initial?.mood ?? "mid");
   const [tags, setTags] = useState(initial?.tags.join("、") ?? "");
   const [notes, setNotes] = useState(initial?.notes ?? "");
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const durationSec =
-      Math.max(0, Number(minutes) || 0) * 60 + Math.max(0, Number(seconds) || 0);
+    const durationSec = Math.max(0, Number(minutes) || 0) * 60 + Math.max(0, Number(seconds) || 0);
 
     if (!title.trim() || !artist.trim() || durationSec <= 0) return;
 

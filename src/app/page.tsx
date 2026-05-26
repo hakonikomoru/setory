@@ -51,9 +51,7 @@ const cardLinkClass = `${cardBaseClass} transition hover:-translate-y-0.5 hover:
 function FeatureCardContent({ feature }: { feature: Feature }) {
   return (
     <>
-      <span
-        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${feature.accent}`}
-      >
+      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${feature.accent}`}>
         {feature.title}
       </span>
       <p className="mt-4 text-sm leading-7 text-violet-800">{feature.body}</p>
@@ -92,15 +90,12 @@ export default function Home() {
         <p className="mb-4 inline-flex rounded-full bg-fuchsia-100 px-4 py-2 text-sm font-bold text-fuchsia-800">
           配信・カラオケ・歌練習
         </p>
-        <h1 className="text-4xl font-black tracking-tight text-violet-950 sm:text-5xl">
-          Setory
-        </h1>
-        <p className="mt-3 text-xl font-bold text-violet-900 sm:text-2xl">
-          歌うためのセトリ作成
-        </p>
+        <h1 className="text-4xl font-black tracking-tight text-violet-950 sm:text-5xl">Setory</h1>
+        <p className="mt-3 text-xl font-bold text-violet-900 sm:text-2xl">歌うためのセトリ作成</p>
         <p className="mt-4 max-w-2xl text-base leading-8 text-violet-800/90 sm:text-lg">
           カラオケの持ち歌リスト、歌練習の曲順づくり、歌配信・ライブのセットリストまで、ひとつのアプリで作れます。
-          曲庫の管理、曲順の調整、OBS オーバーレイ、コピー用テキストの出力まで、インストール不要ですぐ使えます。
+          曲庫の管理、曲順の調整、OBS
+          オーバーレイ、コピー用テキストの出力まで、インストール不要ですぐ使えます。
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link

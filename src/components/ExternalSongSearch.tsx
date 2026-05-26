@@ -3,11 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDuration } from "@/lib/setlist-engine";
 import { externalHitToSong, mergeExternalHits, type ExternalSongHit } from "@/lib/musicbrainz";
-import {
-  findSongInLibrary,
-  isSongInLibrary,
-  isSongInSetlist,
-} from "@/lib/song-match";
+import { findSongInLibrary, isSongInLibrary, isSongInSetlist } from "@/lib/song-match";
 import type { Song } from "@/types/setlist";
 
 /** library: 曲庫のみ。libraryAndSetlist: 曲庫に無ければ追加し、セトリにも追加 */
@@ -59,10 +55,9 @@ export default function ExternalSongSearch({
     setLoading(true);
     setError(null);
 
-    fetch(
-      `/api/songs/search?q=${encodeURIComponent(debouncedQuery)}&max=100`,
-      { signal: controller.signal },
-    )
+    fetch(`/api/songs/search?q=${encodeURIComponent(debouncedQuery)}&max=100`, {
+      signal: controller.signal,
+    })
       .then(async (response) => {
         const payload = (await response.json()) as {
           results?: ExternalSongHit[];
@@ -89,20 +84,12 @@ export default function ExternalSongSearch({
   }, [debouncedQuery]);
 
   function resolveSong(hit: ExternalSongHit): Song {
-    return (
-      findSongInLibrary(librarySongs, hit.title, hit.artist) ??
-      externalHitToSong(hit)
-    );
+    return findSongInLibrary(librarySongs, hit.title, hit.artist) ?? externalHitToSong(hit);
   }
 
   function hitAlreadyImported(hit: ExternalSongHit): boolean {
     if (importTarget === "libraryAndSetlist") {
-      return isSongInSetlist(
-        librarySongs,
-        setlistSongIds,
-        hit.title,
-        hit.artist,
-      );
+      return isSongInSetlist(librarySongs, setlistSongIds, hit.title, hit.artist);
     }
     return isSongInLibrary(librarySongs, hit.title, hit.artist);
   }
@@ -111,12 +98,7 @@ export default function ExternalSongSearch({
     () =>
       results.filter((hit) => {
         if (importTarget === "libraryAndSetlist") {
-          return !isSongInSetlist(
-            librarySongs,
-            setlistSongIds,
-            hit.title,
-            hit.artist,
-          );
+          return !isSongInSetlist(librarySongs, setlistSongIds, hit.title, hit.artist);
         }
         return !isSongInLibrary(librarySongs, hit.title, hit.artist);
       }),
@@ -251,21 +233,11 @@ export default function ExternalSongSearch({
         <>
           <ul className="mt-4 grid max-h-96 gap-2 overflow-y-auto">
             {results.map((hit) => {
-              const inLibrary = isSongInLibrary(
-                librarySongs,
-                hit.title,
-                hit.artist,
-              );
+              const inLibrary = isSongInLibrary(librarySongs, hit.title, hit.artist);
               const inSetlist =
                 importTarget === "libraryAndSetlist" &&
-                isSongInSetlist(
-                  librarySongs,
-                  setlistSongIds,
-                  hit.title,
-                  hit.artist,
-                );
-              const disabled =
-                importTarget === "libraryAndSetlist" ? inSetlist : inLibrary;
+                isSongInSetlist(librarySongs, setlistSongIds, hit.title, hit.artist);
+              const disabled = importTarget === "libraryAndSetlist" ? inSetlist : inLibrary;
               const statusLabel = disabled
                 ? importTarget === "libraryAndSetlist"
                   ? "セトリに追加済み"
@@ -312,12 +284,7 @@ export default function ExternalSongSearch({
 
       <p className="mt-4 text-xs text-violet-500">
         曲情報提供:{" "}
-        <a
-          href="https://musicbrainz.org/"
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-        >
+        <a href="https://musicbrainz.org/" target="_blank" rel="noreferrer" className="underline">
           MusicBrainz
         </a>
         （CC0 / オープンデータ）

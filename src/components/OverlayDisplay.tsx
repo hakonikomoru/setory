@@ -1,9 +1,16 @@
 "use client";
 
+import type { CSSProperties, ReactNode } from "react";
 import OverlayNowTitleMarquee from "@/components/OverlayNowTitleMarquee";
 import { formatDuration } from "@/lib/setlist-engine";
 import {
-  OVERLAY_THEME_CLASS,
+  isCustomOverlaySetlistColor,
+  OVERLAY_CONTENT_INSET_CLASS,
+  overlayLayoutStyle,
+  resolveOverlaySetlistTextColor,
+} from "@/lib/overlay-colors";
+import {
+  getOverlayThemeDefinition,
   overlayMode,
   overlayTheme,
   overlayVisible,
@@ -14,31 +21,49 @@ import type { Setlist, Song } from "@/types/setlist";
 type Props = {
   setlist: Setlist;
   songs: Song[];
-  /** 操作画面の左カラムなど狭い領域向け */
   compact?: boolean;
 };
-
-function panelClass(base: string, compact: boolean, extra = ""): string {
-  if (!compact) return `${base} ${extra}`.trim();
-  const sized = base
-    .replace(/px-6/g, "px-4")
-    .replace(/px-8/g, "px-4")
-    .replace(/py-4/g, "py-3")
-    .replace(/py-6/g, "py-3");
-  return `${sized} max-w-full min-w-0 ${extra}`.trim();
-}
 
 export default function OverlayDisplay({ setlist, songs, compact = false }: Props) {
   if (!overlayVisible(setlist)) return null;
 
   const mode = overlayMode(setlist);
-  const theme = overlayTheme(setlist);
-  const styles = OVERLAY_THEME_CLASS[theme];
-  const { ordered, past, current, next, currentIndex } = resolveOverlaySongs(
-    setlist,
-    songs,
-  );
+  const themeId = overlayTheme(setlist);
+  const theme = getOverlayThemeDefinition(themeId);
+  const { classNames: styles, nowBlockClass, rootClass } = theme;
+  const layoutStyle = overlayLayoutStyle(setlist);
+  const setlistColor = resolveOverlaySetlistTextColor(setlist);
+  const setlistUsesCustomColor = isCustomOverlaySetlistColor(setlist);
+  const setlistColorStyle = setlistUsesCustomColor ? { color: setlistColor } : undefined;
+  const setlistLabelClass = setlistUsesCustomColor
+    ? themeId === "cute" || themeId === "komoru"
+      ? "text-xs font-bold"
+      : "text-xs font-bold uppercase tracking-wide"
+    : styles.setlistLabel;
+  const setlistLineClass = setlistUsesCustomColor
+    ? "text-xs font-bold leading-snug"
+    : styles.setlistLine;
+
+  const { ordered, past, current, next, currentIndex } = resolveOverlaySongs(setlist, songs);
   const showDuration = !setlist.hideDuration;
+
+  const rootPadding = compact
+    ? OVERLAY_CONTENT_INSET_CLASS.compact
+    : OVERLAY_CONTENT_INSET_CLASS.default;
+  const blockGap = compact ? "gap-3" : "gap-4";
+  const sectionTopPad = compact ? "pt-2" : "pt-3";
+  const sectionDividerClass = `border-t ${sectionTopPad} ${styles.sectionBorder}`;
+
+  function frame(children: ReactNode, extraStyle?: CSSProperties) {
+    return (
+      <div
+        className={`min-w-0 ${rootPadding} ${rootClass}`}
+        style={{ ...layoutStyle, ...extraStyle }}
+      >
+        {children}
+      </div>
+    );
+  }
 
   function songSubLine(song: (typeof ordered)[number]) {
     return (
@@ -49,16 +74,23 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
     );
   }
 
-  function pastSongsPanel() {
+  function pastSongsBlock() {
     if (past.length === 0) return null;
     return (
-      <div className="px-1 pt-0.5 opacity-55">
-        <p className={`${styles.label} text-xs`}>SETLIST</p>
+      <div
+        className={`min-w-0 opacity-55 ${sectionDividerClass}`}
+        style={
+          setlistUsesCustomColor
+            ? { ...setlistColorStyle, borderColor: `${setlistColor}73` }
+            : setlistColorStyle
+        }
+      >
+        <p className={setlistLabelClass}>SETLIST</p>
         <ul className="mt-1 space-y-0.5">
           {past.map((song) => {
             const indexInSetlist = ordered.findIndex((item) => item.id === song.id);
             return (
-              <li key={song.id} className={`text-sm leading-snug ${styles.sub}`}>
+              <li key={song.id} className={setlistLineClass}>
                 {indexInSetlist + 1}. {song.title} / {song.artist}
               </li>
             );
@@ -68,126 +100,87 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
     );
   }
 
-  const rootClass = compact ? "min-w-0 max-w-full py-px" : "p-4";
-
   if (ordered.length === 0) {
-    return (
-      <div className={rootClass}>
-        <p className={panelClass(styles.panel, compact, styles.sub)}>セトリが空です</p>
-      </div>
-    );
+    return frame(<p className={styles.sub}>セトリが空です</p>);
   }
 
   if (mode === "fullSetlist") {
-    return (
-      <div className={rootClass}>
-        <div className={panelClass(styles.panel, compact)}>
-          <p className={styles.label}>{setlist.name}</p>
-          <ol className="mt-4 grid gap-2">
-            {ordered.map((song, index) => {
-              const isCurrent = index === currentIndex;
-              const isPast = currentIndex >= 0 && index < currentIndex;
-              return (
-                <li
-                  key={song.id}
+    const fullTitleClass = setlistUsesCustomColor
+      ? compact
+        ? "text-lg font-black leading-snug break-words"
+        : "text-2xl font-black leading-tight"
+      : compact
+        ? styles.fullSetlistTitleCompact
+        : styles.fullSetlistTitle;
+    const fullSubClass = setlistUsesCustomColor
+      ? "text-base font-bold leading-snug"
+      : styles.fullSetlistSub;
+
+    return frame(
+      <div style={setlistColorStyle}>
+        <p className={setlistLabelClass}>{setlist.name}</p>
+        <ol className="mt-3 grid gap-1.5">
+          {ordered.map((song, index) => {
+            const isCurrent = index === currentIndex;
+            const isPast = currentIndex >= 0 && index < currentIndex;
+            return (
+              <li key={song.id} className={isPast ? "opacity-55" : isCurrent ? "" : "opacity-90"}>
+                <p
                   className={
-                    isCurrent
-                      ? "rounded-xl bg-violet-600/20 px-3 py-2 ring-2 ring-violet-400"
-                      : isPast
-                        ? "px-3 py-1 opacity-55"
-                        : "px-3 py-1"
+                    isCurrent ? `${fullTitleClass} ${styles.fullSetlistCurrent}` : fullTitleClass
                   }
                 >
-                  <p
-                    className={
-                      compact
-                        ? `${styles.title} text-lg leading-snug break-words`
-                        : styles.title
-                    }
-                  >
-                    {String(index + 1).padStart(2, "0")} {song.title}
-                  </p>
-                  <p className={styles.sub}>
-                    {song.artist}
-                    {showDuration
-                      ? `（${formatDuration(song.durationSec)}）`
-                      : ""}
-                  </p>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      </div>
+                  {String(index + 1).padStart(2, "0")} {song.title}
+                </p>
+                <p className={fullSubClass}>
+                  {song.artist}
+                  {showDuration ? `（${formatDuration(song.durationSec)}）` : ""}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+      </div>,
     );
   }
 
   if (!current) {
-    return (
-      <div className={rootClass}>
-        <div className={panelClass(styles.panel, compact)}>
-          <p className={styles.label}>Setory</p>
-          <p className={`mt-2 ${styles.sub}`}>
-            セトリ作成で「現在の曲にする」を選んでください
-          </p>
-        </div>
-      </div>
+    return frame(
+      <>
+        <p className={styles.label}>Setory</p>
+        <p className={`mt-2 ${styles.sub}`}>セトリ作成で「現在の曲にする」を選んでください</p>
+      </>,
     );
   }
 
-  const showPast =
-    mode === "current" || mode === "currentAndNext";
+  const showPast = mode === "current" || mode === "currentAndNext";
+  const nowTitleClass = compact ? styles.nowTitleCompact : styles.nowTitle;
+  const nowSubClass = compact ? styles.nowSubCompact : styles.nowSub;
+  const nextTitleClass = compact ? styles.nextTitleCompact : styles.nextTitle;
+  const nextSubClass = compact ? styles.nextSubCompact : styles.nextSub;
+  const nextBlockClass = themeId === "minimal" ? "opacity-65" : "opacity-70";
 
-  const nowTitleClass = compact
-    ? `${styles.title} text-xl`
-    : `${styles.title} text-3xl`;
-  const nowSubClass = compact ? `${styles.sub} text-sm` : styles.sub;
-  const nextTitleClass = compact
-    ? `text-base font-semibold leading-snug opacity-90 ${styles.sub}`
-    : `text-lg font-semibold leading-snug opacity-90 ${styles.sub}`;
-  const nextSubClass = compact
-    ? `text-xs opacity-80 ${styles.sub}`
-    : `text-sm opacity-80 ${styles.sub}`;
-
-  return (
-    <div className={rootClass}>
-      <div className="grid min-w-0 max-w-full gap-2">
-        <div
-          className={panelClass(
-            styles.panel,
-            compact,
-            compact
-              ? "py-3 shadow-md ring-1 ring-violet-400/40"
-              : "py-4 shadow-lg ring-1 ring-violet-400/45",
-          )}
-        >
-          <p className={`overlay-now-label ${styles.label} tracking-wider`}>
-            Now Singing
-          </p>
-          <OverlayNowTitleMarquee
-            songId={current.id}
-            line={`${currentIndex + 1}. ${current.title}`}
-            className={nowTitleClass}
-          />
-          <p className={`mt-1 ${nowSubClass}`}>{songSubLine(current)}</p>
-        </div>
-        {mode === "currentAndNext" && next ? (
-          <div
-            className={panelClass(
-              styles.panel,
-              compact,
-              "border-white/15 py-3 opacity-70 shadow-md",
-            )}
-          >
-            <p className={`${styles.label} opacity-75`}>Next</p>
-            <p className={`mt-0.5 ${nextTitleClass}`}>
-              {currentIndex + 2}. {next.title}
-            </p>
-            <p className={`mt-0 ${nextSubClass}`}>{songSubLine(next)}</p>
-          </div>
-        ) : null}
-        {showPast ? pastSongsPanel() : null}
+  return frame(
+    <div className={`grid max-w-full min-w-0 ${blockGap}`}>
+      <div className={`min-w-0 ${nowBlockClass}`}>
+        <p className={`overlay-now-label ${styles.label}`}>Now Singing</p>
+        <OverlayNowTitleMarquee
+          songId={current.id}
+          line={`${currentIndex + 1}. ${current.title}`}
+          className={nowTitleClass}
+        />
+        <p className={`mt-1 ${nowSubClass}`}>{songSubLine(current)}</p>
       </div>
-    </div>
+      {mode === "currentAndNext" && next ? (
+        <div className={`min-w-0 ${sectionDividerClass} ${nextBlockClass}`}>
+          <p className={styles.label}>Next</p>
+          <p className={`mt-0.5 ${nextTitleClass}`}>
+            {currentIndex + 2}. {next.title}
+          </p>
+          <p className={`mt-0 ${nextSubClass}`}>{songSubLine(next)}</p>
+        </div>
+      ) : null}
+      {showPast ? pastSongsBlock() : null}
+    </div>,
   );
 }

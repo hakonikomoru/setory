@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  loadAppData,
-  saveAppData,
-  seedSampleSongsIfEmpty,
-} from "@/lib/storage";
+import { loadAppData, saveAppData, seedSampleSongsIfEmpty } from "@/lib/storage";
 import type { AppData } from "@/types/setlist";
 
 export function useAppData() {

@@ -64,8 +64,7 @@ export function removeSong(data: AppData, songId: string): AppData {
     setlists: data.setlists.map((setlist) => ({
       ...setlist,
       songIds: setlist.songIds.filter((id) => id !== songId),
-      currentSongId:
-        setlist.currentSongId === songId ? undefined : setlist.currentSongId,
+      currentSongId: setlist.currentSongId === songId ? undefined : setlist.currentSongId,
     })),
   };
 }

@@ -3,16 +3,18 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
+
 最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`cefa37d`・2026-05-26・`npm run sync:project-docs` 自動反映）
+
 <!-- sync:auto:meta:end -->
 
 ---
 
 ## 1. 概要
 
-| 項目 | 内容 |
-|------|------|
-| リポジトリ | hakonikomoru/setory |
+| 項目         | 内容                      |
+| ------------ | ------------------------- |
+| リポジトリ   | hakonikomoru/setory       |
 | ローカルパス | `/Users/ebata/app/setory` |
 
 ---
@@ -22,6 +24,7 @@
 > `<!-- sync:auto:... -->` は **`npm run sync:project-docs`** が上書きします（手編集しない）。
 
 <!-- sync:auto:directory-tree:start -->
+
 ```
 setory/
 ├── public/
@@ -72,18 +75,21 @@ setory/
 │   └── types/
 │       └── setlist.ts
 ```
+
 <!-- sync:auto:directory-tree:end -->
 
 ### 2.1 App Router（自動生成）
 
 <!-- sync:auto:pages:start -->
-| パス | ファイル |
-|------|----------|
-| `/` | `page.tsx` |
-| `/builder` | `builder/page.tsx` |
-| `/library` | `library/page.tsx` |
-| `/overlay` | `overlay/page.tsx` |
+
+| パス        | ファイル            |
+| ----------- | ------------------- |
+| `/`         | `page.tsx`          |
+| `/builder`  | `builder/page.tsx`  |
+| `/library`  | `library/page.tsx`  |
+| `/overlay`  | `overlay/page.tsx`  |
 | `/setlists` | `setlists/page.tsx` |
+
 <!-- sync:auto:pages:end -->
 
 ---

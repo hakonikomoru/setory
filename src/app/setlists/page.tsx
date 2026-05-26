@@ -2,11 +2,7 @@
 
 import Link from "next/link";
 import CopySetlistButton from "@/components/CopySetlistButton";
-import {
-  formatDuration,
-  formatSetlistText,
-  getSetlistDuration,
-} from "@/lib/setlist-engine";
+import { formatDuration, formatSetlistText, getSetlistDuration } from "@/lib/setlist-engine";
 import { removeSetlist } from "@/lib/storage";
 import { useAppData } from "@/lib/use-app-data";
 
@@ -25,9 +21,7 @@ export default function SetlistsPage() {
           <p className="mt-1 text-sm font-semibold text-violet-800">
             カラオケ・歌練習・配信など、作ったセトリを再利用
           </p>
-          <p className="mt-2 text-sm text-violet-700">
-            {data.setlists.length}件保存されています
-          </p>
+          <p className="mt-2 text-sm text-violet-700">{data.setlists.length}件保存されています</p>
         </div>
         <Link
           href="/builder"
@@ -44,10 +38,7 @@ export default function SetlistsPage() {
       ) : (
         <ul className="grid gap-4">
           {[...data.setlists]
-            .sort(
-              (a, b) =>
-                new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-            )
+            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
             .map((setlist) => {
               const duration = getSetlistDuration(setlist, data.songs);
               const text = formatSetlistText(setlist, data.songs);

@@ -2,7 +2,7 @@ export type SongMood = "upbeat" | "mid" | "ballad";
 
 export type OverlayMode = "current" | "currentAndNext" | "fullSetlist";
 
-export type OverlayTheme = "simple" | "cute" | "dark" | "komoru";
+export type OverlayTheme = "simple" | "minimal" | "bold" | "cute" | "dark" | "komoru";
 
 export type Song = {
   id: string;
@@ -28,6 +28,10 @@ export type Setlist = {
   overlayVisible?: boolean;
   overlayMode?: OverlayMode;
   overlayTheme?: OverlayTheme;
+  /** SETLIST 表示の文字色（#rrggbb） */
+  overlaySetlistColor?: string;
+  /** オーバーレイ表示全体の最大幅（px） */
+  overlaySetlistMaxWidthPx?: number;
   createdAt: string;
   updatedAt: string;
 };

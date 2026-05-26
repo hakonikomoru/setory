@@ -47,9 +47,7 @@ export default function SongList({
             <li
               key={song.id}
               className={`flex min-w-0 items-center justify-between gap-2 rounded-xl border px-3 py-2 ${
-                selected
-                  ? "border-fuchsia-300 bg-fuchsia-50/80"
-                  : "border-violet-100 bg-white/90"
+                selected ? "border-fuchsia-300 bg-fuchsia-50/80" : "border-violet-100 bg-white/90"
               }`}
             >
               <p className="min-w-0 flex-1 text-sm leading-snug text-violet-950">
@@ -75,27 +73,24 @@ export default function SongList({
     );
   }
 
-  const listClass =
-    layout === "grid" ? "grid grid-cols-1 gap-2 sm:grid-cols-2" : "grid gap-3";
+  const listClass = layout === "grid" ? "grid grid-cols-1 gap-2 sm:grid-cols-2" : "grid gap-3";
 
   return (
     <ul className={listClass}>
       {songs.map((song) => {
         const selected = selectedIds.includes(song.id);
         const cardClass = `rounded-xl border px-3 py-2.5 ${
-          selected
-            ? "border-fuchsia-300 bg-fuchsia-50/80"
-            : "border-violet-100 bg-white/90"
+          selected ? "border-fuchsia-300 bg-fuchsia-50/80" : "border-violet-100 bg-white/90"
         }`;
 
         if (layout === "grid") {
           return (
             <li key={song.id} className={`flex flex-col ${cardClass}`}>
               <div className="min-w-0 flex-1">
-                <p className="break-words text-sm font-bold leading-snug text-violet-950">
+                <p className="text-sm leading-snug font-bold break-words text-violet-950">
                   {song.title}
                 </p>
-                <p className="mt-0.5 break-words text-xs leading-snug text-violet-700">
+                <p className="mt-0.5 text-xs leading-snug break-words text-violet-700">
                   {song.artist}
                 </p>
                 <p className="mt-1 text-xs text-violet-500">
@@ -151,10 +146,8 @@ export default function SongList({
           <li key={song.id} className={cardClass}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="break-words text-lg font-bold text-violet-950">
-                  {song.title}
-                </p>
-                <p className="break-words text-sm text-violet-700">{song.artist}</p>
+                <p className="text-lg font-bold break-words text-violet-950">{song.title}</p>
+                <p className="text-sm break-words text-violet-700">{song.artist}</p>
                 <p className="mt-1 text-xs text-violet-500">
                   {formatDuration(song.durationSec)} ・ {MOOD_LABEL[song.mood]}
                 </p>

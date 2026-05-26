@@ -40,7 +40,8 @@ export default function BuilderPage() {
           カラオケ・歌練習・配信など、歌う曲順を組み立てます
         </p>
         <p className="mt-2 text-sm text-violet-700">
-          上でセトリを編集、下（PC では右）の登録曲一覧から追加できます。並べ替え後にコピー用テキストを出力します。
+          上でセトリを編集、下（PC
+          では右）の登録曲一覧から追加できます。並べ替え後にコピー用テキストを出力します。
         </p>
       </header>
       <Suspense fallback={<p>読み込み中...</p>}>
