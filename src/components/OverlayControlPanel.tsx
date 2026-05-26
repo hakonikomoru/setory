@@ -123,7 +123,7 @@ export default function OverlayControlPanel() {
       <header>
         <h1 className="text-3xl font-black text-violet-950">オーバーレイ操作</h1>
         <p className="mt-2 text-sm text-violet-700">
-          左が配信プレビュー、右の上からセトリ選択・曲の切り替え・OBS 設定の順です。その下でセトリ編集できます。
+          左が配信プレビュー、右の上から曲の切り替え・OBS 設定の順です。その下でセトリ編集できます。
         </p>
       </header>
 
@@ -137,27 +137,26 @@ export default function OverlayControlPanel() {
             />
 
             <div className="flex min-w-0 flex-col gap-6">
-              <label className="grid shrink-0 gap-1 text-sm font-semibold text-violet-900">
-                操作するセトリ
-                <select
-                  value={selectedId ?? ""}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      router.push(`/overlay?id=${encodeURIComponent(e.target.value)}`);
-                    }
-                  }}
-                  className="w-full rounded-xl border border-violet-200 bg-white px-3 py-2"
-                >
-                  {data.setlists.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}（{item.songIds.length}曲）
-                    </option>
-                  ))}
-                </select>
-              </label>
-
               <section className="shrink-0 overflow-visible rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-sm">
                 <h2 className="text-lg font-bold text-violet-950">曲の切り替え</h2>
+                <label className="mt-3 grid gap-1 text-sm font-semibold text-violet-900">
+                  操作するセトリ
+                  <select
+                    value={selectedId ?? ""}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        router.push(`/overlay?id=${encodeURIComponent(e.target.value)}`);
+                      }
+                    }}
+                    className="w-full rounded-xl border border-violet-200 bg-white px-3 py-2"
+                  >
+                    {data.setlists.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}（{item.songIds.length}曲）
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <button
                     type="button"

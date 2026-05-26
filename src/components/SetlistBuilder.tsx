@@ -76,9 +76,15 @@ export default function SetlistBuilder({
     .map((id) => data.songs.find((song) => song.id === id))
     .filter((song): song is Song => Boolean(song));
 
-  const filteredLibrarySongs = useMemo(
-    () => filterSongsByQuery(data.songs, searchQuery),
-    [data.songs, searchQuery],
+  const addableSongCount = useMemo(
+    () => data.songs.filter((song) => !songIds.includes(song.id)).length,
+    [data.songs, songIds],
+  );
+
+  const addableLibrarySongs = useMemo(
+    () =>
+      filterSongsByQuery(data.songs, searchQuery).filter((song) => !songIds.includes(song.id)),
+    [data.songs, searchQuery, songIds],
   );
   const totalSec = getSetlistDuration(draftSetlist, data.songs);
   const exportText = formatSetlistText(draftSetlist, data.songs);
@@ -319,13 +325,18 @@ export default function SetlistBuilder({
         />
         <RegisteredSongsPanel
           sticky={!embedded}
-          songs={filteredLibrarySongs}
-          totalCount={data.songs.length}
+          songs={addableLibrarySongs}
+          totalCount={addableSongCount}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
-          selectedIds={songIds}
-          onAddToSetlist={toggleSong}
-          emptyLibraryMessage="登録曲がありません。上の検索で取り込むか、曲庫ページで追加してください。"
+          onAddToSetlist={(songId) => {
+            if (!songIds.includes(songId)) toggleSong(songId);
+          }}
+          emptyLibraryMessage={
+            data.songs.length === 0
+              ? "登録曲がありません。上の検索で取り込むか、曲庫ページで追加してください。"
+              : "登録曲はすべてセトリに追加済みです。左の曲順から外すとここに再表示されます。"
+          }
         />
       </section>
     </div>
