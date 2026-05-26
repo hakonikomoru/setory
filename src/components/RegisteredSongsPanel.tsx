@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import RowActionButton from "@/components/RowActionButton";
 import SearchInput from "@/components/SearchInput";
 import SongList from "@/components/SongList";
 import { sortSongsByCreatedAt, type SongListSortOrder } from "@/lib/setlist-engine";
@@ -59,26 +60,23 @@ export default function RegisteredSongsPanel({
           <p className="text-xs text-violet-600">
             {trimmedQuery ? `${songs.length}件表示（全${totalCount}曲）` : `全${totalCount}曲を表示`}
           </p>
-          <div className="flex items-center gap-1" role="group" aria-label="追加順で並べ替え">
-            <span className="text-xs font-semibold text-violet-700">追加順</span>
+          <div className="flex items-center gap-2" role="group" aria-label="追加順で並べ替え">
+            <span className="text-sm font-semibold text-violet-700">追加順</span>
             {(
               [
                 { value: "asc" as const, label: "古い" },
                 { value: "desc" as const, label: "新しい" },
               ] as const
             ).map((item) => (
-              <button
+              <RowActionButton
                 key={item.value}
                 type="button"
+                variant={sortOrder === item.value ? "accent" : "secondary"}
+                aria-pressed={sortOrder === item.value}
                 onClick={() => setSortOrder(item.value)}
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
-                  sortOrder === item.value
-                    ? "bg-violet-600 text-white"
-                    : "border border-violet-200 bg-white text-violet-800 hover:bg-violet-50"
-                }`}
               >
                 {item.label}
-              </button>
+              </RowActionButton>
             ))}
           </div>
         </div>

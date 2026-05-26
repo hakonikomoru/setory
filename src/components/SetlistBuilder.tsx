@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import CopySetlistButton from "@/components/CopySetlistButton";
+import RowActionButton from "@/components/RowActionButton";
 import ExternalSongSearch from "@/components/ExternalSongSearch";
 import RegisteredSongsPanel from "@/components/RegisteredSongsPanel";
 import {
@@ -255,39 +256,41 @@ export default function SetlistBuilder({
                           : `${song.artist}（${formatDuration(song.durationSec)}）`}
                       </p>
                     </div>
-                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-1 self-start">
-                      <button
+                    <div className="flex shrink-0 items-center gap-1.5 self-start">
+                      <RowActionButton
                         type="button"
+                        variant={isCurrent ? "accent" : "secondary"}
+                        size="sm"
                         onClick={() => setAsCurrentSong(song.id)}
-                        className={`rounded-lg border px-2 py-1 text-xs font-semibold ${
-                          isCurrent
-                            ? "border-violet-600 bg-violet-600 text-white"
-                            : "border-violet-300 text-violet-800"
-                        }`}
                       >
                         {isCurrent ? "歌唱中" : "現在の曲"}
-                      </button>
-                      <button
+                      </RowActionButton>
+                      <RowActionButton
                         type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label="上へ移動"
                         onClick={() => moveSong(index, -1)}
-                        className="rounded-lg border px-2 py-1 text-xs"
                       >
                         ↑
-                      </button>
-                      <button
+                      </RowActionButton>
+                      <RowActionButton
                         type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label="下へ移動"
                         onClick={() => moveSong(index, 1)}
-                        className="rounded-lg border px-2 py-1 text-xs"
                       >
                         ↓
-                      </button>
-                      <button
+                      </RowActionButton>
+                      <RowActionButton
                         type="button"
+                        variant="danger"
+                        size="sm"
                         onClick={() => toggleSong(song.id)}
-                        className="rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700"
                       >
                         外す
-                      </button>
+                      </RowActionButton>
                     </div>
                   </li>
                 );

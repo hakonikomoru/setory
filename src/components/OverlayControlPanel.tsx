@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import OverlayPreviewFrame from "@/components/OverlayPreviewFrame";
+import RowActionButton from "@/components/RowActionButton";
 import OverlaySettings from "@/components/OverlaySettings";
 import SetlistBuilder from "@/components/SetlistBuilder";
 import { formatSetlistSongLine } from "@/lib/setlist-engine";
@@ -159,8 +160,10 @@ export default function OverlayControlPanel() {
                   </select>
                 </label>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <button
+                  <RowActionButton
                     type="button"
+                    variant="secondary"
+                    size="lg"
                     disabled={!canRewind}
                     title={
                       overlaySongs.currentIndex === 0 && setlist.overlaySuppressNext !== false
@@ -172,20 +175,20 @@ export default function OverlayControlPanel() {
                     onClick={() =>
                       applyOverlayNavigation(navigateOverlayPrev(setlist, data.songs))
                     }
-                    className="rounded-xl border border-violet-200 bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
                   >
                     前の曲
-                  </button>
-                  <button
+                  </RowActionButton>
+                  <RowActionButton
                     type="button"
+                    variant="primary"
+                    size="lg"
                     disabled={overlaySongs.ordered.length === 0}
                     onClick={() =>
                       applyOverlayNavigation(navigateOverlayNext(setlist, data.songs))
                     }
-                    className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
                   >
                     次の曲
-                  </button>
+                  </RowActionButton>
                 </div>
                 <ol className="mt-4 max-h-[min(24rem,50vh)] list-none space-y-2 overflow-y-auto overscroll-contain px-1 py-1">
                   {overlaySongs.ordered.map((song, index) => {

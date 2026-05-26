@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { rowActionButtonClass } from "@/components/RowActionButton";
 
 type Props = {
   text: string;
   label?: string;
+  /** 一覧行などコンパクト表示 */
+  compact?: boolean;
 };
 
-export default function CopySetlistButton({ text, label = "セトリをコピー" }: Props) {
+export default function CopySetlistButton({
+  text,
+  label = "セトリをコピー",
+  compact = false,
+}: Props) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -20,7 +27,11 @@ export default function CopySetlistButton({ text, label = "セトリをコピー
     <button
       type="button"
       onClick={handleCopy}
-      className="rounded-xl bg-fuchsia-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-fuchsia-200 transition hover:bg-fuchsia-700"
+      className={
+        compact
+          ? rowActionButtonClass("secondary", "md")
+          : rowActionButtonClass("primary", "md", "shadow-md shadow-violet-300/30")
+      }
     >
       {copied ? "コピーしました" : label}
     </button>

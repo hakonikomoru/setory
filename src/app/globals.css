@@ -37,6 +37,19 @@ button.btn-text-left {
   text-align: left;
 }
 
+/* 編集・コピー・操作・削除（button / a / Link で同じ文字サイズ） */
+button.row-action,
+a.row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  line-height: 1;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
 html.overlay-page,
 html.overlay-page body {
   background: transparent !important;

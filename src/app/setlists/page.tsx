@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import CopySetlistButton from "@/components/CopySetlistButton";
+import RowActionButton, { RowActionAnchor, RowActionLink } from "@/components/RowActionButton";
 import { formatDuration, formatSetlistText, getSetlistDuration } from "@/lib/setlist-engine";
 import { removeSetlist } from "@/lib/storage";
 import { useAppData } from "@/lib/use-app-data";
@@ -58,31 +59,29 @@ export default function SetlistsPage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Link
-                        href={`/builder?id=${setlist.id}`}
-                        className="inline-flex items-center justify-center rounded-lg border border-violet-200 px-3 py-1.5 text-xs font-semibold"
-                      >
+                      <RowActionLink href={`/builder?id=${setlist.id}`} variant="secondary">
                         編集
-                      </Link>
-                      <CopySetlistButton text={text} label="コピー" />
-                      <a
+                      </RowActionLink>
+                      <CopySetlistButton text={text} label="コピー" compact />
+                      <RowActionAnchor
                         href={`/overlay?id=${encodeURIComponent(setlist.id)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center justify-center rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-800"
+                        variant="secondary"
+                        className="max-md:hidden"
                       >
                         操作
-                      </a>
-                      <button
+                      </RowActionAnchor>
+                      <RowActionButton
                         type="button"
+                        variant="danger"
                         onClick={() => {
                           if (!window.confirm("このセトリを削除しますか？")) return;
                           setData(removeSetlist(data, setlist.id));
                         }}
-                        className="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-700"
                       >
                         削除
-                      </button>
+                      </RowActionButton>
                     </div>
                   </div>
                   <pre className="mt-4 overflow-x-auto rounded-xl bg-violet-950/95 p-3 text-xs leading-6 text-violet-50">

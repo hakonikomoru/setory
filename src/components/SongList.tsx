@@ -1,5 +1,6 @@
 "use client";
 
+import RowActionButton from "@/components/RowActionButton";
 import { formatDuration, moodLabel } from "@/lib/setlist-engine";
 import type { Song } from "@/types/setlist";
 
@@ -13,6 +14,51 @@ type Props = {
   variant?: "default" | "compact";
   layout?: "list" | "grid";
 };
+
+function SongRowActions({
+  song,
+  selected,
+  onAddToSetlist,
+  onEdit,
+  onDelete,
+}: {
+  song: Song;
+  selected: boolean;
+  onAddToSetlist?: (songId: string) => void;
+  onEdit?: (song: Song) => void;
+  onDelete?: (songId: string) => void;
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-1.5">
+      {onAddToSetlist ? (
+        <RowActionButton
+          type="button"
+          variant={selected ? "muted" : "primary"}
+          size="sm"
+          disabled={selected}
+          onClick={() => onAddToSetlist(song.id)}
+        >
+          {selected ? "追加済み" : "追加"}
+        </RowActionButton>
+      ) : null}
+      {onEdit ? (
+        <RowActionButton type="button" variant="secondary" size="sm" onClick={() => onEdit(song)}>
+          編集
+        </RowActionButton>
+      ) : null}
+      {onDelete ? (
+        <RowActionButton
+          type="button"
+          variant="danger"
+          size="sm"
+          onClick={() => onDelete(song.id)}
+        >
+          削除
+        </RowActionButton>
+      ) : null}
+    </div>
+  );
+}
 
 export default function SongList({
   songs,
@@ -51,13 +97,15 @@ export default function SongList({
                 </span>
               </p>
               {onAddToSetlist ? (
-                <button
+                <RowActionButton
                   type="button"
+                  variant={selected ? "muted" : "primary"}
+                  size="sm"
+                  disabled={selected}
                   onClick={() => onAddToSetlist(song.id)}
-                  className="shrink-0 rounded-lg bg-violet-600 px-2.5 py-1 text-xs font-bold text-white"
                 >
                   {selected ? "追加済み" : "追加"}
-                </button>
+                </RowActionButton>
               ) : null}
             </li>
           );
@@ -90,34 +138,14 @@ export default function SongList({
                   {formatDuration(song.durationSec)} ・ {moodLabel(song.mood)}
                 </p>
               </div>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {onAddToSetlist ? (
-                  <button
-                    type="button"
-                    onClick={() => onAddToSetlist(song.id)}
-                    className="rounded-lg bg-violet-600 px-2 py-1 text-xs font-bold text-white"
-                  >
-                    {selected ? "追加済み" : "追加"}
-                  </button>
-                ) : null}
-                {onEdit ? (
-                  <button
-                    type="button"
-                    onClick={() => onEdit(song)}
-                    className="rounded-lg border border-violet-200 px-2 py-1 text-xs font-semibold"
-                  >
-                    編集
-                  </button>
-                ) : null}
-                {onDelete ? (
-                  <button
-                    type="button"
-                    onClick={() => onDelete(song.id)}
-                    className="rounded-lg border border-rose-200 px-2 py-1 text-xs font-semibold text-rose-700"
-                  >
-                    削除
-                  </button>
-                ) : null}
+              <div className="mt-2">
+                <SongRowActions
+                  song={song}
+                  selected={selected}
+                  onAddToSetlist={onAddToSetlist}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
               </div>
             </li>
           );
@@ -135,35 +163,13 @@ export default function SongList({
                   {formatDuration(song.durationSec)} ・ {moodLabel(song.mood)}
                 </p>
               </div>
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
-                {onAddToSetlist ? (
-                  <button
-                    type="button"
-                    onClick={() => onAddToSetlist(song.id)}
-                    className="rounded-lg bg-violet-600 px-2.5 py-1 text-xs font-bold text-white"
-                  >
-                    {selected ? "追加済み" : "追加"}
-                  </button>
-                ) : null}
-                {onEdit ? (
-                  <button
-                    type="button"
-                    onClick={() => onEdit(song)}
-                    className="rounded-lg border border-violet-200 px-2 py-1 text-xs font-semibold"
-                  >
-                    編集
-                  </button>
-                ) : null}
-                {onDelete ? (
-                  <button
-                    type="button"
-                    onClick={() => onDelete(song.id)}
-                    className="rounded-lg border border-rose-200 px-2 py-1 text-xs font-semibold text-rose-700"
-                  >
-                    削除
-                  </button>
-                ) : null}
-              </div>
+              <SongRowActions
+                song={song}
+                selected={selected}
+                onAddToSetlist={onAddToSetlist}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
             </div>
           </li>
         );

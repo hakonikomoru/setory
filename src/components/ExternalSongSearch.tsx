@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import RowActionButton from "@/components/RowActionButton";
 import SearchInput from "@/components/SearchInput";
 import { formatDuration } from "@/lib/setlist-engine";
 import { externalHitToSong, mergeExternalHits, type ExternalSongHit } from "@/lib/musicbrainz";
@@ -257,14 +258,15 @@ export default function ExternalSongSearch({
                         : ""}
                     </p>
                   </div>
-                  <button
+                  <RowActionButton
                     type="button"
+                    variant={disabled ? "muted" : "primary"}
+                    size="sm"
                     disabled={disabled}
                     onClick={() => handleImport(hit)}
-                    className="shrink-0 self-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold whitespace-nowrap text-white disabled:opacity-40"
                   >
                     {statusLabel}
-                  </button>
+                  </RowActionButton>
                 </li>
               );
             })}
