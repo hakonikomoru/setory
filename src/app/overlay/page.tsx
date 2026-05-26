@@ -4,7 +4,6 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import OverlayControlPanel from "@/components/OverlayControlPanel";
 import OverlayObsOnly from "@/components/OverlayObsOnly";
-import ResponsiveOverlayGate from "@/components/ResponsiveOverlayGate";
 
 function OverlayPageContent() {
   const searchParams = useSearchParams();
@@ -12,20 +11,16 @@ function OverlayPageContent() {
 
   if (isObsOnly) {
     return (
-      <ResponsiveOverlayGate>
-        <Suspense fallback={null}>
-          <OverlayObsOnly />
-        </Suspense>
-      </ResponsiveOverlayGate>
+      <Suspense fallback={null}>
+        <OverlayObsOnly />
+      </Suspense>
     );
   }
 
   return (
-    <ResponsiveOverlayGate>
-      <main className="mx-auto w-full max-w-7xl px-4 py-8">
-        <OverlayControlPanel />
-      </main>
-    </ResponsiveOverlayGate>
+    <main className="mx-auto w-full max-w-7xl px-4 py-8">
+      <OverlayControlPanel />
+    </main>
   );
 }
 

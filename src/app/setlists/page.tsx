@@ -78,7 +78,7 @@ export default function SetlistsPage() {
                         href={`/overlay?id=${encodeURIComponent(setlist.id)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="hidden items-center justify-center rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-800 md:inline-flex"
+                        className="inline-flex items-center justify-center rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-800"
                       >
                         操作
                       </a>

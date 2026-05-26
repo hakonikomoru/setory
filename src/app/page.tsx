@@ -21,7 +21,6 @@ const features = [
     title: "オーバーレイ操作",
     body: "配信中に現在曲・次の曲を切り替え。OBS には表示専用 URL をブラウザソースに登録。",
     accent: "bg-indigo-600 text-white",
-    desktopOnly: true,
   },
   {
     id: "setlists",
@@ -47,9 +46,7 @@ export default function Home() {
         </p>
         <p className="mt-4 max-w-2xl text-base leading-8 text-violet-800/90 sm:text-lg">
           カラオケの持ち歌リスト、歌練習の曲順づくり、歌配信・ライブのセットリストまで、ひとつのアプリで作れます。
-          曲庫の管理、曲順の調整
-          <span className="hidden md:inline">、OBS オーバーレイ</span>
-          、コピー用テキストの出力まで、ブラウザだけで完結します。
+          曲庫の管理、曲順の調整、OBS オーバーレイ、コピー用テキストの出力まで、ブラウザだけで完結します。
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
@@ -72,9 +69,7 @@ export default function Home() {
           <Link
             key={feature.id}
             href={feature.href}
-            className={`rounded-2xl border border-violet-100 bg-white/85 p-6 shadow-md shadow-violet-100/40 transition hover:-translate-y-0.5 hover:shadow-lg ${
-              "desktopOnly" in feature && feature.desktopOnly ? "hidden md:block" : ""
-            }`}
+            className="rounded-2xl border border-violet-100 bg-white/85 p-6 shadow-md shadow-violet-100/40 transition hover:-translate-y-0.5 hover:shadow-lg"
           >
             <span
               className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${feature.accent}`}
