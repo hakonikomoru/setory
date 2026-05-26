@@ -20,6 +20,8 @@ type Props = {
     overlayTheme?: OverlayTheme;
     overlaySetlistColor?: string;
     overlaySetlistMaxWidthPx?: number;
+    overlayHideArtist?: boolean;
+    overlayHideDuration?: boolean;
   }) => void;
 };
 
@@ -114,6 +116,37 @@ export default function OverlaySettings({
           （文字色とは別設定です）
         </span>
       </label>
+
+      <fieldset className="mt-4">
+        <legend className="text-sm font-semibold text-violet-900">オーバーレイの表示内容</legend>
+        <p className="mt-1 text-xs text-violet-600">
+          セトリのコピー用テキスト・曲順一覧には影響しません。OBS と左のプレビューのみです。
+        </p>
+        <div className="mt-2 grid gap-2">
+          <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
+            <input
+              type="checkbox"
+              checked={setlist.overlayHideArtist ?? false}
+              onChange={(e) =>
+                onChange({ overlayHideArtist: e.target.checked ? true : undefined })
+              }
+              className="size-4 rounded border-violet-300"
+            />
+            アーティスト名を表示しない
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
+            <input
+              type="checkbox"
+              checked={setlist.overlayHideDuration ?? false}
+              onChange={(e) =>
+                onChange({ overlayHideDuration: e.target.checked ? true : undefined })
+              }
+              className="size-4 rounded border-violet-300"
+            />
+            曲時間を表示しない
+          </label>
+        </div>
+      </fieldset>
 
       <OverlaySetlistColorPicker
         setlist={setlist}

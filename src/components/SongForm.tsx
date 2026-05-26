@@ -9,10 +9,18 @@ import type { Song } from "@/types/setlist";
 type Props = {
   initial?: Song;
   onSave: (song: Song) => void;
+  /** library: 曲庫登録。setlist: セトリへの追加（オーバーレイの手入力） */
+  saveIntent?: "library" | "setlist";
   onCancel?: () => void;
 };
 
-export default function SongForm({ initial, onSave, onCancel }: Props) {
+export default function SongForm({
+  initial,
+  onSave,
+  saveIntent = "library",
+  onCancel,
+}: Props) {
+  const addToSetlist = saveIntent === "setlist" && !initial;
   const [title, setTitle] = useState(initial?.title ?? "");
   const [artist, setArtist] = useState(initial?.artist ?? "");
   const [minutes, setMinutes] = useState(
@@ -22,13 +30,11 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
   const [moodText, setMoodText] = useState(initial ? formatMoodInput(initial.mood) : "");
   const [notes, setNotes] = useState(initial?.notes ?? "");
 
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
+  function buildSong(): Song | null {
     const durationSec = Math.max(0, Number(minutes) || 0) * 60 + Math.max(0, Number(seconds) || 0);
+    if (!title.trim() || !artist.trim() || durationSec <= 0) return null;
 
-    if (!title.trim() || !artist.trim() || durationSec <= 0) return;
-
-    const song = {
+    return {
       id: initial?.id ?? createId("song"),
       title: title.trim(),
       artist: artist.trim(),
@@ -38,13 +44,23 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
       notes: notes.trim() || undefined,
       createdAt: initial?.createdAt ?? new Date().toISOString(),
     };
+  }
 
-    if (
-      !initial &&
-      !window.confirm(`「${song.title} / ${song.artist}」を曲庫に追加しますか？`)
-    ) {
-      return;
-    }
+  function confirmNewSong(song: Song, message: string): boolean {
+    if (initial) return true;
+    return window.confirm(message);
+  }
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    const song = buildSong();
+    if (!song) return;
+
+    const confirmMessage = addToSetlist
+      ? `「${song.title} / ${song.artist}」を登録曲に追加し、セトリにも追加しますか？`
+      : `「${song.title} / ${song.artist}」を曲庫に追加しますか？`;
+
+    if (!confirmNewSong(song, confirmMessage)) return;
 
     onSave(song);
   }
@@ -123,7 +139,7 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
 
       <div className="flex flex-wrap items-center gap-2">
         <RowActionButton type="submit" variant="primary">
-          {initial ? "曲を更新" : "曲を追加"}
+          {initial ? "曲を更新" : addToSetlist ? "セトリに追加" : "曲を追加"}
         </RowActionButton>
         {onCancel ? (
           <RowActionButton type="button" variant="secondary" onClick={onCancel}>

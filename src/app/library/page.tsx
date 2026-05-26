@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ExternalSongSearch from "@/components/ExternalSongSearch";
 import RegisteredSongsPanel from "@/components/RegisteredSongsPanel";
+import SongAddTabs, { type SongAddTab } from "@/components/SongAddTabs";
 import SongForm from "@/components/SongForm";
 import { filterSongsByQuery } from "@/lib/setlist-engine";
 import { importSongsFromHits } from "@/lib/song-import";
@@ -13,7 +14,12 @@ import type { Song } from "@/types/setlist";
 export default function LibraryPage() {
   const { data, setData, ready } = useAppData();
   const [editing, setEditing] = useState<Song | null>(null);
+  const [addTab, setAddTab] = useState<SongAddTab>("search");
   const [libraryQuery, setLibraryQuery] = useState("");
+
+  useEffect(() => {
+    if (editing) setAddTab("manual");
+  }, [editing]);
 
   const filteredSongs = useMemo(
     () => filterSongsByQuery(data.songs, libraryQuery),
@@ -32,24 +38,29 @@ export default function LibraryPage() {
           カラオケや歌練習で歌う曲を登録・管理します
         </p>
         <p className="mt-2 text-sm text-violet-700">
-          上で曲を取り込み・登録し、下の登録曲一覧で検索・編集できます。
+          タブで曲を取り込み・登録し、下の登録曲一覧で検索・編集できます。
         </p>
       </header>
 
       <div className="grid gap-6">
-        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-          <ExternalSongSearch
-            librarySongs={data.songs}
-            onImport={(song) => setData(upsertSong(data, song))}
-            onImportMany={(hits) => {
-              const { data: next, added } = importSongsFromHits(data, hits);
-              setData(next);
-              window.alert(`${added}曲を曲庫に追加しました`);
-            }}
-          />
-
-          <section>
-            <h2 className="mb-3 text-xl font-bold text-violet-950">手入力で登録</h2>
+        <SongAddTabs
+          idPrefix="library-add"
+          activeTab={addTab}
+          onTabChange={setAddTab}
+          manualHint="曲名・アーティスト・尺などを直接入力して曲庫に登録します。"
+          searchPanel={
+            <ExternalSongSearch
+              showTitle={false}
+              librarySongs={data.songs}
+              onImport={(song) => setData(upsertSong(data, song))}
+              onImportMany={(hits) => {
+                const { data: next, added } = importSongsFromHits(data, hits);
+                setData(next);
+                window.alert(`${added}曲を曲庫に追加しました`);
+              }}
+            />
+          }
+          manualPanel={
             <SongForm
               key={editing?.id ?? "new"}
               initial={editing ?? undefined}
@@ -59,8 +70,8 @@ export default function LibraryPage() {
               }}
               onCancel={editing ? () => setEditing(null) : undefined}
             />
-          </section>
-        </div>
+          }
+        />
 
         <RegisteredSongsPanel
           sticky={false}

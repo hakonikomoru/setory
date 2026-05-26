@@ -5,6 +5,8 @@ import CopySetlistButton from "@/components/CopySetlistButton";
 import RowActionButton from "@/components/RowActionButton";
 import ExternalSongSearch from "@/components/ExternalSongSearch";
 import RegisteredSongsPanel from "@/components/RegisteredSongsPanel";
+import SongAddTabs from "@/components/SongAddTabs";
+import SongForm from "@/components/SongForm";
 import {
   filterSongsByQuery,
   formatDuration,
@@ -36,6 +38,7 @@ export default function SetlistBuilder({
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [hideDuration, setHideDuration] = useState(initialSetlist?.hideDuration ?? false);
+  const [hideArtist, setHideArtist] = useState(initialSetlist?.hideArtist ?? false);
   const [currentSongId, setCurrentSongId] = useState(initialSetlist?.currentSongId);
 
   const draftSetlist: Setlist = useMemo(
@@ -44,6 +47,7 @@ export default function SetlistBuilder({
       name,
       theme: theme.trim() || undefined,
       hideDuration: hideDuration || undefined,
+      hideArtist: hideArtist || undefined,
       currentSongId,
       songIds,
       overlayVisible: initialSetlist?.overlayVisible,
@@ -52,7 +56,7 @@ export default function SetlistBuilder({
       createdAt: initialSetlist?.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }),
-    [initialSetlist, name, theme, hideDuration, currentSongId, songIds],
+    [initialSetlist, name, theme, hideDuration, hideArtist, currentSongId, songIds],
   );
 
   const persistDraft = useCallback(
@@ -89,8 +93,34 @@ export default function SetlistBuilder({
       filterSongsByQuery(data.songs, searchQuery).filter((song) => !songIds.includes(song.id)),
     [data.songs, searchQuery, songIds],
   );
+
+  const librarySongsForPanel = useMemo(
+    () => filterSongsByQuery(data.songs, searchQuery),
+    [data.songs, searchQuery],
+  );
   const totalSec = getSetlistDuration(draftSetlist, data.songs);
   const exportText = formatSetlistText(draftSetlist, data.songs);
+
+  function addSongToLibraryAndSetlist(song: Song) {
+    const nextData = upsertSong(data, song);
+    const nextIds = songIds.includes(song.id) ? songIds : [...songIds, song.id];
+    setSongIds(nextIds);
+    if (embedded) {
+      onDataChange({
+        ...nextData,
+        setlists: [
+          ...nextData.setlists.filter((s) => s.id !== draftSetlist.id),
+          {
+            ...draftSetlist,
+            songIds: nextIds,
+            updatedAt: new Date().toISOString(),
+          },
+        ],
+      });
+    } else {
+      onDataChange(nextData);
+    }
+  }
 
   function toggleSong(songId: string) {
     const removing = songIds.includes(songId);
@@ -186,6 +216,19 @@ export default function SetlistBuilder({
             <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
               <input
                 type="checkbox"
+                checked={hideArtist}
+                onChange={(e) => {
+                  const next = e.target.checked;
+                  setHideArtist(next);
+                  if (embedded) commitDraft({ hideArtist: next || undefined });
+                }}
+                className="size-4 rounded border-violet-300"
+              />
+              アーティスト名を表示しない（コピー用テキスト・曲順一覧）
+            </label>
+            <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
+              <input
+                type="checkbox"
                 checked={hideDuration}
                 onChange={(e) => {
                   const next = e.target.checked;
@@ -250,11 +293,19 @@ export default function SetlistBuilder({
                           </span>
                         ) : null}
                       </p>
-                      <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
-                        {hideDuration
-                          ? song.artist
-                          : `${song.artist}（${formatDuration(song.durationSec)}）`}
-                      </p>
+                      {hideArtist ? (
+                        hideDuration ? null : (
+                          <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
+                            {formatDuration(song.durationSec)}
+                          </p>
+                        )
+                      ) : (
+                        <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
+                          {hideDuration
+                            ? song.artist
+                            : `${song.artist}（${formatDuration(song.durationSec)}）`}
+                        </p>
+                      )}
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5 self-start">
                       <RowActionButton
@@ -306,40 +357,38 @@ export default function SetlistBuilder({
           ) : null}
         </section>
 
-        <section className="grid min-w-0 gap-4">
-          <ExternalSongSearch
-          librarySongs={data.songs}
-          importTarget="libraryAndSetlist"
-          setlistSongIds={songIds}
-          importLabel="セトリに追加"
-          onImport={(song) => {
-            const nextData = upsertSong(data, song);
-            const nextIds = songIds.includes(song.id) ? songIds : [...songIds, song.id];
-            setSongIds(nextIds);
-            if (embedded) {
-              onDataChange({
-                ...nextData,
-                setlists: [
-                  ...nextData.setlists.filter((s) => s.id !== draftSetlist.id),
-                  {
-                    ...draftSetlist,
-                    songIds: nextIds,
-                    updatedAt: new Date().toISOString(),
-                  },
-                ],
-              });
-            } else {
-              onDataChange(nextData);
-            }
-          }}
-          />
-        </section>
+        <SongAddTabs
+          idPrefix={embedded ? "overlay-add" : "builder-add"}
+          manualTabLabel={embedded ? "手入力でセトリに追加" : undefined}
+          manualHint={
+            embedded
+              ? "曲名・アーティスト・尺を入力すると、登録曲（曲庫）に保存したうえでセトリに追加します。"
+              : "曲名・アーティスト・尺などを直接入力して曲庫に登録し、セトリにも追加します。"
+          }
+          searchPanel={
+            <ExternalSongSearch
+              showTitle={false}
+              librarySongs={data.songs}
+              importTarget="libraryAndSetlist"
+              setlistSongIds={songIds}
+              importLabel="セトリに追加"
+              onImport={addSongToLibraryAndSetlist}
+            />
+          }
+          manualPanel={
+            <SongForm
+              saveIntent={embedded ? "setlist" : "library"}
+              onSave={addSongToLibraryAndSetlist}
+            />
+          }
+        />
       </div>
 
       <RegisteredSongsPanel
         sticky={false}
-        songs={addableLibrarySongs}
-        totalCount={addableSongCount}
+        songs={embedded ? librarySongsForPanel : addableLibrarySongs}
+        totalCount={embedded ? data.songs.length : addableSongCount}
+        selectedIds={embedded ? songIds : undefined}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         onAddToSetlist={(songId) => {
@@ -347,8 +396,10 @@ export default function SetlistBuilder({
         }}
         emptyLibraryMessage={
           data.songs.length === 0
-            ? "登録曲がありません。上の検索で取り込むか、曲庫ページで追加してください。"
-            : "登録曲はすべてセトリに追加済みです。左の曲順から外すとここに再表示されます。"
+            ? embedded
+              ? "登録曲がありません。上の検索または手入力でセトリに追加してください。"
+              : "登録曲がありません。上の検索または手入力で追加してください。"
+            : "登録曲はすべてセトリに追加済みです。曲順から外すとここに再表示されます。"
         }
       />
     </div>

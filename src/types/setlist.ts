@@ -23,6 +23,12 @@ export type Setlist = {
   theme?: string;
   /** コピー用テキスト・一覧で曲の尺を出さない */
   hideDuration?: boolean;
+  /** コピー用テキスト・一覧でアーティスト名を出さない */
+  hideArtist?: boolean;
+  /** OBS オーバーレイ表示のみでアーティスト名を出さない */
+  overlayHideArtist?: boolean;
+  /** OBS オーバーレイ表示のみで曲の尺を出さない */
+  overlayHideDuration?: boolean;
   /** オーバーレイでハイライトする曲（曲庫の song id） */
   currentSongId?: string;
   /** 1曲目表示時に NEXT を出さない（false のときだけ NEXT を表示） */

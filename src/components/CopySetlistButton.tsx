@@ -6,15 +6,9 @@ import { rowActionButtonClass } from "@/components/RowActionButton";
 type Props = {
   text: string;
   label?: string;
-  /** 一覧行などコンパクト表示 */
-  compact?: boolean;
 };
 
-export default function CopySetlistButton({
-  text,
-  label = "セトリをコピー",
-  compact = false,
-}: Props) {
+export default function CopySetlistButton({ text, label = "セトリをコピー" }: Props) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -27,11 +21,7 @@ export default function CopySetlistButton({
     <button
       type="button"
       onClick={handleCopy}
-      className={
-        compact
-          ? rowActionButtonClass("secondary", "md")
-          : rowActionButtonClass("primary", "md", "shadow-md shadow-violet-300/30")
-      }
+      className={rowActionButtonClass("secondary", "md")}
     >
       {copied ? "コピーしました" : label}
     </button>

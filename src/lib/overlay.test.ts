@@ -12,6 +12,7 @@ import {
   isFirstSongNextSuppressed,
   navigateOverlayNext,
   navigateOverlayPrev,
+  overlayLineDisplayOptions,
   overlayMode,
   overlayTheme,
   overlayVisible,
@@ -52,6 +53,32 @@ describe("overlay defaults", () => {
     for (const theme of ["simple", "minimal", "bold", "cute", "dark", "komoru"] as const) {
       expect(overlayTheme({ ...baseSetlist, overlayTheme: theme })).toBe(theme);
     }
+  });
+});
+
+describe("overlayLineDisplayOptions", () => {
+  it("uses overlay-only flags, not setlist copy/list flags", () => {
+    const setlist: Setlist = {
+      ...baseSetlist,
+      hideArtist: true,
+      hideDuration: true,
+      overlayHideArtist: false,
+      overlayHideDuration: false,
+    };
+    expect(overlayLineDisplayOptions(setlist)).toEqual({
+      hideArtist: false,
+      hideDuration: false,
+    });
+  });
+
+  it("hides artist and duration on overlay when overlay flags are set", () => {
+    expect(
+      overlayLineDisplayOptions({
+        ...baseSetlist,
+        overlayHideArtist: true,
+        overlayHideDuration: true,
+      }),
+    ).toEqual({ hideArtist: true, hideDuration: true });
   });
 });
 

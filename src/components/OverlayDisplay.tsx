@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import OverlayNowTitleMarquee from "@/components/OverlayNowTitleMarquee";
-import { formatDuration } from "@/lib/setlist-engine";
+import { formatDuration, formatSetlistSongLine } from "@/lib/setlist-engine";
 import {
   isCustomOverlayTextColor,
   OVERLAY_CONTENT_INSET_CLASS,
@@ -12,11 +12,13 @@ import {
 } from "@/lib/overlay-colors";
 import {
   getOverlayThemeDefinition,
+  overlayLineDisplayOptions,
   overlayMode,
   overlayTheme,
   overlayVisible,
   resolveOverlaySongs,
 } from "@/lib/overlay";
+import { OVERLAY_SECTION_LABELS } from "@/lib/overlay-theme";
 import type { Setlist, Song } from "@/types/setlist";
 
 type Props = {
@@ -47,7 +49,9 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
     : undefined;
 
   const { ordered, past, current, next, currentIndex } = resolveOverlaySongs(setlist, songs);
-  const showDuration = !setlist.hideDuration;
+  const lineOptions = overlayLineDisplayOptions(setlist);
+  const showArtist = !lineOptions.hideArtist;
+  const showDuration = !lineOptions.hideDuration;
 
   const rootPadding = compact
     ? OVERLAY_CONTENT_INSET_CLASS.compact
@@ -69,26 +73,24 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
     );
   }
 
-  function songSubLine(song: (typeof ordered)[number]) {
-    return (
-      <>
-        {song.artist}
-        {showDuration ? `（${formatDuration(song.durationSec)}）` : ""}
-      </>
-    );
+  function songSubLine(song: (typeof ordered)[number]): string | null {
+    if (!showArtist && !showDuration) return null;
+    if (!showArtist) return formatDuration(song.durationSec);
+    if (!showDuration) return song.artist;
+    return `${song.artist}（${formatDuration(song.durationSec)}）`;
   }
 
   function pastSongsBlock() {
     if (past.length === 0) return null;
     return (
       <div className={`min-w-0 opacity-55 ${sectionDividerClass}`} style={sectionDividerStyle}>
-        <p className={tc(styles.setlistLabel)}>SETLIST</p>
+        <p className={tc(styles.setlistLabel)}>{OVERLAY_SECTION_LABELS.setlist}</p>
         <ul className="mt-1 space-y-0.5">
           {past.map((song) => {
             const indexInSetlist = ordered.findIndex((item) => item.id === song.id);
             return (
               <li key={song.id} className={tc(styles.setlistLine)}>
-                {indexInSetlist + 1}. {song.title} / {song.artist}
+                {formatSetlistSongLine(song, indexInSetlist, lineOptions)}
               </li>
             );
           })}
@@ -115,6 +117,7 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
           {ordered.map((song, index) => {
             const isCurrent = index === currentIndex;
             const isPast = currentIndex >= 0 && index < currentIndex;
+            const sub = songSubLine(song);
             return (
               <li
                 key={song.id}
@@ -127,10 +130,7 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
                 >
                   {String(index + 1).padStart(2, "0")} {song.title}
                 </p>
-                <p className={tc(fullSubClass)}>
-                  {song.artist}
-                  {showDuration ? `（${formatDuration(song.durationSec)}）` : ""}
-                </p>
+                {sub ? <p className={tc(fullSubClass)}>{sub}</p> : null}
               </li>
             );
           })}
@@ -154,28 +154,32 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
   const nextTitleClass = compact ? styles.nextTitleCompact : styles.nextTitle;
   const nextSubClass = compact ? styles.nextSubCompact : styles.nextSub;
   const nextBlockClass = themeId === "minimal" ? "opacity-65" : "opacity-70";
+  const currentSub = songSubLine(current);
+  const nextSub = next ? songSubLine(next) : null;
 
   return frame(
     <div className={`grid max-w-full min-w-0 ${blockGap}`}>
       <div className={`min-w-0 ${nowBlockClass}`}>
-        <p className={`overlay-now-label ${tc(styles.label)}`}>Now Singing</p>
+        <p className={`overlay-now-label whitespace-nowrap ${tc(styles.label)}`}>
+          {OVERLAY_SECTION_LABELS.now}
+        </p>
         <OverlayNowTitleMarquee
           songId={current.id}
           line={`${currentIndex + 1}. ${current.title}`}
           className={tc(nowTitleClass)}
         />
-        <p className={`mt-1 ${tc(nowSubClass)}`}>{songSubLine(current)}</p>
+        {currentSub ? <p className={`mt-1 ${tc(nowSubClass)}`}>{currentSub}</p> : null}
       </div>
       {mode === "currentAndNext" && next ? (
         <div
           className={`min-w-0 ${sectionDividerClass} ${nextBlockClass}`}
           style={sectionDividerStyle}
         >
-          <p className={tc(styles.label)}>Next</p>
+          <p className={tc(styles.label)}>{OVERLAY_SECTION_LABELS.next}</p>
           <p className={`mt-0.5 ${tc(nextTitleClass)}`}>
             {currentIndex + 2}. {next.title}
           </p>
-          <p className={`mt-0 ${tc(nextSubClass)}`}>{songSubLine(next)}</p>
+          {nextSub ? <p className={`mt-0 ${tc(nextSubClass)}`}>{nextSub}</p> : null}
         </div>
       ) : null}
       {showPast ? pastSongsBlock() : null}

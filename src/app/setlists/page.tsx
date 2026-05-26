@@ -1,7 +1,7 @@
 "use client";
 
 import CopySetlistButton from "@/components/CopySetlistButton";
-import RowActionButton, { RowActionAnchor, RowActionLink } from "@/components/RowActionButton";
+import RowActionButton, { RowActionLink } from "@/components/RowActionButton";
 import { formatDuration, formatSetlistText, getSetlistDuration } from "@/lib/setlist-engine";
 import { removeSetlist } from "@/lib/storage";
 import { useAppData } from "@/lib/use-app-data";
@@ -58,16 +58,7 @@ export default function SetlistsPage() {
                       <RowActionLink href={`/builder?id=${setlist.id}`} variant="secondary">
                         編集
                       </RowActionLink>
-                      <CopySetlistButton text={text} label="コピー" compact />
-                      <RowActionAnchor
-                        href={`/overlay?id=${encodeURIComponent(setlist.id)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        variant="secondary"
-                        className="max-md:hidden"
-                      >
-                        操作
-                      </RowActionAnchor>
+                      <CopySetlistButton text={text} label="コピー" />
                       <RowActionButton
                         type="button"
                         variant="danger"

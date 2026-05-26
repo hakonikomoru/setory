@@ -1,5 +1,5 @@
 import { isOverlayTheme } from "@/lib/overlay-theme";
-import { getSongsFromSetlist } from "@/lib/setlist-engine";
+import { getSongsFromSetlist, type SetlistLineDisplayOptions } from "@/lib/setlist-engine";
 import type { OverlayMode, OverlayTheme, Setlist, Song } from "@/types/setlist";
 
 export {
@@ -25,6 +25,14 @@ export function overlayTheme(setlist: Setlist): OverlayTheme {
   const raw = setlist.overlayTheme;
   if (raw && isOverlayTheme(raw)) return raw;
   return DEFAULT_OVERLAY_THEME;
+}
+
+/** オーバーレイの曲行表示（hideArtist / hideDuration とは別） */
+export function overlayLineDisplayOptions(setlist: Setlist): SetlistLineDisplayOptions {
+  return {
+    hideArtist: Boolean(setlist.overlayHideArtist),
+    hideDuration: Boolean(setlist.overlayHideDuration),
+  };
 }
 
 export type OverlaySongContext = {

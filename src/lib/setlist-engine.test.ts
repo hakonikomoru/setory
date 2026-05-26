@@ -90,4 +90,37 @@ describe("formatSetlistText", () => {
     expect(text).toContain("合計: 1曲");
     expect(text).not.toMatch(/合計: 1曲 \//);
   });
+
+  it("omits artists when hideArtist is set", () => {
+    const setlist: Setlist = {
+      id: "set-3",
+      name: "アーティストなし",
+      songIds: [SAMPLE_SONGS[0].id],
+      hideArtist: true,
+      createdAt: "2026-05-27T00:00:00.000Z",
+      updatedAt: "2026-05-27T00:00:00.000Z",
+    };
+
+    const text = formatSetlistText(setlist, SAMPLE_SONGS);
+    expect(text).toContain("1. 夜に駆ける（");
+    expect(text).not.toContain("YOASOBI");
+    expect(text).toMatch(/^1\. 夜に駆ける（/m);
+  });
+
+  it("shows title only when hideArtist and hideDuration are set", () => {
+    const setlist: Setlist = {
+      id: "set-4",
+      name: "曲名のみ",
+      songIds: [SAMPLE_SONGS[0].id],
+      hideArtist: true,
+      hideDuration: true,
+      createdAt: "2026-05-27T00:00:00.000Z",
+      updatedAt: "2026-05-27T00:00:00.000Z",
+    };
+
+    const text = formatSetlistText(setlist, SAMPLE_SONGS);
+    expect(text).toContain("1. 夜に駆ける");
+    expect(text).not.toContain("YOASOBI");
+    expect(text).not.toMatch(/1\. 夜に駆ける（/);
+  });
 });

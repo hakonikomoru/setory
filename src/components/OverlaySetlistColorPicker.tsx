@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import RowActionButton from "@/components/RowActionButton";
+import { OVERLAY_SECTION_LABELS } from "@/lib/overlay-theme";
 import {
   DEFAULT_OVERLAY_SETLIST_MAX_WIDTH_PX,
   isCustomOverlayTextColor,
@@ -108,7 +109,8 @@ export default function OverlaySetlistColorPicker({
       <fieldset>
         <legend className="text-sm font-semibold text-violet-900">オーバーレイの文字色</legend>
         <p className="mt-1 text-xs text-violet-600">
-          NOW・NEXT・SETLIST など、オーバーレイ全体の文字色に反映されます。
+          {OVERLAY_SECTION_LABELS.now}・{OVERLAY_SECTION_LABELS.next}・
+          {OVERLAY_SECTION_LABELS.setlist} など、オーバーレイ全体の文字色に反映されます。
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <RowActionButton
@@ -172,7 +174,8 @@ export default function OverlaySetlistColorPicker({
       <fieldset>
         <legend className="text-sm font-semibold text-violet-900">オーバーレイの横幅</legend>
         <p className="mt-1 text-xs text-violet-600">
-          NOW・NEXT・SETLIST
+          {OVERLAY_SECTION_LABELS.now}・{OVERLAY_SECTION_LABELS.next}・
+          {OVERLAY_SECTION_LABELS.setlist}
           とプレビュー背景ごと調整。ショートカットと数値は左のプレビュー幅を超えません。
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">

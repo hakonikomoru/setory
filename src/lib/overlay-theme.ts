@@ -1,5 +1,12 @@
 import type { OverlayTheme } from "@/types/setlist";
 
+/** オーバーレイ各ブロックの見出し（NOW は略さず NOW SINGING） */
+export const OVERLAY_SECTION_LABELS = {
+  now: "NOW SINGING",
+  next: "NEXT",
+  setlist: "SETLIST",
+} as const;
+
 export type OverlayThemeColors = {
   label: string;
   primary: string;

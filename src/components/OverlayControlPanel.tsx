@@ -64,6 +64,12 @@ export default function OverlayControlPanel() {
     if ("overlaySetlistMaxWidthPx" in patch && patch.overlaySetlistMaxWidthPx === undefined) {
       delete next.overlaySetlistMaxWidthPx;
     }
+    if ("overlayHideArtist" in patch && patch.overlayHideArtist === undefined) {
+      delete next.overlayHideArtist;
+    }
+    if ("overlayHideDuration" in patch && patch.overlayHideDuration === undefined) {
+      delete next.overlayHideDuration;
+    }
     persistSetlist(next);
   }
 
@@ -201,11 +207,10 @@ export default function OverlayControlPanel() {
                           }`}
                         >
                           <p className="w-full text-left leading-snug font-bold break-words text-violet-950">
-                            {formatSetlistSongLine(
-                              song,
-                              index,
-                              Boolean(setlist.hideDuration),
-                            )}
+                            {formatSetlistSongLine(song, index, {
+                              hideDuration: Boolean(setlist.hideDuration),
+                              hideArtist: Boolean(setlist.hideArtist),
+                            })}
                             {isCurrent ? (
                               <span className="ml-2 rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
                                 現在

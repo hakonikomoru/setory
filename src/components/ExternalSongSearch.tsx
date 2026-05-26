@@ -19,6 +19,8 @@ type Props = {
   className?: string;
   importTarget?: ExternalSongImportTarget;
   setlistSongIds?: string[];
+  /** false のとき見出し h2 を出さない（親のタブ見出しと重ねない） */
+  showTitle?: boolean;
 };
 
 export default function ExternalSongSearch({
@@ -29,6 +31,7 @@ export default function ExternalSongSearch({
   className = "",
   importTarget = "library",
   setlistSongIds = [],
+  showTitle = true,
 }: Props) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -175,12 +178,18 @@ export default function ExternalSongSearch({
 
   return (
     <section className={`grid gap-3 ${className}`}>
-      <header>
-        <h2 className="text-xl font-bold text-violet-950">曲を検索して取り込む</h2>
-        <p className="mt-1 text-sm text-violet-700">
+      {showTitle ? (
+        <header>
+          <h2 className="text-xl font-bold text-violet-950">曲を検索して取り込む</h2>
+          <p className="mt-1 text-sm text-violet-700">
+            1回の検索で最大100件。さらに「まとめて200件取得」で追加できます。
+          </p>
+        </header>
+      ) : (
+        <p className="text-sm text-violet-700">
           1回の検索で最大100件。さらに「まとめて200件取得」で追加できます。
         </p>
-      </header>
+      )}
 
       <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 shadow-sm">
       <label className="grid gap-1 text-sm font-semibold text-violet-900">

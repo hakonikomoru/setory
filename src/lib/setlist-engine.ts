@@ -57,16 +57,35 @@ export function getSetlistDuration(setlist: Setlist, songs: Song[]): number {
   return getSongsFromSetlist(setlist, songs).reduce((sum, song) => sum + song.durationSec, 0);
 }
 
+export type SetlistLineDisplayOptions = {
+  hideDuration?: boolean;
+  hideArtist?: boolean;
+};
+
 /** 保存セトリ・コピー用と同じ 1 行表記（例: `1. 曲名 / アーティスト（3:45）`） */
-export function formatSetlistSongLine(song: Song, index: number, hideDuration: boolean): string {
-  const base = `${index + 1}. ${song.title} / ${song.artist}`;
-  return hideDuration ? base : `${base}（${formatDuration(song.durationSec)}）`;
+export function formatSetlistSongLine(
+  song: Song,
+  index: number,
+  options: SetlistLineDisplayOptions = {},
+): string {
+  const hideDuration = Boolean(options.hideDuration);
+  const hideArtist = Boolean(options.hideArtist);
+  const prefix = `${index + 1}. ${song.title}`;
+
+  if (hideArtist && hideDuration) return prefix;
+  if (hideArtist) return `${prefix}（${formatDuration(song.durationSec)}）`;
+  if (hideDuration) return `${prefix} / ${song.artist}`;
+  return `${prefix} / ${song.artist}（${formatDuration(song.durationSec)}）`;
 }
 
 export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
   const ordered = getSongsFromSetlist(setlist, songs);
+  const lineOptions: SetlistLineDisplayOptions = {
+    hideDuration: Boolean(setlist.hideDuration),
+    hideArtist: Boolean(setlist.hideArtist),
+  };
+  const lines = ordered.map((song, index) => formatSetlistSongLine(song, index, lineOptions));
   const hideDuration = Boolean(setlist.hideDuration);
-  const lines = ordered.map((song, index) => formatSetlistSongLine(song, index, hideDuration));
   const total = ordered.reduce((sum, song) => sum + song.durationSec, 0);
   const totalLine = hideDuration
     ? `合計: ${ordered.length}曲`
