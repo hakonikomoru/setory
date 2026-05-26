@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import SearchInput from "@/components/SearchInput";
 import { formatDuration } from "@/lib/setlist-engine";
 import { externalHitToSong, mergeExternalHits, type ExternalSongHit } from "@/lib/musicbrainz";
 import { findSongInLibrary, isSongInLibrary, isSongInSetlist } from "@/lib/song-match";
@@ -182,13 +183,11 @@ export default function ExternalSongSearch({
 
       <label className="mt-4 grid gap-1 text-sm font-semibold text-violet-900">
         曲名・アーティストで検索
-        <input
-          type="search"
+        <SearchInput
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={setQuery}
           placeholder="例: artist:YOASOBI、夜に駆ける"
-          className="rounded-xl border border-violet-200 bg-white px-3 py-2"
-          autoComplete="off"
+          inputClassName="bg-white"
         />
       </label>
 

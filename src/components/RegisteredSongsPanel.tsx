@@ -1,5 +1,6 @@
 "use client";
 
+import SearchInput from "@/components/SearchInput";
 import SongList from "@/components/SongList";
 import type { Song } from "@/types/setlist";
 
@@ -42,13 +43,10 @@ export default function RegisteredSongsPanel({
       <div className="mt-3 rounded-2xl border border-violet-100 bg-white/90 p-4 shadow-sm">
         <label className="grid gap-1 text-sm font-semibold text-violet-900">
           曲名で検索
-          <input
-            type="search"
+          <SearchInput
             value={searchQuery}
-            onChange={(e) => onSearchQueryChange(e.target.value)}
+            onChange={onSearchQueryChange}
             placeholder={searchPlaceholder}
-            className="rounded-xl border border-violet-200 px-3 py-2"
-            autoComplete="off"
           />
         </label>
         <p className="mt-2 text-xs text-violet-600">
