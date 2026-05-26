@@ -1,0 +1,16 @@
+{
+  "repo": "hakonikomoru/setory",
+  "rootLabel": "setory",
+  "treeMaxDepth": 2,
+  "markers": [
+    "meta",
+    "directory-tree",
+    "pages"
+  ],
+  "treeEntries": [
+    "public",
+    "scripts",
+    "src"
+  ],
+  "nextAppRoot": "src/app"
+}

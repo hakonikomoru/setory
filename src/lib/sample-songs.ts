@@ -1,0 +1,68 @@
+import type { Song } from "@/types/setlist";
+
+export const SAMPLE_SONGS: Song[] = [
+  {
+    id: "sample-1",
+    title: "夜に駆ける",
+    artist: "YOASOBI",
+    durationSec: 258,
+    mood: "upbeat",
+    tags: ["アニソン", "定番"],
+  },
+  {
+    id: "sample-2",
+    title: "残酷な天使のテーゼ",
+    artist: "高橋洋子",
+    durationSec: 245,
+    mood: "upbeat",
+    tags: ["アニソン", "定番", "盛り上がり"],
+  },
+  {
+    id: "sample-3",
+    title: "ドライフラワー",
+    artist: "優里",
+    durationSec: 281,
+    mood: "ballad",
+    tags: ["バラード", "切ない"],
+  },
+  {
+    id: "sample-4",
+    title: "マリーゴールド",
+    artist: "あいみょん",
+    durationSec: 307,
+    mood: "mid",
+    tags: ["J-POP", "定番"],
+  },
+  {
+    id: "sample-5",
+    title: "紅蓮華",
+    artist: "LiSA",
+    durationSec: 238,
+    mood: "upbeat",
+    tags: ["アニソン", "盛り上がり"],
+  },
+  {
+    id: "sample-6",
+    title: "Lemon",
+    artist: "米津玄師",
+    durationSec: 255,
+    mood: "ballad",
+    tags: ["バラード", "定番"],
+  },
+  {
+    id: "sample-7",
+    title: "群青",
+    artist: "YOASOBI",
+    durationSec: 248,
+    mood: "mid",
+    tags: ["J-POP", "切ない"],
+  },
+  {
+    id: "sample-8",
+    title: "God knows...",
+    artist: "涼宮ハルヒ（CV.平野綾）",
+    durationSec: 357,
+    mood: "upbeat",
+    tags: ["アニソン", "盛り上がり", "定番"],
+  },
+];
