@@ -28,11 +28,16 @@ export function getSetlistDuration(setlist: Setlist, songs: Song[]): number {
 
 export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
   const ordered = getSongsFromSetlist(setlist, songs);
-  const lines = ordered.map(
-    (song, index) =>
-      `${index + 1}. ${song.title} / ${song.artist}（${formatDuration(song.durationSec)}）`,
+  const hideDuration = Boolean(setlist.hideDuration);
+  const lines = ordered.map((song, index) =>
+    hideDuration
+      ? `${index + 1}. ${song.title} / ${song.artist}`
+      : `${index + 1}. ${song.title} / ${song.artist}（${formatDuration(song.durationSec)}）`,
   );
   const total = ordered.reduce((sum, song) => sum + song.durationSec, 0);
+  const totalLine = hideDuration
+    ? `合計: ${ordered.length}曲`
+    : `合計: ${ordered.length}曲 / ${formatDuration(total)}`;
 
   return [
     `【${setlist.name}】`,
@@ -40,7 +45,7 @@ export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
     "",
     ...lines,
     "",
-    `合計: ${ordered.length}曲 / ${formatDuration(total)}`,
+    totalLine,
   ]
     .filter((line): line is string => line !== null)
     .join("\n");
@@ -147,4 +152,21 @@ export function parseTagsInput(input: string): string[] {
     .split(/[,、\s]+/)
     .map((tag) => tag.trim())
     .filter(Boolean);
+}
+
+/** 曲名・アーティスト・タグで曲庫を絞り込む（空クエリは全件） */
+export function filterSongsByQuery(songs: Song[], query: string): Song[] {
+  const tokens = query
+    .trim()
+    .toLowerCase()
+    .split(/[\s,、]+/)
+    .filter(Boolean);
+
+  if (tokens.length === 0) return songs;
+
+  return songs.filter((song) => {
+    const haystack =
+      `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase();
+    return tokens.every((token) => haystack.includes(token));
+  });
 }

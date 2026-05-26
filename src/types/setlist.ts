@@ -15,6 +15,8 @@ export type Setlist = {
   name: string;
   songIds: string[];
   theme?: string;
+  /** コピー用テキスト・一覧で曲の尺を出さない */
+  hideDuration?: boolean;
   createdAt: string;
   updatedAt: string;
 };

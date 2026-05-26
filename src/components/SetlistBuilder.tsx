@@ -2,37 +2,50 @@
 
 import { useMemo, useState } from "react";
 import CopySetlistButton from "@/components/CopySetlistButton";
+import ExternalSongSearch from "@/components/ExternalSongSearch";
 import SongList from "@/components/SongList";
 import {
+  filterSongsByQuery,
   formatDuration,
   formatSetlistText,
   getSetlistDuration,
 } from "@/lib/setlist-engine";
-import { createId } from "@/lib/storage";
+import { createId, upsertSong } from "@/lib/storage";
 import type { AppData, Setlist, Song } from "@/types/setlist";
 
 type Props = {
   data: AppData;
   initialSetlist?: Setlist;
   onSave: (data: AppData) => void;
+  onDataChange: (data: AppData) => void;
 };
 
-export default function SetlistBuilder({ data, initialSetlist, onSave }: Props) {
+export default function SetlistBuilder({
+  data,
+  initialSetlist,
+  onSave,
+  onDataChange,
+}: Props) {
   const [name, setName] = useState(initialSetlist?.name ?? "新しいセトリ");
   const [theme, setTheme] = useState(initialSetlist?.theme ?? "");
   const [songIds, setSongIds] = useState<string[]>(initialSetlist?.songIds ?? []);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [hideDuration, setHideDuration] = useState(
+    initialSetlist?.hideDuration ?? false,
+  );
 
   const draftSetlist: Setlist = useMemo(
     () => ({
       id: initialSetlist?.id ?? createId("setlist"),
       name,
       theme: theme.trim() || undefined,
+      hideDuration: hideDuration || undefined,
       songIds,
       createdAt: initialSetlist?.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }),
-    [initialSetlist, name, theme, songIds],
+    [initialSetlist, name, theme, hideDuration, songIds],
   );
 
   const selectedSongs = songIds
@@ -40,6 +53,10 @@ export default function SetlistBuilder({ data, initialSetlist, onSave }: Props) 
     .filter((song): song is Song => Boolean(song));
 
   const availableSongs = data.songs.filter((song) => !songIds.includes(song.id));
+  const filteredAvailableSongs = useMemo(
+    () => filterSongsByQuery(availableSongs, searchQuery),
+    [availableSongs, searchQuery],
+  );
   const totalSec = getSetlistDuration(draftSetlist, data.songs);
   const exportText = formatSetlistText(draftSetlist, data.songs);
 
@@ -102,11 +119,21 @@ export default function SetlistBuilder({ data, initialSetlist, onSave }: Props) 
                 placeholder="誕生日配信、切ない回 など"
               />
             </label>
+            <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
+              <input
+                type="checkbox"
+                checked={hideDuration}
+                onChange={(e) => setHideDuration(e.target.checked)}
+                className="size-4 rounded border-violet-300"
+              />
+              曲時間を表示しない（コピー用テキスト・曲順一覧）
+            </label>
           </div>
           <p className="mt-4 text-sm text-violet-700">
-            選択中: {selectedSongs.length}曲 / 合計 {formatDuration(totalSec)}
+            選択中: {selectedSongs.length}曲
+            {hideDuration ? null : <> / 合計 {formatDuration(totalSec)}</>}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleSave}
@@ -141,10 +168,12 @@ export default function SetlistBuilder({ data, initialSetlist, onSave }: Props) 
                       {index + 1}. {song.title}
                     </p>
                     <p className="text-sm text-violet-700">
-                      {song.artist}（{formatDuration(song.durationSec)}）
+                      {hideDuration
+                        ? song.artist
+                        : `${song.artist}（${formatDuration(song.durationSec)}）`}
                     </p>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => moveSong(index, -1)}
@@ -180,11 +209,49 @@ export default function SetlistBuilder({ data, initialSetlist, onSave }: Props) 
 
       <section>
         <h3 className="mb-3 text-lg font-bold text-violet-950">曲を追加</h3>
-        <SongList
-          songs={availableSongs}
-          selectedIds={songIds}
-          onAddToSetlist={toggleSong}
+        <ExternalSongSearch
+          librarySongs={data.songs}
+          importLabel="追加してセトリへ"
+          className="mb-4"
+          onImport={(song) => {
+            const nextData = upsertSong(data, song);
+            onDataChange(nextData);
+            setSongIds((current) =>
+              current.includes(song.id) ? current : [...current, song.id],
+            );
+          }}
         />
+        <div className="mb-4 rounded-2xl border border-violet-100 bg-white/90 p-4 shadow-sm">
+          <label className="grid gap-1 text-sm font-semibold text-violet-900">
+            登録曲から曲名で検索
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="曲名・アーティスト・タグ"
+              className="rounded-xl border border-violet-200 px-3 py-2"
+              autoComplete="off"
+            />
+          </label>
+          <p className="mt-2 text-xs text-violet-600">
+            {searchQuery.trim()
+              ? `${filteredAvailableSongs.length}件ヒット（未追加 ${availableSongs.length}曲）`
+              : `未追加の曲: ${availableSongs.length}曲`}
+          </p>
+        </div>
+        {searchQuery.trim() &&
+        filteredAvailableSongs.length === 0 &&
+        availableSongs.length > 0 ? (
+          <p className="rounded-2xl border border-dashed border-violet-200 bg-violet-50/60 px-4 py-6 text-center text-sm text-violet-700">
+            「{searchQuery.trim()}」に一致する曲がありません。
+          </p>
+        ) : (
+          <SongList
+            songs={filteredAvailableSongs}
+            selectedIds={songIds}
+            onAddToSetlist={toggleSong}
+          />
+        )}
       </section>
     </div>
   );

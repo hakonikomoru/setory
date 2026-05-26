@@ -114,7 +114,7 @@ export default function SuggestPage() {
             <option value="surprise">ランダム（サプライズ）</option>
           </select>
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="submit"
             className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white"

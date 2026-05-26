@@ -28,7 +28,7 @@ export default function SetlistsPage() {
         </div>
         <Link
           href="/builder"
-          className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white"
+          className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white"
         >
           新規作成
         </Link>
@@ -63,10 +63,10 @@ export default function SetlistsPage() {
                         {setlist.songIds.length}曲 / {formatDuration(duration)}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Link
                         href={`/builder?id=${setlist.id}`}
-                        className="rounded-lg border border-violet-200 px-3 py-1.5 text-xs font-semibold"
+                        className="inline-flex items-center justify-center rounded-lg border border-violet-200 px-3 py-1.5 text-xs font-semibold"
                       >
                         編集
                       </Link>

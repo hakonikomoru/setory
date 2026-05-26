@@ -30,7 +30,7 @@ export default function AppNav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold transition ${
                   active
                     ? "bg-violet-600 text-white shadow-md shadow-violet-200"
                     : "bg-violet-50 text-violet-800 hover:bg-violet-100"

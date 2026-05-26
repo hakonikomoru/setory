@@ -22,6 +22,7 @@ function BuilderContent() {
       key={initialSetlist?.id ?? "new"}
       data={data}
       initialSetlist={initialSetlist}
+      onDataChange={setData}
       onSave={(next) => {
         setData(next);
         window.alert("セトリを保存しました");
@@ -36,7 +37,7 @@ export default function BuilderPage() {
       <header className="mb-6">
         <h1 className="text-3xl font-black text-violet-950">セトリ作成</h1>
         <p className="mt-2 text-sm text-violet-700">
-          曲を選んで並べ替え、配信概要欄やX投稿用のテキストをコピーできます。
+          曲名で検索して追加し、並べ替えたあと配信概要欄やX投稿用のテキストをコピーできます。
         </p>
       </header>
       <Suspense fallback={<p>読み込み中...</p>}>
