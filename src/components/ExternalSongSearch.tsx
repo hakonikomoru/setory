@@ -195,26 +195,22 @@ export default function ExternalSongSearch({
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {importableHits.length > 0 ? (
-          <button
-            type="button"
-            onClick={handleImportAll}
-            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white"
-          >
+          <RowActionButton type="button" variant="primary" onClick={handleImportAll}>
             {importTarget === "libraryAndSetlist"
               ? "表示中の曲をすべてセトリに追加"
               : "表示中の未追加曲をすべて追加"}
             （{importableHits.length}曲）
-          </button>
+          </RowActionButton>
         ) : null}
         {debouncedQuery.length >= 2 ? (
-          <button
+          <RowActionButton
             type="button"
+            variant="secondary"
             disabled={deepLoading || loading}
             onClick={loadDeep}
-            className="rounded-xl border border-indigo-300 bg-white px-4 py-2 text-sm font-semibold text-indigo-800 disabled:opacity-40"
           >
             {deepLoading ? "取得中..." : "まとめて200件取得"}
-          </button>
+          </RowActionButton>
         ) : null}
       </div>
 

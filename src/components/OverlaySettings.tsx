@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import OverlaySetlistColorPicker from "@/components/OverlaySetlistColorPicker";
+import RowActionButton, { RowActionAnchor } from "@/components/RowActionButton";
 import { buildObsDisplayUrl, buildOverlayControlUrl, OVERLAY_THEME_OPTIONS } from "@/lib/overlay";
 import type { OverlayMode, OverlayTheme, Setlist } from "@/types/setlist";
 
@@ -127,27 +128,15 @@ export default function OverlaySettings({
           {obsUrl}
         </code>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={copyObsUrl}
-            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white"
-          >
+          <RowActionButton type="button" variant="primary" onClick={copyObsUrl}>
             {copiedObs ? "コピーしました" : "OBS用 URL をコピー"}
-          </button>
-          <a
-            href={obsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-white px-4 py-2 text-sm font-semibold text-indigo-800"
-          >
+          </RowActionButton>
+          <RowActionAnchor href={obsUrl} target="_blank" rel="noreferrer" variant="secondary">
             表示のみを開く
-          </a>
-          <a
-            href={controlUrl}
-            className="inline-flex items-center justify-center rounded-xl border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-800"
-          >
+          </RowActionAnchor>
+          <RowActionAnchor href={controlUrl} variant="secondary">
             操作画面を開く
-          </a>
+          </RowActionAnchor>
         </div>
       </div>
 

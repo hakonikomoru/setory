@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import RowActionButton from "@/components/RowActionButton";
 import { createId } from "@/lib/storage";
 import { formatMoodInput, parseMoodInput } from "@/lib/setlist-engine";
 import type { Song } from "@/types/setlist";
@@ -121,20 +122,13 @@ export default function SongForm({ initial, onSave, onCancel }: Props) {
       </label>
 
       <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="submit"
-          className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-700"
-        >
+        <RowActionButton type="submit" variant="primary">
           {initial ? "曲を更新" : "曲を追加"}
-        </button>
+        </RowActionButton>
         {onCancel ? (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-xl border border-violet-200 px-4 py-2 text-sm font-semibold text-violet-800"
-          >
+          <RowActionButton type="button" variant="secondary" onClick={onCancel}>
             キャンセル
-          </button>
+          </RowActionButton>
         ) : null}
       </div>
     </form>

@@ -38,6 +38,11 @@ export function rowActionButtonClass(
   return `${BASE_CLASS} ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]} ${className}`.trim();
 }
 
+/** グリーンバック・既定色・全幅などの選択チップ */
+export function toggleActionClass(active: boolean, className = "") {
+  return rowActionButtonClass(active ? "accent" : "secondary", "md", className);
+}
+
 type ActionStyleProps = {
   variant?: RowActionButtonVariant;
   size?: RowActionButtonSize;

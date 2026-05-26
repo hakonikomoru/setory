@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import CopySetlistButton from "@/components/CopySetlistButton";
 import RowActionButton, { RowActionAnchor, RowActionLink } from "@/components/RowActionButton";
 import { formatDuration, formatSetlistText, getSetlistDuration } from "@/lib/setlist-engine";
@@ -24,12 +23,9 @@ export default function SetlistsPage() {
           </p>
           <p className="mt-2 text-sm text-violet-700">{data.setlists.length}件保存されています</p>
         </div>
-        <Link
-          href="/builder"
-          className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white"
-        >
+        <RowActionLink href="/builder" variant="primary">
           新規作成
-        </Link>
+        </RowActionLink>
       </header>
 
       {data.setlists.length === 0 ? (

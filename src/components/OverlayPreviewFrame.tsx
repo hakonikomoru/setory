@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import OverlayDisplay from "@/components/OverlayDisplay";
+import RowActionButton from "@/components/RowActionButton";
 import { overlayLayoutStyle } from "@/lib/overlay-colors";
 import { useElementWidth } from "@/lib/use-element-width";
 import type { Setlist, Song } from "@/types/setlist";
@@ -45,18 +46,15 @@ export default function OverlayPreviewFrame({
         <h2 className="text-lg font-bold text-violet-950">プレビュー背景</h2>
         <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="プレビュー背景">
           {BACKDROPS.map((item) => (
-            <button
+            <RowActionButton
               key={item.value}
               type="button"
+              variant={backdrop === item.value ? "accent" : "secondary"}
+              aria-pressed={backdrop === item.value}
               onClick={() => setBackdrop(item.value)}
-              className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                backdrop === item.value
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-200"
-                  : "border border-violet-200 bg-white text-violet-800 hover:bg-violet-50"
-              }`}
             >
               {item.label}
-            </button>
+            </RowActionButton>
           ))}
         </div>
       </div>

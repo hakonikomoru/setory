@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import OverlayPreviewFrame from "@/components/OverlayPreviewFrame";
-import RowActionButton from "@/components/RowActionButton";
+import RowActionButton, { RowActionLink } from "@/components/RowActionButton";
 import OverlaySettings from "@/components/OverlaySettings";
 import SetlistBuilder from "@/components/SetlistBuilder";
 import { formatSetlistSongLine } from "@/lib/setlist-engine";
@@ -109,12 +108,9 @@ export default function OverlayControlPanel() {
     return (
       <div className="rounded-2xl border border-dashed border-violet-200 bg-white/90 p-8 text-center">
         <p className="text-violet-800">保存したセトリがありません。</p>
-        <Link
-          href="/builder"
-          className="mt-4 inline-flex items-center justify-center rounded-xl bg-violet-600 px-5 py-2 text-sm font-bold text-white"
-        >
+        <RowActionLink href="/builder" variant="primary" className="mt-4">
           セトリを作成する
-        </Link>
+        </RowActionLink>
       </div>
     );
   }

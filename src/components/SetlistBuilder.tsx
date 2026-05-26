@@ -205,14 +205,14 @@ export default function SetlistBuilder({
             {embedded ? (
               <p className="text-sm text-violet-600">曲順・セトリ情報の変更は自動で保存されます</p>
             ) : (
-              <button
+              <RowActionButton
                 type="button"
+                variant="primary"
                 onClick={handleSave}
                 disabled={songIds.length === 0}
-                className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
               >
                 セトリを保存
-              </button>
+              </RowActionButton>
             )}
             <CopySetlistButton text={exportText} />
             </div>

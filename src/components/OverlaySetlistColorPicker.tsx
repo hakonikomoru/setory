@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import RowActionButton from "@/components/RowActionButton";
 import {
   DEFAULT_OVERLAY_SETLIST_MAX_WIDTH_PX,
   isCustomOverlayTextColor,
@@ -110,18 +111,15 @@ export default function OverlaySetlistColorPicker({
           NOW・NEXT・SETLIST など、オーバーレイ全体の文字色に反映されます。
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <button
+          <RowActionButton
             type="button"
             title="見た目に合わせた既定の色"
+            variant={!custom ? "accent" : "secondary"}
+            aria-pressed={!custom}
             onClick={selectThemeDefault}
-            className={`flex h-9 min-w-[4.5rem] items-center justify-center rounded-lg border px-2 text-xs font-semibold transition ${
-              !custom
-                ? "border-violet-500 bg-violet-100 text-violet-900 ring-2 ring-violet-400"
-                : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50"
-            }`}
           >
             既定色
-          </button>
+          </RowActionButton>
           {OVERLAY_SETLIST_PALETTE.map((preset) => {
             const selected = custom && activeColor === preset.color;
             return (
@@ -164,13 +162,9 @@ export default function OverlaySetlistColorPicker({
             spellCheck={false}
           />
           {custom ? (
-            <button
-              type="button"
-              onClick={selectThemeDefault}
-              className="rounded-lg border border-violet-200 px-2 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-50"
-            >
+            <RowActionButton type="button" variant="secondary" onClick={selectThemeDefault}>
               リセット
-            </button>
+            </RowActionButton>
           ) : null}
         </label>
       </fieldset>
@@ -185,45 +179,35 @@ export default function OverlaySetlistColorPicker({
           {widthPresets
             .filter((preset) => preset.widthPx === undefined)
             .map((preset) => (
-              <button
+              <RowActionButton
                 key={preset.id}
                 type="button"
+                variant={!widthCustom ? "accent" : "secondary"}
+                aria-pressed={!widthCustom}
                 onClick={() => onWidthChange(preset.widthPx)}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
-                  !widthCustom
-                    ? "border-violet-500 bg-violet-100 text-violet-900 ring-2 ring-violet-400"
-                    : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50"
-                }`}
               >
                 {preset.label}
-              </button>
+              </RowActionButton>
             ))}
           {widthCustom ? (
-            <button
-              type="button"
-              onClick={() => onWidthChange(undefined)}
-              className="rounded-lg border border-violet-200 px-3 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-50"
-            >
+            <RowActionButton type="button" variant="secondary" onClick={() => onWidthChange(undefined)}>
               全幅に戻す
-            </button>
+            </RowActionButton>
           ) : null}
           {widthPresets
             .filter((preset) => preset.widthPx !== undefined)
             .map((preset) => {
               const selected = widthCustom && displayWidthPx === preset.widthPx;
               return (
-                <button
+                <RowActionButton
                   key={preset.id}
                   type="button"
+                  variant={selected ? "accent" : "secondary"}
+                  aria-pressed={selected}
                   onClick={() => onWidthChange(preset.widthPx)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
-                    selected
-                      ? "border-violet-500 bg-violet-100 text-violet-900 ring-2 ring-violet-400"
-                      : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50"
-                  }`}
                 >
                   {`${preset.label}px`}
-                </button>
+                </RowActionButton>
               );
             })}
         </div>
