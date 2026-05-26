@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Setory",
     description:
-      "カラオケ・歌練習・配信のセットリストをブラウザだけで作れるローカル保存型Webアプリ",
+      "カラオケ・歌練習・配信向けのセトリ作成。インストール不要で、この端末に保存して使えます",
     locale: "ja_JP",
     type: "website",
   },

@@ -39,7 +39,7 @@ const features: Feature[] = [
     id: "setlists",
     href: "/setlists",
     title: "保存したセトリ",
-    body: "過去のセトリを一覧・編集・再コピー。ブラウザのローカルストレージに保存されます。",
+    body: "過去のセトリを一覧・編集・再コピー。この端末に保存されるので、あとからすぐ呼び出せます。",
     accent: "bg-violet-100 text-violet-900",
   },
 ];
@@ -100,7 +100,7 @@ export default function Home() {
         </p>
         <p className="mt-4 max-w-2xl text-base leading-8 text-violet-800/90 sm:text-lg">
           カラオケの持ち歌リスト、歌練習の曲順づくり、歌配信・ライブのセットリストまで、ひとつのアプリで作れます。
-          曲庫の管理、曲順の調整、OBS オーバーレイ、コピー用テキストの出力まで、ブラウザだけで完結します。
+          曲庫の管理、曲順の調整、OBS オーバーレイ、コピー用テキストの出力まで、インストール不要ですぐ使えます。
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
