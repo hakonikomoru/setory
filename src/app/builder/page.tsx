@@ -37,7 +37,7 @@ export default function BuilderPage() {
       <header className="mb-6">
         <h1 className="text-3xl font-black text-violet-950">セトリ作成</h1>
         <p className="mt-2 text-sm text-violet-700">
-          左でセトリを編集、右の登録曲一覧から追加できます。並べ替え後にコピー用テキストを出力します。
+          上でセトリを編集、下（PC では右）の登録曲一覧から追加できます。並べ替え後にコピー用テキストを出力します。
         </p>
       </header>
       <Suspense fallback={<p>読み込み中...</p>}>

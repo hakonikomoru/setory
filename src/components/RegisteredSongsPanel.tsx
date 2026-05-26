@@ -35,7 +35,11 @@ export default function RegisteredSongsPanel({
   const trimmedQuery = searchQuery.trim();
 
   return (
-    <aside className={sticky ? "sticky top-4 min-w-0" : "min-w-0"}>
+    <aside
+      className={
+        sticky ? "min-w-0 md:sticky md:top-4" : "min-w-0"
+      }
+    >
       <h2 className="text-xl font-bold text-violet-950">
         {title}（{totalCount}曲）
       </h2>

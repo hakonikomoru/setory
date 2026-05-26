@@ -149,7 +149,7 @@ export default function SetlistBuilder({
   }
 
   return (
-    <div className="grid grid-cols-2 items-start gap-6">
+    <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
       <section className="grid gap-4">
         <div className="rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-lg shadow-violet-100/40">
           <h2 className="text-xl font-bold text-violet-950">セトリ情報</h2>

@@ -135,8 +135,8 @@ export default function OverlayControlPanel() {
       </label>
 
       {setlist ? (
-        <div className="grid grid-cols-2 items-start gap-6">
-          <div className="sticky top-4 min-w-0 py-px">
+        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-2">
+          <div className="min-w-0 py-px xl:sticky xl:top-4">
             <OverlayDisplay setlist={setlist} songs={data.songs} compact />
           </div>
 

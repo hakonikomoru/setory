@@ -75,7 +75,8 @@ export default function SongList({
     );
   }
 
-  const listClass = layout === "grid" ? "grid grid-cols-2 gap-2" : "grid gap-3";
+  const listClass =
+    layout === "grid" ? "grid grid-cols-1 gap-2 sm:grid-cols-2" : "grid gap-3";
 
   return (
     <ul className={listClass}>

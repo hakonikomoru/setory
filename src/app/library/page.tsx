@@ -29,11 +29,11 @@ export default function LibraryPage() {
       <header className="mb-6">
         <h1 className="text-3xl font-black text-violet-950">曲庫</h1>
         <p className="mt-2 text-sm text-violet-700">
-          左で曲を取り込み・登録、右で登録曲を検索・編集できます。
+          上で曲を取り込み・登録、下（PC では右）で登録曲を検索・編集できます。
         </p>
       </header>
 
-      <div className="grid grid-cols-2 items-start gap-6">
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
         <div className="grid min-w-0 gap-6">
           <ExternalSongSearch
             librarySongs={data.songs}
