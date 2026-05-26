@@ -29,12 +29,13 @@ export default function AppNav() {
               link.href === "/"
                 ? pathname === "/"
                 : pathname.startsWith(link.href);
+            const desktopOnly = "desktopOnly" in link && link.desktopOnly;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`inline-flex shrink-0 items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                  "desktopOnly" in link && link.desktopOnly ? "hidden md:inline-flex" : ""
+                className={`shrink-0 items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                  desktopOnly ? "hidden md:inline-flex" : "inline-flex"
                 } ${
                   active
                     ? "bg-violet-600 text-white shadow-md shadow-violet-200"

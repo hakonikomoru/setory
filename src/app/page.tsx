@@ -1,6 +1,17 @@
 import Link from "next/link";
+import { Fragment } from "react";
 
-const features = [
+type Feature = {
+  id: string;
+  href: string;
+  title: string;
+  body: string;
+  accent: string;
+  note?: string;
+  desktopLinkOnly?: boolean;
+};
+
+const features: Feature[] = [
   {
     id: "library",
     href: "/library",
@@ -20,7 +31,9 @@ const features = [
     href: "/overlay",
     title: "オーバーレイ操作",
     body: "配信中に現在曲・次の曲を切り替え。OBS には表示専用 URL をブラウザソースに登録。",
+    note: "PC版ブラウザのみ",
     accent: "bg-indigo-600 text-white",
+    desktopLinkOnly: true,
   },
   {
     id: "setlists",
@@ -30,6 +43,47 @@ const features = [
     accent: "bg-violet-100 text-violet-900",
   },
 ];
+
+const cardBaseClass =
+  "rounded-2xl border border-violet-100 bg-white/85 p-6 shadow-md shadow-violet-100/40";
+const cardLinkClass = `${cardBaseClass} transition hover:-translate-y-0.5 hover:shadow-lg`;
+
+function FeatureCardContent({ feature }: { feature: Feature }) {
+  return (
+    <>
+      <span
+        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${feature.accent}`}
+      >
+        {feature.title}
+      </span>
+      <p className="mt-4 text-sm leading-7 text-violet-800">{feature.body}</p>
+      {feature.note ? (
+        <p className="mt-2 text-xs font-normal text-violet-500">{feature.note}</p>
+      ) : null}
+    </>
+  );
+}
+
+function FeatureCard({ feature }: { feature: Feature }) {
+  if (feature.desktopLinkOnly) {
+    return (
+      <Fragment key={feature.id}>
+        <div className={`${cardBaseClass} md:hidden`}>
+          <FeatureCardContent feature={feature} />
+        </div>
+        <Link href={feature.href} className={`${cardLinkClass} hidden md:block`}>
+          <FeatureCardContent feature={feature} />
+        </Link>
+      </Fragment>
+    );
+  }
+
+  return (
+    <Link key={feature.id} href={feature.href} className={cardLinkClass}>
+      <FeatureCardContent feature={feature} />
+    </Link>
+  );
+}
 
 export default function Home() {
   return (
@@ -66,18 +120,7 @@ export default function Home() {
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2">
         {features.map((feature) => (
-          <Link
-            key={feature.id}
-            href={feature.href}
-            className="rounded-2xl border border-violet-100 bg-white/85 p-6 shadow-md shadow-violet-100/40 transition hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            <span
-              className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${feature.accent}`}
-            >
-              {feature.title}
-            </span>
-            <p className="mt-4 text-sm leading-7 text-violet-800">{feature.body}</p>
-          </Link>
+          <FeatureCard key={feature.id} feature={feature} />
         ))}
       </section>
     </main>
