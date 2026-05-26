@@ -1,6 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import AppShell from "@/components/AppShell";
+import {
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_TITLE_FULL,
+  siteMetadataBase,
+} from "@/lib/site-metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,17 +19,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const metadataBase = siteMetadataBase();
+
 export const metadata: Metadata = {
-  title: "Setory",
-  description:
-    "配信・カラオケ・歌練習向けのセトリ作成。曲庫管理・曲順編集・コピー出力、PC では OBS オーバーレイにも対応",
-  applicationName: "Setory",
+  metadataBase,
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_TITLE,
   openGraph: {
-    title: "Setory",
-    description:
-      "カラオケ・歌練習・配信向けのセトリ作成。インストール不要で、この端末に保存して使えます",
+    title: SITE_TITLE_FULL,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_TITLE,
     locale: "ja_JP",
     type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: SITE_TITLE_FULL,
+    description: SITE_DESCRIPTION,
   },
 };
 
