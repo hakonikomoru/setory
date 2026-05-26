@@ -1,5 +1,9 @@
 export type SongMood = "upbeat" | "mid" | "ballad";
 
+export type OverlayMode = "current" | "currentAndNext" | "fullSetlist";
+
+export type OverlayTheme = "simple" | "cute" | "dark" | "komoru";
+
 export type Song = {
   id: string;
   title: string;
@@ -17,16 +21,15 @@ export type Setlist = {
   theme?: string;
   /** コピー用テキスト・一覧で曲の尺を出さない */
   hideDuration?: boolean;
+  /** オーバーレイでハイライトする曲（曲庫の song id） */
+  currentSongId?: string;
+  /** 1曲目表示時に NEXT を出さない（false のときだけ NEXT を表示） */
+  overlaySuppressNext?: boolean;
+  overlayVisible?: boolean;
+  overlayMode?: OverlayMode;
+  overlayTheme?: OverlayTheme;
   createdAt: string;
   updatedAt: string;
-};
-
-export type SuggestOptions = {
-  theme: string;
-  targetMinutes: number;
-  preferredTags: string[];
-  moodFlow: "warmup-peak-cooldown" | "steady" | "surprise";
-  maxSongs?: number;
 };
 
 export type AppData = {

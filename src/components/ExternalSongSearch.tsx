@@ -3,8 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDuration } from "@/lib/setlist-engine";
 import { externalHitToSong, mergeExternalHits, type ExternalSongHit } from "@/lib/musicbrainz";
-import { isSongInLibrary } from "@/lib/song-match";
+import {
+  findSongInLibrary,
+  isSongInLibrary,
+  isSongInSetlist,
+} from "@/lib/song-match";
 import type { Song } from "@/types/setlist";
+
+/** library: 曲庫のみ。libraryAndSetlist: 曲庫に無ければ追加し、セトリにも追加 */
+export type ExternalSongImportTarget = "library" | "libraryAndSetlist";
 
 type Props = {
   librarySongs: Song[];
@@ -12,6 +19,8 @@ type Props = {
   onImportMany?: (hits: ExternalSongHit[]) => void;
   importLabel?: string;
   className?: string;
+  importTarget?: ExternalSongImportTarget;
+  setlistSongIds?: string[];
 };
 
 export default function ExternalSongSearch({
@@ -20,6 +29,8 @@ export default function ExternalSongSearch({
   onImportMany,
   importLabel = "曲庫に追加",
   className = "",
+  importTarget = "library",
+  setlistSongIds = [],
 }: Props) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -77,17 +88,44 @@ export default function ExternalSongSearch({
     return () => controller.abort();
   }, [debouncedQuery]);
 
+  function resolveSong(hit: ExternalSongHit): Song {
+    return (
+      findSongInLibrary(librarySongs, hit.title, hit.artist) ??
+      externalHitToSong(hit)
+    );
+  }
+
+  function hitAlreadyImported(hit: ExternalSongHit): boolean {
+    if (importTarget === "libraryAndSetlist") {
+      return isSongInSetlist(
+        librarySongs,
+        setlistSongIds,
+        hit.title,
+        hit.artist,
+      );
+    }
+    return isSongInLibrary(librarySongs, hit.title, hit.artist);
+  }
+
   const importableHits = useMemo(
     () =>
-      results.filter(
-        (hit) => !isSongInLibrary(librarySongs, hit.title, hit.artist),
-      ),
-    [librarySongs, results],
+      results.filter((hit) => {
+        if (importTarget === "libraryAndSetlist") {
+          return !isSongInSetlist(
+            librarySongs,
+            setlistSongIds,
+            hit.title,
+            hit.artist,
+          );
+        }
+        return !isSongInLibrary(librarySongs, hit.title, hit.artist);
+      }),
+    [importTarget, librarySongs, results, setlistSongIds],
   );
 
   function handleImport(hit: ExternalSongHit) {
-    if (isSongInLibrary(librarySongs, hit.title, hit.artist)) return;
-    onImport(externalHitToSong(hit));
+    if (hitAlreadyImported(hit)) return;
+    onImport(resolveSong(hit));
   }
 
   function handleImportAll() {
@@ -97,7 +135,7 @@ export default function ExternalSongSearch({
       return;
     }
     for (const hit of importableHits) {
-      onImport(externalHitToSong(hit));
+      onImport(resolveSong(hit));
     }
   }
 
@@ -157,7 +195,7 @@ export default function ExternalSongSearch({
     >
       <h2 className="text-lg font-bold text-violet-950">曲を検索して取り込む</h2>
       <p className="mt-1 text-sm text-violet-700">
-        1回の検索で最大100件。さらに「まとめて200件取得」やスターターパックで数百曲を追加できます。
+        1回の検索で最大100件。さらに「まとめて200件取得」で追加できます。
       </p>
 
       <label className="mt-4 grid gap-1 text-sm font-semibold text-violet-900">
@@ -179,7 +217,10 @@ export default function ExternalSongSearch({
             onClick={handleImportAll}
             className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white"
           >
-            表示中の未追加曲をすべて追加（{importableHits.length}曲）
+            {importTarget === "libraryAndSetlist"
+              ? "表示中の曲をすべてセトリに追加"
+              : "表示中の未追加曲をすべて追加"}
+            （{importableHits.length}曲）
           </button>
         ) : null}
         {debouncedQuery.length >= 2 ? (
@@ -201,18 +242,35 @@ export default function ExternalSongSearch({
             ? "2文字以上入力すると検索します（artist:名前 でアーティスト検索）"
             : error
               ? error
-              : `${results.length}件表示・未追加 ${importableHits.length}曲`}
+              : importTarget === "libraryAndSetlist"
+                ? `${results.length}件表示・セトリ未追加 ${importableHits.length}曲`
+                : `${results.length}件表示・未追加 ${importableHits.length}曲`}
       </p>
 
       {results.length > 0 ? (
         <>
           <ul className="mt-4 grid max-h-96 gap-2 overflow-y-auto">
             {results.map((hit) => {
-              const exists = isSongInLibrary(
+              const inLibrary = isSongInLibrary(
                 librarySongs,
                 hit.title,
                 hit.artist,
               );
+              const inSetlist =
+                importTarget === "libraryAndSetlist" &&
+                isSongInSetlist(
+                  librarySongs,
+                  setlistSongIds,
+                  hit.title,
+                  hit.artist,
+                );
+              const disabled =
+                importTarget === "libraryAndSetlist" ? inSetlist : inLibrary;
+              const statusLabel = disabled
+                ? importTarget === "libraryAndSetlist"
+                  ? "セトリに追加済み"
+                  : "追加済み"
+                : importLabel;
               return (
                 <li
                   key={hit.externalId}
@@ -222,15 +280,18 @@ export default function ExternalSongSearch({
                     <p className="font-bold text-violet-950">{hit.title}</p>
                     <p className="text-sm text-violet-700">
                       {hit.artist}（{formatDuration(hit.durationSec)}）
+                      {importTarget === "libraryAndSetlist" && inLibrary && !inSetlist
+                        ? " ・ 曲庫に登録済み"
+                        : ""}
                     </p>
                   </div>
                   <button
                     type="button"
-                    disabled={exists}
+                    disabled={disabled}
                     onClick={() => handleImport(hit)}
                     className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
                   >
-                    {exists ? "追加済み" : importLabel}
+                    {statusLabel}
                   </button>
                 </li>
               );

@@ -7,7 +7,7 @@ const links = [
   { href: "/", label: "ホーム" },
   { href: "/library", label: "曲庫" },
   { href: "/builder", label: "作成" },
-  { href: "/suggest", label: "自動提案" },
+  { href: "/overlay", label: "オーバーレイ" },
   { href: "/setlists", label: "保存一覧" },
 ];
 

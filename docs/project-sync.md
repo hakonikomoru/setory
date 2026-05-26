@@ -3,7 +3,7 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`792f4a5`・2026-05-26・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`cefa37d`・2026-05-26・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -36,21 +36,29 @@ setory/
 │   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   ├── library/
+│   │   ├── overlay/
 │   │   ├── page.tsx
 │   │   ├── setlists/
 │   │   └── suggest/
 │   ├── components/
 │   │   ├── AppNav.tsx
+│   │   ├── AppShell.tsx
 │   │   ├── CopySetlistButton.tsx
 │   │   ├── ExternalSongSearch.tsx
+│   │   ├── OverlayControlPanel.tsx
+│   │   ├── OverlayDisplay.tsx
+│   │   ├── OverlayNowTitleMarquee.tsx
+│   │   ├── OverlayObsOnly.tsx
+│   │   ├── OverlaySettings.tsx
+│   │   ├── RegisteredSongsPanel.tsx
 │   │   ├── SetlistBuilder.tsx
 │   │   ├── SongForm.tsx
-│   │   ├── SongList.tsx
-│   │   └── StarterPackImport.tsx
+│   │   └── SongList.tsx
 │   ├── lib/
-│   │   ├── musicbrainz-starter-packs.ts
 │   │   ├── musicbrainz.test.ts
 │   │   ├── musicbrainz.ts
+│   │   ├── overlay.test.ts
+│   │   ├── overlay.ts
 │   │   ├── sample-songs.ts
 │   │   ├── setlist-engine.test.ts
 │   │   ├── setlist-engine.ts
@@ -59,7 +67,8 @@ setory/
 │   │   ├── song-match.test.ts
 │   │   ├── song-match.ts
 │   │   ├── storage.ts
-│   │   └── use-app-data.ts
+│   │   ├── use-app-data.ts
+│   │   └── use-overlay-data.ts
 │   └── types/
 │       └── setlist.ts
 ```
@@ -73,8 +82,8 @@ setory/
 | `/` | `page.tsx` |
 | `/builder` | `builder/page.tsx` |
 | `/library` | `library/page.tsx` |
+| `/overlay` | `overlay/page.tsx` |
 | `/setlists` | `setlists/page.tsx` |
-| `/suggest` | `suggest/page.tsx` |
 <!-- sync:auto:pages:end -->
 
 ---

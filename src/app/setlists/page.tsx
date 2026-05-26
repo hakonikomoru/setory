@@ -36,7 +36,7 @@ export default function SetlistsPage() {
 
       {data.setlists.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-violet-200 px-4 py-8 text-center text-sm text-violet-600">
-          まだセトリがありません。作成ページまたは自動提案から保存してください。
+          まだセトリがありません。作成ページからセトリを保存してください。
         </p>
       ) : (
         <ul className="grid gap-4">
@@ -71,6 +71,14 @@ export default function SetlistsPage() {
                         編集
                       </Link>
                       <CopySetlistButton text={text} label="コピー" />
+                      <a
+                        href={`/overlay?id=${encodeURIComponent(setlist.id)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-800"
+                      >
+                        操作
+                      </a>
                       <button
                         type="button"
                         onClick={() => {

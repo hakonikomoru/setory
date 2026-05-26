@@ -1,0 +1,235 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import OverlayDisplay from "@/components/OverlayDisplay";
+import OverlaySettings from "@/components/OverlaySettings";
+import SetlistBuilder from "@/components/SetlistBuilder";
+import { formatSetlistSongLine } from "@/lib/setlist-engine";
+import {
+  buildObsDisplayUrl,
+  canNavigateOverlayPrev,
+  navigateOverlayNext,
+  navigateOverlayPrev,
+  resolveOverlaySongs,
+} from "@/lib/overlay";
+import { upsertSetlist } from "@/lib/storage";
+import { useAppData } from "@/lib/use-app-data";
+import type { Setlist } from "@/types/setlist";
+
+export default function OverlayControlPanel() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedId = searchParams.get("id");
+  const { data, setData, ready } = useAppData();
+
+  const setlist = useMemo(
+    () => data.setlists.find((item) => item.id === selectedId),
+    [data.setlists, selectedId],
+  );
+
+  const overlaySongs = useMemo(() => {
+    if (!setlist) {
+      return { ordered: [], current: undefined, next: undefined, currentIndex: -1 };
+    }
+    return resolveOverlaySongs(setlist, data.songs);
+  }, [setlist, data.songs]);
+
+  useEffect(() => {
+    if (!ready || selectedId || data.setlists.length === 0) return;
+    router.replace(`/overlay?id=${encodeURIComponent(data.setlists[0].id)}`);
+  }, [ready, selectedId, data.setlists, router]);
+
+  function persistSetlist(next: Setlist) {
+    setData(upsertSetlist(data, { ...next, updatedAt: new Date().toISOString() }));
+  }
+
+  function patchSetlist(patch: Partial<Setlist>) {
+    if (!setlist) return;
+    persistSetlist({ ...setlist, ...patch });
+  }
+
+  function applyOverlayNavigation(nav: {
+    currentSongId?: string;
+    overlaySuppressNext?: boolean;
+  }) {
+    if (!setlist || nav.currentSongId === undefined) return;
+    const next: Setlist = {
+      ...setlist,
+      currentSongId: nav.currentSongId,
+      updatedAt: new Date().toISOString(),
+    };
+    if (nav.overlaySuppressNext === undefined) {
+      delete next.overlaySuppressNext;
+    } else {
+      next.overlaySuppressNext = nav.overlaySuppressNext;
+    }
+    persistSetlist(next);
+  }
+
+  function setCurrentSongId(songId: string) {
+    if (!setlist) return;
+    const index = setlist.songIds.indexOf(songId);
+    const next: Setlist = {
+      ...setlist,
+      currentSongId: songId,
+      updatedAt: new Date().toISOString(),
+    };
+    if (index === 0) {
+      next.overlaySuppressNext = true;
+    } else {
+      delete next.overlaySuppressNext;
+    }
+    persistSetlist(next);
+  }
+
+  const canRewind = setlist
+    ? canNavigateOverlayPrev(setlist, data.songs)
+    : false;
+
+  if (!ready) {
+    return <p className="text-violet-700">読み込み中...</p>;
+  }
+
+  if (data.setlists.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-violet-200 bg-white/90 p-8 text-center">
+        <p className="text-violet-800">保存したセトリがありません。</p>
+        <Link
+          href="/builder"
+          className="mt-4 inline-flex items-center justify-center rounded-xl bg-violet-600 px-5 py-2 text-sm font-bold text-white"
+        >
+          セトリを作成する
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-6">
+      <header>
+        <h1 className="text-3xl font-black text-violet-950">オーバーレイ操作</h1>
+        <p className="mt-2 text-sm text-violet-700">
+          左が配信表示、右で曲の切り替えと OBS 設定。下段はセトリ編集（右に登録曲一覧）です。
+        </p>
+      </header>
+
+      <label className="grid max-w-md gap-1 text-sm font-semibold text-violet-900">
+        操作するセトリ
+        <select
+          value={selectedId ?? ""}
+          onChange={(e) => {
+            if (e.target.value) {
+              router.push(`/overlay?id=${encodeURIComponent(e.target.value)}`);
+            }
+          }}
+          className="rounded-xl border border-violet-200 bg-white px-3 py-2"
+        >
+          {data.setlists.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}（{item.songIds.length}曲）
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {setlist ? (
+        <div className="grid grid-cols-2 items-start gap-6">
+          <div className="sticky top-4 min-w-0 py-px">
+            <OverlayDisplay setlist={setlist} songs={data.songs} compact />
+          </div>
+
+          <div className="grid min-w-0 gap-6">
+            <section className="overflow-visible rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-sm">
+              <h2 className="text-lg font-bold text-violet-950">曲の切り替え</h2>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  disabled={!canRewind}
+                  title={
+                    overlaySongs.currentIndex === 0 &&
+                    setlist.overlaySuppressNext !== false
+                      ? "1曲目で NEXT を隠しているときは戻れません"
+                      : overlaySongs.currentIndex === 0
+                        ? "NEXT を隠す"
+                        : undefined
+                  }
+                  onClick={() => applyOverlayNavigation(navigateOverlayPrev(setlist, data.songs))}
+                  className="rounded-xl border border-violet-200 bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
+                >
+                  前の曲
+                </button>
+                <button
+                  type="button"
+                  disabled={overlaySongs.ordered.length === 0}
+                  onClick={() => applyOverlayNavigation(navigateOverlayNext(setlist, data.songs))}
+                  className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
+                >
+                  次の曲
+                </button>
+              </div>
+              <ol className="mt-4 max-h-[min(24rem,50vh)] list-none space-y-2 overflow-y-auto overscroll-contain px-1 py-1">
+                {overlaySongs.ordered.map((song, index) => {
+                  const isCurrent = setlist.currentSongId === song.id;
+                  return (
+                    <li key={song.id} className="min-w-0 px-px">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentSongId(song.id)}
+                        className={`btn-text-left flex w-full min-w-0 flex-col rounded-xl border px-3 py-2 transition ${
+                          isCurrent
+                            ? "border-violet-500 bg-violet-100 ring-2 ring-inset ring-violet-400"
+                            : "border-violet-100 bg-violet-50/50 hover:bg-violet-50"
+                        }`}
+                      >
+                        <p className="w-full break-words text-left font-bold leading-snug text-violet-950">
+                          {formatSetlistSongLine(
+                            song,
+                            index,
+                            Boolean(setlist.hideDuration),
+                          )}
+                          {isCurrent ? (
+                            <span className="ml-2 rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
+                              現在
+                            </span>
+                          ) : null}
+                        </p>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+
+            <OverlaySettings
+              setlistId={setlist.id}
+              overlayVisible={setlist.overlayVisible ?? true}
+              overlayMode={setlist.overlayMode ?? "currentAndNext"}
+              overlayTheme={setlist.overlayTheme ?? "simple"}
+              obsDisplayUrl={buildObsDisplayUrl(setlist.id)}
+              onChange={(patch) => patchSetlist(patch)}
+            />
+          </div>
+
+          <div className="col-span-2 border-t border-violet-200 pt-6">
+            <h2 className="text-lg font-bold text-violet-950">セトリ編集</h2>
+            <p className="mt-1 text-sm text-violet-600">
+              曲の追加・並べ替え・セトリ名の変更は自動で保存され、左の表示に反映されます。
+            </p>
+            <div className="mt-4">
+              <SetlistBuilder
+                key={setlist.id}
+                embedded
+                data={data}
+                initialSetlist={setlist}
+                onDataChange={setData}
+                onSave={setData}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

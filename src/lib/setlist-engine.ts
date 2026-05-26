@@ -1,10 +1,4 @@
-import type { Setlist, Song, SongMood, SuggestOptions } from "@/types/setlist";
-
-const MOOD_ENERGY: Record<SongMood, number> = {
-  ballad: 1,
-  mid: 2,
-  upbeat: 3,
-};
+import type { Setlist, Song } from "@/types/setlist";
 
 export function formatDuration(totalSec: number): string {
   const minutes = Math.floor(totalSec / 60);
@@ -26,13 +20,23 @@ export function getSetlistDuration(setlist: Setlist, songs: Song[]): number {
   );
 }
 
+/** 保存セトリ・コピー用と同じ 1 行表記（例: `1. 曲名 / アーティスト（3:45）`） */
+export function formatSetlistSongLine(
+  song: Song,
+  index: number,
+  hideDuration: boolean,
+): string {
+  const base = `${index + 1}. ${song.title} / ${song.artist}`;
+  return hideDuration
+    ? base
+    : `${base}（${formatDuration(song.durationSec)}）`;
+}
+
 export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
   const ordered = getSongsFromSetlist(setlist, songs);
   const hideDuration = Boolean(setlist.hideDuration);
   const lines = ordered.map((song, index) =>
-    hideDuration
-      ? `${index + 1}. ${song.title} / ${song.artist}`
-      : `${index + 1}. ${song.title} / ${song.artist}（${formatDuration(song.durationSec)}）`,
+    formatSetlistSongLine(song, index, hideDuration),
   );
   const total = ordered.reduce((sum, song) => sum + song.durationSec, 0);
   const totalLine = hideDuration
@@ -49,102 +53,6 @@ export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
   ]
     .filter((line): line is string => line !== null)
     .join("\n");
-}
-
-function scoreSongForTheme(song: Song, theme: string, tags: string[]): number {
-  const haystack = `${song.title} ${song.artist} ${song.tags.join(" ")}`.toLowerCase();
-  let score = 0;
-
-  const themeTokens = theme
-    .toLowerCase()
-    .split(/[\s,、。]+/)
-    .filter(Boolean);
-
-  for (const token of themeTokens) {
-    if (haystack.includes(token)) score += 3;
-  }
-
-  for (const tag of tags) {
-    if (song.tags.some((songTag) => songTag.includes(tag) || tag.includes(songTag))) {
-      score += 4;
-    }
-  }
-
-  return score;
-}
-
-function orderByMoodFlow(songs: Song[], flow: SuggestOptions["moodFlow"]): Song[] {
-  if (flow === "steady") {
-    return [...songs].sort(
-      (a, b) => MOOD_ENERGY[a.mood] - MOOD_ENERGY[b.mood],
-    );
-  }
-
-  if (flow === "surprise") {
-    const shuffled = [...songs];
-    for (let i = shuffled.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }
-
-  const ballads = songs.filter((s) => s.mood === "ballad");
-  const mids = songs.filter((s) => s.mood === "mid");
-  const upbeats = songs.filter((s) => s.mood === "upbeat");
-
-  const opening = [...mids, ...ballads].slice(0, 1);
-  const peak = [...upbeats, ...mids];
-  const closing = [...ballads, ...mids].slice(0, 1);
-
-  const used = new Set<string>();
-  const result: Song[] = [];
-
-  for (const group of [opening, peak, closing]) {
-    for (const song of group) {
-      if (used.has(song.id)) continue;
-      used.add(song.id);
-      result.push(song);
-    }
-  }
-
-  for (const song of songs) {
-    if (!used.has(song.id)) result.push(song);
-  }
-
-  return result;
-}
-
-export function suggestSetlistSongs(
-  songs: Song[],
-  options: SuggestOptions,
-): Song[] {
-  const targetSec = Math.max(5, options.targetMinutes) * 60;
-  const maxSongs = options.maxSongs ?? 12;
-
-  const ranked = [...songs]
-    .map((song) => ({
-      song,
-      score: scoreSongForTheme(song, options.theme, options.preferredTags),
-    }))
-    .sort((a, b) => b.score - a.score || a.song.title.localeCompare(b.song.title));
-
-  const picked: Song[] = [];
-  let totalSec = 0;
-
-  for (const { song } of ranked) {
-    if (picked.length >= maxSongs) break;
-    if (totalSec + song.durationSec > targetSec && picked.length >= 3) continue;
-    picked.push(song);
-    totalSec += song.durationSec;
-    if (totalSec >= targetSec) break;
-  }
-
-  if (picked.length === 0 && ranked[0]) {
-    picked.push(ranked[0].song);
-  }
-
-  return orderByMoodFlow(picked, options.moodFlow);
 }
 
 export function parseTagsInput(input: string): string[] {

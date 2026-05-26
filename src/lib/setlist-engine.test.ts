@@ -3,24 +3,8 @@ import { SAMPLE_SONGS } from "@/lib/sample-songs";
 import {
   filterSongsByQuery,
   formatSetlistText,
-  suggestSetlistSongs,
 } from "@/lib/setlist-engine";
 import type { Setlist } from "@/types/setlist";
-
-describe("suggestSetlistSongs", () => {
-  it("returns songs within a reasonable count for target duration", () => {
-    const result = suggestSetlistSongs(SAMPLE_SONGS, {
-      theme: "アニソン",
-      targetMinutes: 20,
-      preferredTags: ["アニソン"],
-      moodFlow: "warmup-peak-cooldown",
-    });
-
-    expect(result.length).toBeGreaterThan(0);
-    expect(result.length).toBeLessThanOrEqual(12);
-    expect(result.some((song) => song.tags.includes("アニソン"))).toBe(true);
-  });
-});
 
 describe("filterSongsByQuery", () => {
   it("returns all songs when query is empty", () => {

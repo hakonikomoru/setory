@@ -2,6 +2,9 @@ import { SAMPLE_SONGS } from "@/lib/sample-songs";
 import type { AppData, Setlist, Song } from "@/types/setlist";
 
 const STORAGE_KEY = "setory:data";
+
+/** 同一タブ内のオーバーレイ iframe などへ即時反映する */
+export const APP_DATA_UPDATED_EVENT = "setory:data-updated";
 const LEGACY_STORAGE_KEYS = ["setori-maker:data", "setlist-creator:data"] as const;
 
 const EMPTY_DATA: AppData = { songs: [], setlists: [] };
@@ -39,6 +42,7 @@ export function loadAppData(): AppData {
 export function saveAppData(data: AppData) {
   if (!isBrowser()) return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  window.dispatchEvent(new CustomEvent(APP_DATA_UPDATED_EVENT));
 }
 
 export function seedSampleSongsIfEmpty(data: AppData): AppData {
@@ -60,6 +64,8 @@ export function removeSong(data: AppData, songId: string): AppData {
     setlists: data.setlists.map((setlist) => ({
       ...setlist,
       songIds: setlist.songIds.filter((id) => id !== songId),
+      currentSongId:
+        setlist.currentSongId === songId ? undefined : setlist.currentSongId,
     })),
   };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isSongInLibrary } from "@/lib/song-match";
+import { isSongInLibrary, isSongInSetlist } from "@/lib/song-match";
 import type { Song } from "@/types/setlist";
 
 const songs: Song[] = [
@@ -17,5 +17,12 @@ describe("isSongInLibrary", () => {
   it("matches case-insensitively", () => {
     expect(isSongInLibrary(songs, "夜に駆ける", "yoasobi")).toBe(true);
     expect(isSongInLibrary(songs, "Lemon", "米津玄師")).toBe(false);
+  });
+});
+
+describe("isSongInSetlist", () => {
+  it("is true when library song is in setlist ids", () => {
+    expect(isSongInSetlist(songs, ["1"], "夜に駆ける", "YOASOBI")).toBe(true);
+    expect(isSongInSetlist(songs, [], "夜に駆ける", "YOASOBI")).toBe(false);
   });
 });

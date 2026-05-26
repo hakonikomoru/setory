@@ -33,11 +33,11 @@ function BuilderContent() {
 
 export default function BuilderPage() {
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8">
+    <main className="mx-auto w-full max-w-7xl px-4 py-8">
       <header className="mb-6">
         <h1 className="text-3xl font-black text-violet-950">セトリ作成</h1>
         <p className="mt-2 text-sm text-violet-700">
-          曲名で検索して追加し、並べ替えたあと配信概要欄やX投稿用のテキストをコピーできます。
+          左でセトリを編集、右の登録曲一覧から追加できます。並べ替え後にコピー用テキストを出力します。
         </p>
       </header>
       <Suspense fallback={<p>読み込み中...</p>}>

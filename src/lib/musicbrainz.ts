@@ -171,25 +171,3 @@ export async function searchMusicBrainzRecordingsDeep(
 
   return mergeExternalHits(...pages).slice(0, maxResults);
 }
-
-export async function fetchStarterPackHits(
-  packId: string,
-  getPack: (id: string) => { queries: string[]; perQueryLimit?: number } | undefined,
-): Promise<ExternalSongHit[]> {
-  const pack = getPack(packId);
-  if (!pack) throw new Error(`Unknown starter pack: ${packId}`);
-
-  const batches: ExternalSongHit[][] = [];
-
-  for (let i = 0; i < pack.queries.length; i += 1) {
-    const hits = await searchMusicBrainzRecordingsDeep(pack.queries[i], {
-      maxResults: pack.perQueryLimit ?? 80,
-    });
-    batches.push(hits);
-    if (i < pack.queries.length - 1) {
-      await sleep(MUSICBRAINZ_RATE_LIMIT_MS);
-    }
-  }
-
-  return mergeExternalHits(...batches);
-}

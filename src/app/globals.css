@@ -37,3 +37,78 @@ button {
   line-height: 1.25;
   text-align: center;
 }
+
+/* 曲リストなど、全文を左揃えで見せるボタン */
+button.btn-text-left {
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+html.overlay-page,
+html.overlay-page body {
+  background: transparent !important;
+  min-height: 100vh;
+}
+
+@keyframes overlay-now-glow {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 6px rgba(167, 139, 250, 0.35);
+  }
+  50% {
+    opacity: 0.92;
+    text-shadow:
+      0 0 14px rgba(192, 132, 252, 0.75),
+      0 0 24px rgba(217, 70, 239, 0.35);
+  }
+}
+
+@keyframes overlay-now-dot {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.65;
+  }
+}
+
+.overlay-now-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: overlay-now-glow 2.2s ease-in-out infinite;
+}
+
+.overlay-now-label::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: overlay-now-dot 2.2s ease-in-out infinite;
+}
+
+.overlay-now-title-track {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.overlay-now-title-text {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay-now-label,
+  .overlay-now-label::before {
+    animation: none;
+  }
+}

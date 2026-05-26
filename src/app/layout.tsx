@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Setory",
   description:
-    "歌配信・ライブ向けのセットリストを、曲庫管理・自動提案・コピー出力まで一気通貫で作れるWebアプリ",
+    "歌配信・ライブ向けのセットリストを、曲庫管理・OBSオーバーレイ・コピー出力まで一気通貫で作れるWebアプリ",
   applicationName: "Setory",
   openGraph: {
     title: "Setory",
@@ -40,8 +40,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <AppNav />
-        {children}
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
