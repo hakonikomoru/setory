@@ -21,19 +21,42 @@ export const OVERLAY_SETLIST_PALETTE: OverlaySetlistPalettePreset[] = [
   { id: "black", label: "黒", color: "#171717" },
 ];
 
-export function themeSetlistTextColor(theme: OverlayTheme): string {
-  return OVERLAY_THEME_COLORS[theme].setlist;
+const OVERLAY_TEXT_SIZE_CLASS =
+  /^text-(?:xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl|\[[^\]]+\])$/;
+
+/** テーマの Tailwind クラスから文字色だけ除き、サイズ・太さは残す */
+export function overlayClassWithoutTextColor(className: string): string {
+  return className
+    .split(/\s+/)
+    .filter((part) => {
+      if (!part.startsWith("text-")) return true;
+      return OVERLAY_TEXT_SIZE_CLASS.test(part);
+    })
+    .join(" ");
 }
 
-export function resolveOverlaySetlistTextColor(setlist: Setlist): string {
+export function themeOverlayTextColor(theme: OverlayTheme): string {
+  return OVERLAY_THEME_COLORS[theme].primary;
+}
+
+/** @deprecated themeOverlayTextColor を利用 */
+export const themeSetlistTextColor = themeOverlayTextColor;
+
+export function resolveOverlayTextColor(setlist: Setlist): string {
   const custom = normalizeHexColor(setlist.overlaySetlistColor);
   if (custom) return custom;
-  return themeSetlistTextColor(overlayTheme(setlist));
+  return themeOverlayTextColor(overlayTheme(setlist));
 }
 
-export function isCustomOverlaySetlistColor(setlist: Setlist): boolean {
+/** @deprecated resolveOverlayTextColor を利用 */
+export const resolveOverlaySetlistTextColor = resolveOverlayTextColor;
+
+export function isCustomOverlayTextColor(setlist: Setlist): boolean {
   return Boolean(normalizeHexColor(setlist.overlaySetlistColor));
 }
+
+/** @deprecated isCustomOverlayTextColor を利用 */
+export const isCustomOverlaySetlistColor = isCustomOverlayTextColor;
 
 export const DEFAULT_OVERLAY_SETLIST_MAX_WIDTH_PX = 800;
 

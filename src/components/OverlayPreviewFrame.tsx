@@ -62,7 +62,7 @@ export default function OverlayPreviewFrame({
       </div>
       <div ref={measureRef} className="flex min-h-[20rem] min-w-0 flex-1 flex-col xl:min-h-0">
         <div
-          className={`flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain border-2 border-violet-300 shadow-sm ring-1 ring-violet-200/80 ${active.bgClass}`}
+          className={`flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain border border-black ${active.bgClass}`}
           style={layoutStyle}
         >
           <OverlayDisplay setlist={setlist} songs={songs} compact />

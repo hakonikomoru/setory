@@ -28,7 +28,7 @@ export type Setlist = {
   overlayVisible?: boolean;
   overlayMode?: OverlayMode;
   overlayTheme?: OverlayTheme;
-  /** SETLIST 表示の文字色（#rrggbb） */
+  /** オーバーレイ全体の文字色（#rrggbb） */
   overlaySetlistColor?: string;
   /** オーバーレイ表示全体の最大幅（px） */
   overlaySetlistMaxWidthPx?: number;

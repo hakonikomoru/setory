@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   DEFAULT_OVERLAY_SETLIST_MAX_WIDTH_PX,
-  isCustomOverlaySetlistColor,
+  isCustomOverlayTextColor,
   isCustomOverlaySetlistWidth,
   normalizeHexColor,
   OVERLAY_SETLIST_PALETTE,
@@ -13,9 +13,9 @@ import {
   overlaySetlistWidthLabelPx,
   overlayWidthPresetsForBackground,
   resolveOverlaySetlistMaxWidthPx,
-  resolveOverlaySetlistTextColor,
+  resolveOverlayTextColor,
   snapOverlaySetlistWidthForSlider,
-  themeSetlistTextColor,
+  themeOverlayTextColor,
 } from "@/lib/overlay-colors";
 import { overlayTheme } from "@/lib/overlay";
 import type { Setlist } from "@/types/setlist";
@@ -34,9 +34,9 @@ export default function OverlaySetlistColorPicker({
   onWidthChange,
 }: Props) {
   const theme = overlayTheme(setlist);
-  const themeColor = themeSetlistTextColor(theme);
-  const activeColor = resolveOverlaySetlistTextColor(setlist);
-  const custom = isCustomOverlaySetlistColor(setlist);
+  const themeColor = themeOverlayTextColor(theme);
+  const activeColor = resolveOverlayTextColor(setlist);
+  const custom = isCustomOverlayTextColor(setlist);
   const pickerValue = custom ? activeColor : themeColor;
 
   const widthCustom = isCustomOverlaySetlistWidth(setlist);
@@ -70,9 +70,9 @@ export default function OverlaySetlistColorPicker({
   return (
     <div className="mt-4 grid gap-4">
       <fieldset>
-        <legend className="text-sm font-semibold text-violet-900">SETLIST の文字色</legend>
+        <legend className="text-sm font-semibold text-violet-900">オーバーレイの文字色</legend>
         <p className="mt-1 text-xs text-violet-600">
-          歌い終わった曲の一覧（SETLIST）とセトリ一覧モードに反映されます。
+          NOW・NEXT・SETLIST など、オーバーレイ全体の文字色に反映されます。
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button

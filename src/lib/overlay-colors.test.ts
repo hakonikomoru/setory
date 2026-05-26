@@ -16,9 +16,10 @@ import {
   overlaySetlistWidthLabelPx,
   overlayWidthPresetsForBackground,
   resolveOverlaySetlistMaxWidthPx,
-  resolveOverlaySetlistTextColor,
+  overlayClassWithoutTextColor,
+  resolveOverlayTextColor,
   snapOverlaySetlistWidthForSlider,
-  themeSetlistTextColor,
+  themeOverlayTextColor,
 } from "@/lib/overlay-colors";
 import type { OverlayTheme, Setlist } from "@/types/setlist";
 
@@ -50,25 +51,37 @@ describe("normalizeHexColor", () => {
   });
 });
 
-describe("resolveOverlaySetlistTextColor", () => {
-  it("uses theme setlist color when custom is unset", () => {
-    expect(resolveOverlaySetlistTextColor(baseSetlist)).toBe("#5b21b6");
+describe("resolveOverlayTextColor", () => {
+  it("uses theme primary color when custom is unset", () => {
+    expect(resolveOverlayTextColor(baseSetlist)).toBe("#2e1065");
     expect(isCustomOverlaySetlistColor(baseSetlist)).toBe(false);
   });
 
   it("uses custom color when set", () => {
     const setlist = { ...baseSetlist, overlaySetlistColor: "#ffffff" };
-    expect(resolveOverlaySetlistTextColor(setlist)).toBe("#ffffff");
+    expect(resolveOverlayTextColor(setlist)).toBe("#ffffff");
     expect(isCustomOverlaySetlistColor(setlist)).toBe(true);
   });
 
   it.each([
-    ["dark", "#ede9fe"],
-    ["komoru", "#ede9fe"],
-    ["cute", "#5b21b6"],
-  ] as const)("uses %s theme setlist color", (theme, expected) => {
-    expect(themeSetlistTextColor(theme)).toBe(expected);
-    expect(resolveOverlaySetlistTextColor({ ...baseSetlist, overlayTheme: theme })).toBe(expected);
+    ["dark", "#ffffff"],
+    ["komoru", "#ffffff"],
+    ["cute", "#831843"],
+  ] as const)("uses %s theme primary color", (theme, expected) => {
+    expect(themeOverlayTextColor(theme)).toBe(expected);
+    expect(resolveOverlayTextColor({ ...baseSetlist, overlayTheme: theme })).toBe(
+      expected,
+    );
+  });
+});
+
+describe("overlayClassWithoutTextColor", () => {
+  it("removes color utilities but keeps size", () => {
+    expect(
+      overlayClassWithoutTextColor(
+        "text-3xl font-black text-violet-950 drop-shadow-sm",
+      ),
+    ).toBe("text-3xl font-black drop-shadow-sm");
   });
 });
 

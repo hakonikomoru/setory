@@ -107,7 +107,7 @@ export default function OverlaySettings({
         </select>
         <span className="text-xs font-normal text-violet-600">
           {OVERLAY_THEME_OPTIONS.find((item) => item.value === theme)?.description}
-          （SETLIST の文字色とは別設定です）
+          （文字色とは別設定です）
         </span>
       </label>
 
