@@ -6,6 +6,7 @@ import {
   formatSetlistText,
   parseSongDurationFields,
   parseTemplateSongLines,
+  parseTemplateSongLinesWithSource,
   sortSongsByCreatedAt,
   sortSongsWithUnaddedSetlistFirst,
 } from "@/lib/setlist-engine";
@@ -164,6 +165,15 @@ describe("parseTemplateSongLines", () => {
     );
     expect(lines).toHaveLength(3);
     expect(lines[2]).toEqual({ title: "D", artist: "E" });
+  });
+});
+
+describe("parseTemplateSongLinesWithSource", () => {
+  it("includes 1-based source line numbers", () => {
+    expect(parseTemplateSongLinesWithSource("A / B\n\nC / D")).toEqual([
+      { title: "A", artist: "B", sourceLine: 1 },
+      { title: "C", artist: "D", sourceLine: 3 },
+    ]);
   });
 });
 

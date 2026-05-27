@@ -15,6 +15,7 @@ import {
   formatSongDurationLabel,
   getSetlistDuration,
 } from "@/lib/setlist-engine";
+import { findSongInLibrary } from "@/lib/song-match";
 import { createId, upsertSong } from "@/lib/storage";
 import type { SetAppData } from "@/lib/use-app-data";
 import type { AppData, Setlist, Song } from "@/types/setlist";
@@ -117,8 +118,10 @@ export default function SetlistBuilder({
       let ids = [...(prevSetlist?.songIds ?? songIds)];
 
       for (const song of songs) {
-        nextData = upsertSong(nextData, song);
-        if (!ids.includes(song.id)) ids = [...ids, song.id];
+        const existing = findSongInLibrary(nextData.songs, song.title, song.artist);
+        const toUse = existing ?? song;
+        if (!existing) nextData = upsertSong(nextData, toUse);
+        if (!ids.includes(toUse.id)) ids = [...ids, toUse.id];
       }
 
       nextIds = ids;
@@ -378,9 +381,10 @@ export default function SetlistBuilder({
           }
           templatePanel={
             <TemplateSongImport
+              librarySongs={data.songs}
               addButtonLabel={embedded ? "セトリに追加" : "追加"}
               onAdd={addSongToLibraryAndSetlist}
-              onAddMany={addSongsToLibraryAndSetlist}
+              onImportMany={({ resolved }) => addSongsToLibraryAndSetlist(resolved)}
               onAfterAdd={embedded ? () => setAddTab("registered") : undefined}
             />
           }

@@ -82,6 +82,7 @@ export default function LibraryPage() {
           templateHint="曲庫に一括登録します。アーティストがない行は曲名のみで登録されます。"
           templatePanel={
             <TemplateSongImport
+              librarySongs={data.songs}
               onAdd={(song) => setData((prev) => upsertSong(prev, song))}
               onAddMany={(songs) => {
                 setData((prev) => {

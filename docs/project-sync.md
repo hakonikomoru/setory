@@ -119,5 +119,5 @@ setory/
 
 - 正式表記: **komolab - こもらぼ -**（`KomoLab` / `こもラボ` などに揺らさない）
 - フッター: `制作・運営：komolab - こもらぼ -`（`src/components/Footer.tsx`）
-- 設定: `src/config/site.ts` の `credit`（将来 `credit.href` でリンク化可）
+- 設定: `src/config/site.ts` の `credit`（`credit.href` → こもるラボラトリー公式サイト）
 - ハッシュタグ `#komolab` / `#こもらぼ` は README に記載。フッターは制作名のみ

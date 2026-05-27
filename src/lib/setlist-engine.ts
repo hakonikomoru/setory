@@ -71,24 +71,40 @@ export type ParsedTemplateSongLine = {
   artist: string;
 };
 
+export type ParsedTemplateSongLineWithSource = ParsedTemplateSongLine & {
+  /** テキストエリア上の行番号（1始まり） */
+  sourceLine: number;
+};
+
+function parseTemplateSongLine(rawLine: string): ParsedTemplateSongLine | null {
+  const line = rawLine.trim();
+  if (!line) return null;
+
+  const slashMatch = line.match(/\s*[\/／]\s*/);
+  if (!slashMatch || slashMatch.index === undefined) {
+    return { title: line, artist: "" };
+  }
+
+  const title = line.slice(0, slashMatch.index).trim();
+  const artist = line.slice(slashMatch.index + slashMatch[0].length).trim();
+  if (!title) return null;
+  return { title, artist };
+}
+
 /** 1行1曲。`曲名 / アーティスト` または曲名のみ（アーティストなし） */
 export function parseTemplateSongLines(text: string): ParsedTemplateSongLine[] {
-  const results: ParsedTemplateSongLine[] = [];
+  return parseTemplateSongLinesWithSource(text).map(({ sourceLine: _sourceLine, ...line }) => line);
+}
 
-  for (const rawLine of text.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line) continue;
+/** 取り込み対象行と、元テキストの行番号 */
+export function parseTemplateSongLinesWithSource(text: string): ParsedTemplateSongLineWithSource[] {
+  const results: ParsedTemplateSongLineWithSource[] = [];
+  const rawLines = text.split(/\r?\n/);
 
-    const slashMatch = line.match(/\s*[\/／]\s*/);
-    if (!slashMatch || slashMatch.index === undefined) {
-      results.push({ title: line, artist: "" });
-      continue;
-    }
-
-    const title = line.slice(0, slashMatch.index).trim();
-    const artist = line.slice(slashMatch.index + slashMatch[0].length).trim();
-    if (!title) continue;
-    results.push({ title, artist });
+  for (let index = 0; index < rawLines.length; index++) {
+    const parsed = parseTemplateSongLine(rawLines[index]);
+    if (!parsed) continue;
+    results.push({ ...parsed, sourceLine: index + 1 });
   }
 
   return results;

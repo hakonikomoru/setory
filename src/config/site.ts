@@ -3,7 +3,6 @@ export const siteConfig = {
     label: "制作・運営",
     name: "komolab - こもらぼ -",
     hashtags: ["#komolab", "#こもらぼ"],
-    /** 将来 /komolab や外部ページへリンクする場合に設定 */
-    href: undefined as string | undefined,
+    href: "https://komoru-laboratory-site.vercel.app",
   },
 } as const;
