@@ -47,7 +47,10 @@ export function saveAppData(data: AppData) {
 
 const LEGACY_SONG_CREATED_AT_BASE_MS = Date.parse("2026-01-01T00:00:00.000Z");
 
-function normalizeSong(song: Song, index: number): Song {
+type StoredSong = Song & { mood?: unknown };
+
+function normalizeSong(raw: StoredSong, index: number): Song {
+  const { mood: _mood, ...song } = raw;
   if (song.createdAt) return song;
   return {
     ...song,

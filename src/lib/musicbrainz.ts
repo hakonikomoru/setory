@@ -73,7 +73,6 @@ export function externalHitToSong(hit: ExternalSongHit): Song {
     title: hit.title,
     artist: hit.artist,
     durationSec: hit.durationSec,
-    mood: "mid",
     tags: ["MusicBrainz"],
     notes: `MusicBrainz ID: ${hit.externalId}`,
     createdAt: new Date().toISOString(),

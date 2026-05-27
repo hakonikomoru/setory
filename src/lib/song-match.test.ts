@@ -8,7 +8,6 @@ const songs: Song[] = [
     title: "夜に駆ける",
     artist: "YOASOBI",
     durationSec: 258,
-    mood: "mid",
     tags: [],
     createdAt: "2026-05-27T00:00:00.000Z",
   },

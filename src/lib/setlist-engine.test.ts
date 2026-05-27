@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import { SAMPLE_SONGS } from "@/lib/sample-songs";
 import {
   filterSongsByQuery,
-  formatMoodInput,
+  formatSetlistSongLine,
   formatSetlistText,
-  parseMoodInput,
+  parseSongDurationFields,
+  parseTemplateSongLines,
   sortSongsByCreatedAt,
+  sortSongsWithUnaddedSetlistFirst,
 } from "@/lib/setlist-engine";
 import type { Setlist } from "@/types/setlist";
 
@@ -43,16 +45,18 @@ describe("sortSongsByCreatedAt", () => {
   });
 });
 
-describe("parseMoodInput", () => {
-  it("maps Japanese labels and defaults empty to mid", () => {
-    expect(parseMoodInput("")).toBe("mid");
-    expect(parseMoodInput("盛り上がり")).toBe("upbeat");
-    expect(parseMoodInput("バラード")).toBe("ballad");
-    expect(parseMoodInput("中間")).toBe("mid");
-  });
-
-  it("round-trips known moods for the form", () => {
-    expect(formatMoodInput(parseMoodInput("盛り上がり"))).toBe("盛り上がり");
+describe("sortSongsWithUnaddedSetlistFirst", () => {
+  it("puts songs not in the setlist before added ones", () => {
+    const songs = [
+      { ...SAMPLE_SONGS[0], id: "a", createdAt: "2026-05-01T00:00:00.000Z" },
+      { ...SAMPLE_SONGS[1], id: "b", createdAt: "2026-05-03T00:00:00.000Z" },
+      { ...SAMPLE_SONGS[2], id: "c", createdAt: "2026-05-02T00:00:00.000Z" },
+    ];
+    expect(sortSongsWithUnaddedSetlistFirst(songs, ["b"], "desc").map((s) => s.id)).toEqual([
+      "c",
+      "a",
+      "b",
+    ]);
   });
 });
 
@@ -122,5 +126,57 @@ describe("formatSetlistText", () => {
     expect(text).toContain("1. 夜に駆ける");
     expect(text).not.toContain("YOASOBI");
     expect(text).not.toMatch(/1\. 夜に駆ける（/);
+  });
+});
+
+describe("parseSongDurationFields", () => {
+  it("returns 0 when both minutes and seconds are 0", () => {
+    expect(parseSongDurationFields("0", "0")).toBe(0);
+    expect(parseSongDurationFields("", "")).toBe(0);
+  });
+
+  it("computes duration when either part is non-zero", () => {
+    expect(parseSongDurationFields("4", "0")).toBe(240);
+    expect(parseSongDurationFields("0", "30")).toBe(30);
+  });
+});
+
+describe("parseTemplateSongLines", () => {
+  it("parses title and artist separated by slash", () => {
+    expect(parseTemplateSongLines("夜に駆ける / YOASOBI")).toEqual([
+      { title: "夜に駆ける", artist: "YOASOBI" },
+    ]);
+    expect(parseTemplateSongLines("曲名／アーティスト")).toEqual([
+      { title: "曲名", artist: "アーティスト" },
+    ]);
+  });
+
+  it("parses title-only lines without artist", () => {
+    expect(parseTemplateSongLines("secret base\n\nメルト")).toEqual([
+      { title: "secret base", artist: "" },
+      { title: "メルト", artist: "" },
+    ]);
+  });
+
+  it("parses multiple lines and ignores empty lines", () => {
+    const lines = parseTemplateSongLines(
+      "A / B\nC\n\nD / E",
+    );
+    expect(lines).toHaveLength(3);
+    expect(lines[2]).toEqual({ title: "D", artist: "E" });
+  });
+});
+
+describe("formatSetlistSongLine without artist", () => {
+  it("omits slash when artist is empty", () => {
+    const song = { ...SAMPLE_SONGS[0], artist: "" };
+    expect(formatSetlistSongLine(song, 0, {})).toBe("1. 夜に駆ける（4:18）");
+    expect(formatSetlistSongLine(song, 0, { hideDuration: true })).toBe("1. 夜に駆ける");
+  });
+
+  it("omits duration label when duration is unset", () => {
+    const song = { ...SAMPLE_SONGS[0], durationSec: 0 };
+    expect(formatSetlistSongLine(song, 0, {})).toBe("1. 夜に駆ける / YOASOBI");
+    expect(formatSetlistSongLine({ ...song, artist: "" }, 0, {})).toBe("1. 夜に駆ける");
   });
 });

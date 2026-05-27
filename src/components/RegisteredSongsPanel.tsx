@@ -4,7 +4,11 @@ import { useMemo, useState } from "react";
 import RowActionButton from "@/components/RowActionButton";
 import SearchInput from "@/components/SearchInput";
 import SongList from "@/components/SongList";
-import { sortSongsByCreatedAt, type SongListSortOrder } from "@/lib/setlist-engine";
+import {
+  sortSongsByCreatedAt,
+  sortSongsWithUnaddedSetlistFirst,
+  type SongListSortOrder,
+} from "@/lib/setlist-engine";
 import type { Song } from "@/types/setlist";
 
 type Props = {
@@ -13,6 +17,8 @@ type Props = {
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
   title?: string;
+  /** false のとき見出し h2 を出さない（タブ内表示用） */
+  showHeader?: boolean;
   sticky?: boolean;
   searchPlaceholder?: string;
   onEdit?: (song: Song) => void;
@@ -28,6 +34,7 @@ export default function RegisteredSongsPanel({
   searchQuery,
   onSearchQueryChange,
   title = "登録曲",
+  showHeader = true,
   sticky = true,
   searchPlaceholder = "曲名・アーティスト",
   onEdit,
@@ -38,16 +45,23 @@ export default function RegisteredSongsPanel({
 }: Props) {
   const trimmedQuery = searchQuery.trim();
   const [sortOrder, setSortOrder] = useState<SongListSortOrder>("desc");
-  const sortedSongs = useMemo(() => sortSongsByCreatedAt(songs, sortOrder), [songs, sortOrder]);
+  const sortedSongs = useMemo(() => {
+    if (selectedIds) {
+      return sortSongsWithUnaddedSetlistFirst(songs, selectedIds, sortOrder);
+    }
+    return sortSongsByCreatedAt(songs, sortOrder);
+  }, [songs, sortOrder, selectedIds]);
 
   return (
     <aside className={sticky ? "min-w-0 md:sticky md:top-4" : "min-w-0"}>
-      <header>
-        <h2 className="text-xl font-bold text-violet-950">
-          {title}（{totalCount}曲）
-        </h2>
-      </header>
-      <div className="mt-3 rounded-2xl border border-violet-100 bg-white/90 p-4 shadow-sm">
+      {showHeader ? (
+        <header>
+          <h2 className="text-xl font-bold text-violet-950">
+            {title}（{totalCount}曲）
+          </h2>
+        </header>
+      ) : null}
+      <div className={`${showHeader ? "mt-3" : ""} rounded-2xl border border-violet-100 bg-white/90 p-4 shadow-sm`}>
         <label className="grid gap-1 text-sm font-semibold text-violet-900">
           曲名で検索
           <SearchInput

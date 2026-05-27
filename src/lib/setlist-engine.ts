@@ -1,51 +1,31 @@
-import type { Setlist, Song, SongMood } from "@/types/setlist";
-
-const MOOD_LABELS: Record<SongMood, string> = {
-  upbeat: "盛り上がり",
-  mid: "中間",
-  ballad: "バラード",
-};
-
-export function moodLabel(mood: SongMood): string {
-  return MOOD_LABELS[mood];
-}
-
-export function formatMoodInput(mood: SongMood): string {
-  return MOOD_LABELS[mood];
-}
-
-/** 手入力の雰囲気テキストを SongMood に正規化する */
-export function parseMoodInput(input: string): SongMood {
-  const trimmed = input.trim();
-  if (!trimmed) return "mid";
-
-  const lower = trimmed.toLowerCase();
-  if (
-    trimmed.includes("盛") ||
-    lower.includes("upbeat") ||
-    lower === "up" ||
-    trimmed.includes("テンション")
-  ) {
-    return "upbeat";
-  }
-  if (
-    trimmed.includes("バラ") ||
-    lower.includes("ballad") ||
-    trimmed.includes("切ない") ||
-    trimmed.includes("しっとり")
-  ) {
-    return "ballad";
-  }
-  if (trimmed.includes("中") || lower.includes("mid")) {
-    return "mid";
-  }
-  return "mid";
-}
+import type { Setlist, Song } from "@/types/setlist";
 
 export function formatDuration(totalSec: number): string {
   const minutes = Math.floor(totalSec / 60);
   const seconds = totalSec % 60;
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
+/** 尺が未設定（0秒）のときは空文字 */
+export function formatSongDurationLabel(durationSec: number): string {
+  if (durationSec <= 0) return "";
+  return `（${formatDuration(durationSec)}）`;
+}
+
+export function formatSongDurationFields(durationSec: number): { minutes: string; seconds: string } {
+  if (durationSec <= 0) return { minutes: "0", seconds: "0" };
+  return {
+    minutes: String(Math.floor(durationSec / 60)),
+    seconds: String(durationSec % 60),
+  };
+}
+
+/** 分・秒がともに 0 のときは未登録（0秒） */
+export function parseSongDurationFields(minutes: string, seconds: string): number {
+  const min = Math.max(0, Number(minutes) || 0);
+  const sec = Math.max(0, Number(seconds) || 0);
+  if (min === 0 && sec === 0) return 0;
+  return min * 60 + sec;
 }
 
 export function getSongsFromSetlist(setlist: Setlist, songs: Song[]): Song[] {
@@ -71,11 +51,47 @@ export function formatSetlistSongLine(
   const hideDuration = Boolean(options.hideDuration);
   const hideArtist = Boolean(options.hideArtist);
   const prefix = `${index + 1}. ${song.title}`;
+  const artist = song.artist.trim();
+
+  const durationLabel = formatSongDurationLabel(song.durationSec);
+
+  if (!artist) {
+    if (hideDuration || hideArtist) return prefix;
+    return `${prefix}${durationLabel}`;
+  }
 
   if (hideArtist && hideDuration) return prefix;
-  if (hideArtist) return `${prefix}（${formatDuration(song.durationSec)}）`;
-  if (hideDuration) return `${prefix} / ${song.artist}`;
-  return `${prefix} / ${song.artist}（${formatDuration(song.durationSec)}）`;
+  if (hideArtist) return `${prefix}${durationLabel}`;
+  if (hideDuration) return `${prefix} / ${artist}`;
+  return `${prefix} / ${artist}${durationLabel}`;
+}
+
+export type ParsedTemplateSongLine = {
+  title: string;
+  artist: string;
+};
+
+/** 1行1曲。`曲名 / アーティスト` または曲名のみ（アーティストなし） */
+export function parseTemplateSongLines(text: string): ParsedTemplateSongLine[] {
+  const results: ParsedTemplateSongLine[] = [];
+
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const slashMatch = line.match(/\s*[\/／]\s*/);
+    if (!slashMatch || slashMatch.index === undefined) {
+      results.push({ title: line, artist: "" });
+      continue;
+    }
+
+    const title = line.slice(0, slashMatch.index).trim();
+    const artist = line.slice(slashMatch.index + slashMatch[0].length).trim();
+    if (!title) continue;
+    results.push({ title, artist });
+  }
+
+  return results;
 }
 
 export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
@@ -87,9 +103,10 @@ export function formatSetlistText(setlist: Setlist, songs: Song[]): string {
   const lines = ordered.map((song, index) => formatSetlistSongLine(song, index, lineOptions));
   const hideDuration = Boolean(setlist.hideDuration);
   const total = ordered.reduce((sum, song) => sum + song.durationSec, 0);
-  const totalLine = hideDuration
-    ? `合計: ${ordered.length}曲`
-    : `合計: ${ordered.length}曲 / ${formatDuration(total)}`;
+  const totalLine =
+    hideDuration || total <= 0
+      ? `合計: ${ordered.length}曲`
+      : `合計: ${ordered.length}曲 / ${formatDuration(total)}`;
 
   return [
     `【${setlist.name}】`,
@@ -138,4 +155,19 @@ export function sortSongsByCreatedAt(songs: Song[], order: SongListSortOrder): S
     return a.artist.localeCompare(b.artist, "ja");
   });
   return order === "desc" ? sorted.reverse() : sorted;
+}
+
+/** セトリ未追加を上に、追加済みを下に（各グループ内は追加順） */
+export function sortSongsWithUnaddedSetlistFirst(
+  songs: Song[],
+  setlistSongIds: string[],
+  order: SongListSortOrder,
+): Song[] {
+  const sorted = sortSongsByCreatedAt(songs, order);
+  if (setlistSongIds.length === 0) return sorted;
+
+  const inSetlist = new Set(setlistSongIds);
+  const pending = sorted.filter((song) => !inSetlist.has(song.id));
+  const added = sorted.filter((song) => inSetlist.has(song.id));
+  return [...pending, ...added];
 }

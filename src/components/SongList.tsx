@@ -1,7 +1,7 @@
 "use client";
 
 import RowActionButton from "@/components/RowActionButton";
-import { formatDuration, moodLabel } from "@/lib/setlist-engine";
+import { formatDuration, formatSongDurationLabel } from "@/lib/setlist-engine";
 import type { Song } from "@/types/setlist";
 
 type Props = {
@@ -82,6 +82,7 @@ export default function SongList({
       <ul className="grid gap-1.5">
         {songs.map((song) => {
           const selected = selectedIds.includes(song.id);
+          const artist = song.artist.trim();
           return (
             <li
               key={song.id}
@@ -91,10 +92,12 @@ export default function SongList({
             >
               <p className="min-w-0 flex-1 text-sm leading-snug text-violet-950">
                 <span className="font-bold">{song.title}</span>
-                <span className="text-violet-700"> / {song.artist}</span>
-                <span className="ml-1 text-xs text-violet-500">
-                  （{formatDuration(song.durationSec)}）
-                </span>
+                {artist ? <span className="text-violet-700"> / {artist}</span> : null}
+                {song.durationSec > 0 ? (
+                  <span className="ml-1 text-xs text-violet-500">
+                    {formatSongDurationLabel(song.durationSec)}
+                  </span>
+                ) : null}
               </p>
               {onAddToSetlist ? (
                 <RowActionButton
@@ -120,6 +123,7 @@ export default function SongList({
     <ul className={listClass}>
       {songs.map((song) => {
         const selected = selectedIds.includes(song.id);
+        const artist = song.artist.trim();
         const cardClass = `rounded-xl border px-3 py-2.5 ${
           selected ? "border-fuchsia-300 bg-fuchsia-50/80" : "border-violet-100 bg-white/90"
         }`;
@@ -131,12 +135,12 @@ export default function SongList({
                 <p className="text-sm leading-snug font-bold break-words text-violet-950">
                   {song.title}
                 </p>
-                <p className="mt-0.5 text-xs leading-snug break-words text-violet-700">
-                  {song.artist}
-                </p>
-                <p className="mt-1 text-xs text-violet-500">
-                  {formatDuration(song.durationSec)} ・ {moodLabel(song.mood)}
-                </p>
+                {artist ? (
+                  <p className="mt-0.5 text-xs leading-snug break-words text-violet-700">{artist}</p>
+                ) : null}
+                {song.durationSec > 0 ? (
+                  <p className="mt-1 text-xs text-violet-500">{formatDuration(song.durationSec)}</p>
+                ) : null}
               </div>
               <div className="mt-2">
                 <SongRowActions
@@ -157,11 +161,13 @@ export default function SongList({
               <div className="min-w-0 flex-1">
                 <p className="text-sm leading-snug font-bold break-words text-violet-950">
                   {song.title}
-                  <span className="font-normal text-violet-700"> / {song.artist}</span>
+                  {artist ? (
+                    <span className="font-normal text-violet-700"> / {artist}</span>
+                  ) : null}
                 </p>
-                <p className="mt-0.5 text-xs text-violet-500">
-                  {formatDuration(song.durationSec)} ・ {moodLabel(song.mood)}
-                </p>
+                {song.durationSec > 0 ? (
+                  <p className="mt-0.5 text-xs text-violet-500">{formatDuration(song.durationSec)}</p>
+                ) : null}
               </div>
               <SongRowActions
                 song={song}

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { loadAppData, saveAppData, seedSampleSongsIfEmpty } from "@/lib/storage";
 import type { AppData } from "@/types/setlist";
 
+export type SetAppData = (next: AppData | ((prev: AppData) => AppData)) => void;
+
 export function useAppData() {
   const [data, setData] = useState<AppData>({ songs: [], setlists: [] });
   const [ready, setReady] = useState(false);
@@ -19,9 +21,12 @@ export function useAppData() {
     setReady(true);
   }, []);
 
-  const persist = useCallback((next: AppData) => {
-    setData(next);
-    saveAppData(next);
+  const persist = useCallback<SetAppData>((next) => {
+    setData((prev) => {
+      const resolved = typeof next === "function" ? next(prev) : next;
+      saveAppData(resolved);
+      return resolved;
+    });
   }, []);
 
   return { data, setData: persist, ready };

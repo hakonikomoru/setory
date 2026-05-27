@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import OverlayNowTitleMarquee from "@/components/OverlayNowTitleMarquee";
-import { formatDuration, formatSetlistSongLine } from "@/lib/setlist-engine";
+import { formatDuration, formatSetlistSongLine, formatSongDurationLabel } from "@/lib/setlist-engine";
 import {
   isCustomOverlayTextColor,
   OVERLAY_CONTENT_INSET_CLASS,
@@ -75,9 +75,13 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
 
   function songSubLine(song: (typeof ordered)[number]): string | null {
     if (!showArtist && !showDuration) return null;
-    if (!showArtist) return formatDuration(song.durationSec);
+    if (!showArtist) {
+      return song.durationSec > 0 ? formatDuration(song.durationSec) : null;
+    }
     if (!showDuration) return song.artist;
-    return `${song.artist}（${formatDuration(song.durationSec)}）`;
+    const durationLabel = formatSongDurationLabel(song.durationSec);
+    if (!durationLabel) return song.artist || null;
+    return `${song.artist}${durationLabel}`;
   }
 
   function pastSongsBlock() {

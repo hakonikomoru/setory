@@ -3,7 +3,7 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`9bb3222`・2026-05-26・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`f815e46`・2026-05-27・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -56,8 +56,10 @@ setory/
 │   │   ├── RowActionButton.tsx
 │   │   ├── SearchInput.tsx
 │   │   ├── SetlistBuilder.tsx
+│   │   ├── SongAddTabs.tsx
 │   │   ├── SongForm.tsx
-│   │   └── SongList.tsx
+│   │   ├── SongList.tsx
+│   │   └── TemplateSongImport.tsx
 │   ├── lib/
 │   │   ├── musicbrainz.test.ts
 │   │   ├── musicbrainz.ts

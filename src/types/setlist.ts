@@ -1,5 +1,3 @@
-export type SongMood = "upbeat" | "mid" | "ballad";
-
 export type OverlayMode = "current" | "currentAndNext" | "fullSetlist";
 
 export type OverlayTheme = "simple" | "minimal" | "bold" | "cute" | "dark" | "komoru";
@@ -9,7 +7,6 @@ export type Song = {
   title: string;
   artist: string;
   durationSec: number;
-  mood: SongMood;
   tags: string[];
   notes?: string;
   /** 曲庫への登録日時（ISO 8601） */

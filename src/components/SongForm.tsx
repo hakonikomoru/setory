@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import RowActionButton from "@/components/RowActionButton";
 import { createId } from "@/lib/storage";
-import { formatMoodInput, parseMoodInput } from "@/lib/setlist-engine";
+import { formatSongDurationFields, parseSongDurationFields } from "@/lib/setlist-engine";
 import type { Song } from "@/types/setlist";
 
 type Props = {
@@ -23,23 +23,20 @@ export default function SongForm({
   const addToSetlist = saveIntent === "setlist" && !initial;
   const [title, setTitle] = useState(initial?.title ?? "");
   const [artist, setArtist] = useState(initial?.artist ?? "");
-  const [minutes, setMinutes] = useState(
-    initial ? String(Math.floor(initial.durationSec / 60)) : "4",
-  );
-  const [seconds, setSeconds] = useState(initial ? String(initial.durationSec % 60) : "0");
-  const [moodText, setMoodText] = useState(initial ? formatMoodInput(initial.mood) : "");
+  const initialDuration = formatSongDurationFields(initial?.durationSec ?? 0);
+  const [minutes, setMinutes] = useState(initialDuration.minutes);
+  const [seconds, setSeconds] = useState(initialDuration.seconds);
   const [notes, setNotes] = useState(initial?.notes ?? "");
 
   function buildSong(): Song | null {
-    const durationSec = Math.max(0, Number(minutes) || 0) * 60 + Math.max(0, Number(seconds) || 0);
-    if (!title.trim() || !artist.trim() || durationSec <= 0) return null;
+    const durationSec = parseSongDurationFields(minutes, seconds);
+    if (!title.trim() || !artist.trim()) return null;
 
     return {
       id: initial?.id ?? createId("song"),
       title: title.trim(),
       artist: artist.trim(),
       durationSec,
-      mood: parseMoodInput(moodText),
       tags: initial?.tags ?? [],
       notes: notes.trim() || undefined,
       createdAt: initial?.createdAt ?? new Date().toISOString(),
@@ -93,7 +90,7 @@ export default function SongForm({
         </label>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-violet-900">
           尺（分）
           <input
@@ -113,16 +110,6 @@ export default function SongForm({
             value={seconds}
             onChange={(e) => setSeconds(e.target.value)}
             className="w-full min-w-0 rounded-xl border border-violet-200 px-3 py-2"
-          />
-        </label>
-        <label className="grid min-w-0 gap-1 text-sm font-semibold text-violet-900">
-          雰囲気
-          <input
-            type="text"
-            value={moodText}
-            onChange={(e) => setMoodText(e.target.value)}
-            className="w-full min-w-0 rounded-xl border border-violet-200 px-3 py-2"
-            placeholder="例: バラード"
           />
         </label>
       </div>

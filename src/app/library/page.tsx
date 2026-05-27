@@ -5,6 +5,7 @@ import ExternalSongSearch from "@/components/ExternalSongSearch";
 import RegisteredSongsPanel from "@/components/RegisteredSongsPanel";
 import SongAddTabs, { type SongAddTab } from "@/components/SongAddTabs";
 import SongForm from "@/components/SongForm";
+import TemplateSongImport from "@/components/TemplateSongImport";
 import { filterSongsByQuery } from "@/lib/setlist-engine";
 import { importSongsFromHits } from "@/lib/song-import";
 import { removeSong, upsertSong } from "@/lib/storage";
@@ -52,11 +53,18 @@ export default function LibraryPage() {
             <ExternalSongSearch
               showTitle={false}
               librarySongs={data.songs}
-              onImport={(song) => setData(upsertSong(data, song))}
+              onImport={(song) => setData((prev) => upsertSong(prev, song))}
               onImportMany={(hits) => {
-                const { data: next, added } = importSongsFromHits(data, hits);
-                setData(next);
-                window.alert(`${added}曲を曲庫に追加しました`);
+                setData((prev) => {
+                  const { data: next, added } = importSongsFromHits(prev, hits);
+                  if (added > 0) {
+                    window.setTimeout(
+                      () => window.alert(`${added}曲を曲庫に追加しました`),
+                      0,
+                    );
+                  }
+                  return next;
+                });
               }}
             />
           }
@@ -65,10 +73,23 @@ export default function LibraryPage() {
               key={editing?.id ?? "new"}
               initial={editing ?? undefined}
               onSave={(song) => {
-                setData(upsertSong(data, song));
+                setData((prev) => upsertSong(prev, song));
                 setEditing(null);
               }}
               onCancel={editing ? () => setEditing(null) : undefined}
+            />
+          }
+          templateHint="曲庫に一括登録します。アーティストがない行は曲名のみで登録されます。"
+          templatePanel={
+            <TemplateSongImport
+              onAdd={(song) => setData((prev) => upsertSong(prev, song))}
+              onAddMany={(songs) => {
+                setData((prev) => {
+                  let next = prev;
+                  for (const song of songs) next = upsertSong(next, song);
+                  return next;
+                });
+              }}
             />
           }
         />
@@ -82,7 +103,7 @@ export default function LibraryPage() {
           onEdit={setEditing}
           onDelete={(songId) => {
             if (!window.confirm("この曲を削除しますか？")) return;
-            setData(removeSong(data, songId));
+            setData((prev) => removeSong(prev, songId));
             if (editing?.id === songId) setEditing(null);
           }}
         />
