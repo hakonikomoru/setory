@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import RowActionButton from "@/components/RowActionButton";
+import StreamingServiceIcon from "@/components/StreamingServiceIcon";
 import { buildSongSearchQuery, STREAMING_SERVICES } from "@/lib/streaming-links";
 import type { Song } from "@/types/setlist";
 
@@ -84,13 +85,11 @@ export default function SongStreamingSearchLinks({ song, className = "" }: Props
                 href={service.buildSearchUrl(query)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block px-3 py-2 text-sm font-semibold text-violet-900 transition hover:bg-violet-50"
+                className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-violet-900 transition hover:bg-violet-50"
                 onClick={() => setOpen(false)}
               >
+                <StreamingServiceIcon serviceId={service.id} />
                 {service.label}
-                {service.primary ? (
-                  <span className="ml-1.5 text-xs font-normal text-violet-500">おすすめ</span>
-                ) : null}
               </a>
             </li>
           ))}

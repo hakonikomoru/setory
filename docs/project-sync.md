@@ -3,7 +3,7 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`766bc7e`・2026-05-27・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`db2f30a`・2026-05-27・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -63,6 +63,7 @@ setory/
 │   │   ├── SongForm.tsx
 │   │   ├── SongList.tsx
 │   │   ├── SongStreamingSearchLinks.tsx
+│   │   ├── StreamingServiceIcon.tsx
 │   │   └── TemplateSongImport.tsx
 │   ├── config/
 │   │   └── site.ts
@@ -84,6 +85,7 @@ setory/
 │   │   ├── song-match.test.ts
 │   │   ├── song-match.ts
 │   │   ├── storage.ts
+│   │   ├── streaming-brand-icons.ts
 │   │   ├── streaming-links.test.ts
 │   │   ├── streaming-links.ts
 │   │   ├── use-app-data.ts

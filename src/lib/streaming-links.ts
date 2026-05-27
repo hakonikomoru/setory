@@ -10,7 +10,6 @@ export type StreamingService = {
   id: StreamingServiceId;
   label: string;
   buttonLabel: string;
-  primary?: boolean;
   buildSearchUrl: (query: string) => string;
 };
 
@@ -41,7 +40,6 @@ export const STREAMING_SERVICES: StreamingService[] = [
     id: "youtube-music",
     label: "YouTube Music",
     buttonLabel: "YT Music",
-    primary: true,
     buildSearchUrl: (query) =>
       `https://music.youtube.com/search?q=${encodeURIComponent(query)}`,
   },
