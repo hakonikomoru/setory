@@ -2,6 +2,7 @@
 
 import CopySetlistButton from "@/components/CopySetlistButton";
 import RowActionButton, { RowActionLink } from "@/components/RowActionButton";
+import SetlistSongDisplay from "@/components/SetlistSongDisplay";
 import { formatDuration, formatSetlistText, getSetlistDuration } from "@/lib/setlist-engine";
 import { removeSetlist } from "@/lib/storage";
 import { useAppData } from "@/lib/use-app-data";
@@ -38,7 +39,7 @@ export default function SetlistsPage() {
             .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
             .map((setlist) => {
               const duration = getSetlistDuration(setlist, data.songs);
-              const text = formatSetlistText(setlist, data.songs);
+              const copyText = formatSetlistText(setlist, data.songs);
               return (
                 <li
                   key={setlist.id}
@@ -58,7 +59,7 @@ export default function SetlistsPage() {
                       <RowActionLink href={`/builder?id=${setlist.id}`} variant="secondary">
                         編集
                       </RowActionLink>
-                      <CopySetlistButton text={text} label="コピー" />
+                      <CopySetlistButton text={copyText} label="コピー" />
                       <RowActionButton
                         type="button"
                         variant="danger"
@@ -71,9 +72,11 @@ export default function SetlistsPage() {
                       </RowActionButton>
                     </div>
                   </div>
-                  <pre className="mt-4 overflow-x-auto rounded-xl bg-violet-950/95 p-3 text-xs leading-6 text-violet-50">
-                    {text}
-                  </pre>
+                  <SetlistSongDisplay
+                    className="mt-4"
+                    setlist={setlist}
+                    songs={data.songs}
+                  />
                 </li>
               );
             })}

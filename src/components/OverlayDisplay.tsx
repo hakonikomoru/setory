@@ -147,7 +147,7 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
     return frame(
       <>
         <p className={tc(styles.label)}>Setory</p>
-        <p className={`mt-2 ${tc(styles.sub)}`}>セトリ作成で「現在の曲にする」を選んでください</p>
+        <p className={`mt-2 ${tc(styles.sub)}`}>オーバーレイ操作で「現在の曲」を選んでください</p>
       </>,
     );
   }

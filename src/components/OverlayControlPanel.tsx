@@ -195,29 +195,43 @@ export default function OverlayControlPanel() {
                 <ol className="mt-4 max-h-[min(24rem,50vh)] list-none space-y-2 overflow-y-auto overscroll-contain px-1 py-1">
                   {overlaySongs.ordered.map((song, index) => {
                     const isCurrent = setlist.currentSongId === song.id;
+                    const line = formatSetlistSongLine(song, index, {
+                      hideDuration: Boolean(setlist.hideDuration),
+                      hideArtist: Boolean(setlist.hideArtist),
+                    });
                     return (
-                      <li key={song.id} className="min-w-0 px-px">
-                        <button
-                          type="button"
-                          onClick={() => setCurrentSongId(song.id)}
-                          className={`btn-text-left flex w-full min-w-0 flex-col rounded-xl border px-3 py-2 transition ${
+                      <li
+                        key={song.id}
+                        className="flex min-w-0 items-center gap-2 px-px"
+                      >
+                        <div
+                          className={`min-w-0 flex-1 rounded-xl border px-3 py-2 ${
                             isCurrent
                               ? "border-violet-500 bg-violet-100 ring-2 ring-violet-400 ring-inset"
-                              : "border-violet-100 bg-violet-50/50 hover:bg-violet-50"
+                              : "border-violet-100 bg-violet-50/50"
                           }`}
                         >
-                          <p className="w-full text-left leading-snug font-bold break-words text-violet-950">
-                            {formatSetlistSongLine(song, index, {
-                              hideDuration: Boolean(setlist.hideDuration),
-                              hideArtist: Boolean(setlist.hideArtist),
-                            })}
+                          <p
+                            className="truncate text-sm leading-snug font-bold text-violet-950"
+                            title={line}
+                          >
+                            {line}
                             {isCurrent ? (
                               <span className="ml-2 rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
                                 現在
                               </span>
                             ) : null}
                           </p>
-                        </button>
+                        </div>
+                        <RowActionButton
+                          type="button"
+                          variant={isCurrent ? "accent" : "secondary"}
+                          size="sm"
+                          className="shrink-0"
+                          onClick={() => setCurrentSongId(song.id)}
+                        >
+                          {isCurrent ? "歌唱中" : "現在の曲"}
+                        </RowActionButton>
                       </li>
                     );
                   })}

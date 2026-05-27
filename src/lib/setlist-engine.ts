@@ -42,7 +42,7 @@ export type SetlistLineDisplayOptions = {
   hideArtist?: boolean;
 };
 
-/** 保存セトリ・コピー用と同じ 1 行表記（例: `1. 曲名 / アーティスト（3:45）`） */
+/** クリップボードコピー用の 1 行表記（例: `1. 曲名 / アーティスト（3:45）`） */
 export function formatSetlistSongLine(
   song: Song,
   index: number,

@@ -148,26 +148,15 @@ export default function SetlistBuilder({
   function toggleSong(songId: string) {
     const removing = songIds.includes(songId);
     const nextIds = removing ? songIds.filter((id) => id !== songId) : [...songIds, songId];
-    const nextCurrent = removing && currentSongId === songId ? undefined : currentSongId;
+    const nextCurrent =
+      embedded && removing && currentSongId === songId ? undefined : currentSongId;
     setSongIds(nextIds);
-    if (nextCurrent !== currentSongId) setCurrentSongId(nextCurrent);
+    if (embedded && nextCurrent !== currentSongId) setCurrentSongId(nextCurrent);
     persistDraft({
       ...draftSetlist,
       songIds: nextIds,
-      currentSongId: nextCurrent,
+      ...(embedded ? { currentSongId: nextCurrent } : {}),
     });
-  }
-
-  function setAsCurrentSong(songId: string) {
-    setCurrentSongId(songId);
-    const index = songIds.indexOf(songId);
-    const next: Setlist = { ...draftSetlist, currentSongId: songId };
-    if (index === 0) {
-      next.overlaySuppressNext = true;
-    } else {
-      delete next.overlaySuppressNext;
-    }
-    persistDraft(next);
   }
 
   function moveSong(index: number, direction: -1 | 1) {
@@ -293,7 +282,6 @@ export default function SetlistBuilder({
           ) : (
             <ol className="grid gap-2 px-1 py-1">
               {selectedSongs.map((song, index) => {
-                const isCurrent = currentSongId === song.id;
                 return (
                   <li
                     key={song.id}
@@ -301,20 +289,11 @@ export default function SetlistBuilder({
                     onDragStart={() => setDragIndex(index)}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={() => handleDrop(index)}
-                    className={`flex items-start gap-3 rounded-xl border px-3 py-2 ${
-                      isCurrent
-                        ? "border-violet-500 bg-violet-100 ring-2 ring-violet-400 ring-inset"
-                        : "border-fuchsia-200 bg-fuchsia-50/70"
-                    }`}
+                    className="flex items-start gap-3 rounded-xl border border-fuchsia-200 bg-fuchsia-50/70 px-3 py-2"
                   >
                     <div className="min-w-0 flex-1">
                       <p className="leading-snug font-bold break-words text-violet-950">
                         {index + 1}. {song.title}
-                        {isCurrent ? (
-                          <span className="ml-2 inline-block rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
-                            現在
-                          </span>
-                        ) : null}
                       </p>
                       {hideArtist ? (
                         hideDuration || song.durationSec <= 0 ? null : (
@@ -331,14 +310,6 @@ export default function SetlistBuilder({
                       )}
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5 self-start">
-                      <RowActionButton
-                        type="button"
-                        variant={isCurrent ? "accent" : "secondary"}
-                        size="sm"
-                        onClick={() => setAsCurrentSong(song.id)}
-                      >
-                        {isCurrent ? "歌唱中" : "現在の曲"}
-                      </RowActionButton>
                       <RowActionButton
                         type="button"
                         variant="ghost"
@@ -372,12 +343,6 @@ export default function SetlistBuilder({
             </ol>
           )}
           </div>
-
-          {!embedded ? (
-          <pre className="overflow-x-auto rounded-2xl bg-violet-950 p-4 text-sm leading-6 text-violet-50">
-            {exportText}
-          </pre>
-          ) : null}
         </section>
 
         <SongAddTabs
