@@ -3,7 +3,7 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`3b1e3ed`・2026-05-27・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`766bc7e`・2026-05-27・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -34,6 +34,7 @@ setory/
 │   │   ├── api/
 │   │   ├── builder/
 │   │   ├── globals.css
+│   │   ├── go/
 │   │   ├── layout.tsx
 │   │   ├── library/
 │   │   ├── overlay/
@@ -45,6 +46,7 @@ setory/
 │   │   ├── AppShell.tsx
 │   │   ├── CopySetlistButton.tsx
 │   │   ├── ExternalSongSearch.tsx
+│   │   ├── Footer.tsx
 │   │   ├── OverlayControlPanel.tsx
 │   │   ├── OverlayDisplay.tsx
 │   │   ├── OverlayNowTitleMarquee.tsx
@@ -60,7 +62,10 @@ setory/
 │   │   ├── SongAddTabs.tsx
 │   │   ├── SongForm.tsx
 │   │   ├── SongList.tsx
+│   │   ├── SongStreamingSearchLinks.tsx
 │   │   └── TemplateSongImport.tsx
+│   ├── config/
+│   │   └── site.ts
 │   ├── lib/
 │   │   ├── musicbrainz.test.ts
 │   │   ├── musicbrainz.ts
@@ -79,6 +84,8 @@ setory/
 │   │   ├── song-match.test.ts
 │   │   ├── song-match.ts
 │   │   ├── storage.ts
+│   │   ├── streaming-links.test.ts
+│   │   ├── streaming-links.ts
 │   │   ├── use-app-data.ts
 │   │   ├── use-element-width.ts
 │   │   └── use-overlay-data.ts
@@ -105,3 +112,10 @@ setory/
 
 - プロダクト方針・環境変数・デプロイ手順
 - 削除した機能の説明が残っていないか、変更のたびに確認する
+
+### 制作クレジット（komolab 共通）
+
+- 正式表記: **komolab - こもらぼ -**（`KomoLab` / `こもラボ` などに揺らさない）
+- フッター: `制作・運営：komolab - こもらぼ -`（`src/components/Footer.tsx`）
+- 設定: `src/config/site.ts` の `credit`（将来 `credit.href` でリンク化可）
+- ハッシュタグ `#komolab` / `#こもらぼ` は README に記載。フッターは制作名のみ

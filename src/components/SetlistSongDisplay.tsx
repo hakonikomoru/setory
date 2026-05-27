@@ -1,5 +1,6 @@
 "use client";
 
+import SongStreamingSearchLinks from "@/components/SongStreamingSearchLinks";
 import {
   formatDuration,
   formatSongDurationLabel,
@@ -52,12 +53,13 @@ export default function SetlistSongDisplay({ setlist, songs, className = "" }: P
         return (
           <li
             key={song.id}
-            className="min-w-0 rounded-xl border border-fuchsia-200/80 bg-fuchsia-50/50 px-3 py-2.5"
+            className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-fuchsia-200/80 bg-fuchsia-50/50 px-3 py-2.5"
           >
-            <p className="truncate text-sm text-violet-950" title={fullLine}>
+            <p className="min-w-0 flex-1 truncate text-sm text-violet-950" title={fullLine}>
               <span className="font-bold">{lineTitle}</span>
               {suffix ? <span className="font-normal text-violet-700"> / {suffix}</span> : null}
             </p>
+            <SongStreamingSearchLinks song={song} />
           </li>
         );
       })}
