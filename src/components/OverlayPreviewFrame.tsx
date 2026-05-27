@@ -13,11 +13,35 @@ const BACKDROPS: {
   value: OverlayPreviewBackdrop;
   label: string;
   bgClass: string;
+  buttonClass: string;
 }[] = [
-  { value: "green", label: "グリーンバック", bgClass: "bg-[#00b140]" },
-  { value: "white", label: "白", bgClass: "bg-white" },
-  { value: "black", label: "黒", bgClass: "bg-black" },
+  {
+    value: "green",
+    label: "グリーン",
+    bgClass: "bg-[#00b140]",
+    buttonClass:
+      "bg-[#00b140] text-white shadow-sm ring-1 ring-[#008830] hover:bg-[#00a038] active:bg-[#009030]",
+  },
+  {
+    value: "white",
+    label: "白",
+    bgClass: "bg-white",
+    buttonClass:
+      "bg-white text-violet-950 shadow-sm ring-1 ring-violet-300 hover:bg-violet-50 active:bg-violet-100",
+  },
+  {
+    value: "black",
+    label: "黒",
+    bgClass: "bg-black",
+    buttonClass:
+      "bg-black text-white shadow-sm ring-1 ring-neutral-600 hover:bg-neutral-800 active:bg-neutral-900",
+  },
 ];
+
+function backdropButtonClass(item: (typeof BACKDROPS)[number], selected: boolean) {
+  const selectedRing = selected ? "ring-2 ring-violet-600 ring-offset-2 ring-offset-white" : "";
+  return `${item.buttonClass} ${selectedRing}`;
+}
 
 type Props = {
   setlist: Setlist;
@@ -49,7 +73,8 @@ export default function OverlayPreviewFrame({
             <RowActionButton
               key={item.value}
               type="button"
-              variant={backdrop === item.value ? "accent" : "secondary"}
+              variant="surface"
+              className={backdropButtonClass(item, backdrop === item.value)}
               aria-pressed={backdrop === item.value}
               onClick={() => setBackdrop(item.value)}
             >

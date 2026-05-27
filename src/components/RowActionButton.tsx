@@ -14,6 +14,8 @@ const VARIANT_CLASS = {
     "bg-violet-50/90 text-violet-700 shadow-sm ring-1 ring-violet-100 hover:bg-violet-100 active:bg-violet-200/60",
   muted:
     "bg-transparent text-violet-600 ring-1 ring-transparent hover:bg-violet-50 hover:ring-violet-100",
+  /** className で背景・文字色を指定する用 */
+  surface: "",
 } as const;
 
 /** 編集・コピー・操作・削除 — sm / md は同一（text-sm・h-9） */
@@ -38,7 +40,7 @@ export function rowActionButtonClass(
   return `${BASE_CLASS} ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]} ${className}`.trim();
 }
 
-/** グリーンバック・既定色・全幅などの選択チップ */
+/** プレビュー背景（グリーン等）・既定色・全幅などの選択チップ */
 export function toggleActionClass(active: boolean, className = "") {
   return rowActionButtonClass(active ? "accent" : "secondary", "md", className);
 }
