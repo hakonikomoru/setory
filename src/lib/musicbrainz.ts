@@ -81,6 +81,48 @@ export function externalHitToSong(hit: ExternalSongHit): Song {
 
 export const MUSICBRAINZ_MAX_LIMIT = 100;
 export const MUSICBRAINZ_RATE_LIMIT_MS = 1100;
+export const MUSICBRAINZ_MIN_TERM_LENGTH = 2;
+
+function quoteLuceneTerm(term: string): string {
+  if (/[\s+\-&|!(){}[\]^"~*?:\\]/.test(term)) {
+    return `"${term.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  }
+  return term;
+}
+
+/** MusicBrainz WS の Lucene クエリ（曲名・アーティストを個別指定） */
+export function buildMusicBrainzSearchQuery(title: string, artist: string): string | null {
+  const trimmedTitle = title.trim();
+  const trimmedArtist = artist.trim();
+  const parts: string[] = [];
+
+  if (trimmedTitle.length >= MUSICBRAINZ_MIN_TERM_LENGTH) {
+    parts.push(`recording:${quoteLuceneTerm(trimmedTitle)}`);
+  }
+  if (trimmedArtist.length >= MUSICBRAINZ_MIN_TERM_LENGTH) {
+    parts.push(`artist:${quoteLuceneTerm(trimmedArtist)}`);
+  }
+
+  if (parts.length === 0) return null;
+  return parts.join(" AND ");
+}
+
+export function isMusicBrainzSearchReady(title: string, artist: string): boolean {
+  return buildMusicBrainzSearchQuery(title, artist) !== null;
+}
+
+export function musicBrainzSearchParams(
+  title: string,
+  artist: string,
+  extra: Record<string, string> = {},
+): URLSearchParams {
+  const params = new URLSearchParams(extra);
+  const trimmedTitle = title.trim();
+  const trimmedArtist = artist.trim();
+  if (trimmedTitle) params.set("title", trimmedTitle);
+  if (trimmedArtist) params.set("artist", trimmedArtist);
+  return params;
+}
 
 export type MusicBrainzSearchOptions = {
   limit?: number;

@@ -4,7 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import RowActionButton from "@/components/RowActionButton";
 import SearchInput from "@/components/SearchInput";
 import { formatDuration } from "@/lib/setlist-engine";
-import { externalHitToSong, mergeExternalHits, type ExternalSongHit } from "@/lib/musicbrainz";
+import {
+  externalHitToSong,
+  isMusicBrainzSearchReady,
+  mergeExternalHits,
+  musicBrainzSearchParams,
+  type ExternalSongHit,
+} from "@/lib/musicbrainz";
 import { findSongInLibrary, isSongInLibrary, isSongInSetlist } from "@/lib/song-match";
 import type { Song } from "@/types/setlist";
 
@@ -33,8 +39,10 @@ export default function ExternalSongSearch({
   setlistSongIds = [],
   showTitle = true,
 }: Props) {
-  const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [titleQuery, setTitleQuery] = useState("");
+  const [artistQuery, setArtistQuery] = useState("");
+  const [debouncedTitle, setDebouncedTitle] = useState("");
+  const [debouncedArtist, setDebouncedArtist] = useState("");
   const [results, setResults] = useState<ExternalSongHit[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -43,12 +51,17 @@ export default function ExternalSongSearch({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 400);
+    const timer = window.setTimeout(() => {
+      setDebouncedTitle(titleQuery.trim());
+      setDebouncedArtist(artistQuery.trim());
+    }, 400);
     return () => window.clearTimeout(timer);
-  }, [query]);
+  }, [titleQuery, artistQuery]);
+
+  const searchReady = isMusicBrainzSearchReady(debouncedTitle, debouncedArtist);
 
   useEffect(() => {
-    if (debouncedQuery.length < 2) {
+    if (!searchReady) {
       setResults([]);
       setHasMore(false);
       setError(null);
@@ -60,7 +73,7 @@ export default function ExternalSongSearch({
     setLoading(true);
     setError(null);
 
-    fetch(`/api/songs/search?q=${encodeURIComponent(debouncedQuery)}&max=100`, {
+    fetch(`/api/songs/search?${musicBrainzSearchParams(debouncedTitle, debouncedArtist, { max: "100" })}`, {
       signal: controller.signal,
     })
       .then(async (response) => {
@@ -86,7 +99,11 @@ export default function ExternalSongSearch({
       });
 
     return () => controller.abort();
-  }, [debouncedQuery]);
+  }, [debouncedArtist, debouncedTitle, searchReady]);
+
+  function searchQueryString(extra: Record<string, string> = {}) {
+    return musicBrainzSearchParams(debouncedTitle, debouncedArtist, extra).toString();
+  }
 
   function resolveSong(hit: ExternalSongHit): Song {
     return findSongInLibrary(librarySongs, hit.title, hit.artist) ?? externalHitToSong(hit);
@@ -127,12 +144,12 @@ export default function ExternalSongSearch({
   }
 
   async function loadMore() {
-    if (!debouncedQuery || loadingMore) return;
+    if (!searchReady || loadingMore) return;
     setLoadingMore(true);
     setError(null);
     try {
       const response = await fetch(
-        `/api/songs/search?q=${encodeURIComponent(debouncedQuery)}&max=100&offset=${results.length}`,
+        `/api/songs/search?${searchQueryString({ max: "100", offset: String(results.length) })}`,
       );
       const payload = (await response.json()) as {
         results?: ExternalSongHit[];
@@ -153,13 +170,11 @@ export default function ExternalSongSearch({
   }
 
   async function loadDeep() {
-    if (!debouncedQuery || deepLoading) return;
+    if (!searchReady || deepLoading) return;
     setDeepLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        `/api/songs/search?q=${encodeURIComponent(debouncedQuery)}&deep=1&max=200`,
-      );
+      const response = await fetch(`/api/songs/search?${searchQueryString({ deep: "1", max: "200" })}`);
       const payload = (await response.json()) as {
         results?: ExternalSongHit[];
         error?: string;
@@ -192,15 +207,28 @@ export default function ExternalSongSearch({
       )}
 
       <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 shadow-sm">
-      <label className="grid gap-1 text-sm font-semibold text-violet-900">
-        曲名・アーティストで検索
-        <SearchInput
-          value={query}
-          onChange={setQuery}
-          placeholder="例: artist:YOASOBI、夜に駆ける"
-          inputClassName="bg-white"
-        />
-      </label>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="grid gap-1 text-sm font-semibold text-violet-900">
+          曲名
+          <SearchInput
+            value={titleQuery}
+            onChange={setTitleQuery}
+            placeholder="例: 夜に駆ける"
+            inputClassName="bg-white"
+            clearLabel="曲名検索をクリア"
+          />
+        </label>
+        <label className="grid gap-1 text-sm font-semibold text-violet-900">
+          アーティスト
+          <SearchInput
+            value={artistQuery}
+            onChange={setArtistQuery}
+            placeholder="例: YOASOBI"
+            inputClassName="bg-white"
+            clearLabel="アーティスト検索をクリア"
+          />
+        </label>
+      </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {importableHits.length > 0 ? (
@@ -211,7 +239,7 @@ export default function ExternalSongSearch({
             （{importableHits.length}曲）
           </RowActionButton>
         ) : null}
-        {debouncedQuery.length >= 2 ? (
+        {searchReady ? (
           <RowActionButton
             type="button"
             variant="secondary"
@@ -226,8 +254,8 @@ export default function ExternalSongSearch({
       <p className="mt-2 text-xs text-violet-600">
         {loading
           ? "検索中..."
-          : debouncedQuery.length < 2
-            ? "2文字以上入力すると検索します（artist:名前 でアーティスト検索）"
+          : !searchReady
+            ? "曲名またはアーティストを2文字以上入力すると検索します"
             : error
               ? error
               : importTarget === "libraryAndSetlist"

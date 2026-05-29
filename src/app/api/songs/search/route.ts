@@ -1,12 +1,24 @@
 import {
+  buildMusicBrainzSearchQuery,
   MUSICBRAINZ_MAX_LIMIT,
   searchMusicBrainzRecordings,
   searchMusicBrainzRecordingsDeep,
 } from "@/lib/musicbrainz";
 
+function resolveSearchQuery(request: Request): string {
+  const { searchParams } = new URL(request.url);
+  const title = searchParams.get("title")?.trim() ?? "";
+  const artist = searchParams.get("artist")?.trim() ?? "";
+  const built = buildMusicBrainzSearchQuery(title, artist);
+  if (built) return built;
+
+  const legacy = searchParams.get("q")?.trim() ?? "";
+  return legacy;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const query = searchParams.get("q")?.trim() ?? "";
+  const query = resolveSearchQuery(request);
   const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
   const deep = searchParams.get("deep") === "1";
   const maxResults = Math.min(
