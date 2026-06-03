@@ -160,9 +160,7 @@ describe("parseTemplateSongLines", () => {
   });
 
   it("parses multiple lines and ignores empty lines", () => {
-    const lines = parseTemplateSongLines(
-      "A / B\nC\n\nD / E",
-    );
+    const lines = parseTemplateSongLines("A / B\nC\n\nD / E");
     expect(lines).toHaveLength(3);
     expect(lines[2]).toEqual({ title: "D", artist: "E" });
   });

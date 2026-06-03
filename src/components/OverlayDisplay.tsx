@@ -2,7 +2,11 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import OverlayNowTitleMarquee from "@/components/OverlayNowTitleMarquee";
-import { formatDuration, formatSetlistSongLine, formatSongDurationLabel } from "@/lib/setlist-engine";
+import {
+  formatDuration,
+  formatSetlistSongLine,
+  formatSongDurationLabel,
+} from "@/lib/setlist-engine";
 import {
   isCustomOverlayTextColor,
   OVERLAY_CONTENT_INSET_CLASS,
@@ -123,10 +127,7 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
             const isPast = currentIndex >= 0 && index < currentIndex;
             const sub = songSubLine(song);
             return (
-              <li
-                key={song.id}
-                className={isPast ? "opacity-55" : isCurrent ? "" : "opacity-90"}
-              >
+              <li key={song.id} className={isPast ? "opacity-55" : isCurrent ? "" : "opacity-90"}>
                 <p
                   className={
                     isCurrent ? `${tc(fullTitleClass)} ${currentMark}` : tc(fullTitleClass)

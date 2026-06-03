@@ -94,8 +94,7 @@ export default function SetlistBuilder({
   );
 
   const addableLibrarySongs = useMemo(
-    () =>
-      filterSongsByQuery(data.songs, searchQuery).filter((song) => !songIds.includes(song.id)),
+    () => filterSongsByQuery(data.songs, searchQuery).filter((song) => !songIds.includes(song.id)),
     [data.songs, searchQuery, songIds],
   );
 
@@ -199,152 +198,154 @@ export default function SetlistBuilder({
           <h2 className="text-xl font-bold text-violet-950">セトリ情報</h2>
           <div className="rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-lg shadow-violet-100/40">
             <div className="grid gap-3">
-            <label className="grid gap-1 text-sm font-semibold text-violet-900">
-              セトリ名
-              <input
-                value={name}
-                onChange={(e) => {
-                  const nextName = e.target.value;
-                  setName(nextName);
-                  if (embedded) commitDraft({ name: nextName });
-                }}
-                className="rounded-xl border border-violet-200 px-3 py-2"
-              />
-            </label>
-            <label className="grid gap-1 text-sm font-semibold text-violet-900">
-              テーマ・メモ
-              <input
-                value={theme}
-                onChange={(e) => {
-                  const nextTheme = e.target.value;
-                  setTheme(nextTheme);
-                  if (embedded) {
-                    commitDraft({
-                      theme: nextTheme.trim() || undefined,
-                    });
-                  }
-                }}
-                className="rounded-xl border border-violet-200 px-3 py-2"
-                placeholder="カラオケ練習、誕生日配信、切ない回 など"
-              />
-            </label>
-            <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
-              <input
-                type="checkbox"
-                checked={hideArtist}
-                onChange={(e) => {
-                  const next = e.target.checked;
-                  setHideArtist(next);
-                  if (embedded) commitDraft({ hideArtist: next || undefined });
-                }}
-                className="size-4 rounded border-violet-300"
-              />
-              アーティスト名を表示しない（コピー用テキスト・曲順一覧）
-            </label>
-            <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
-              <input
-                type="checkbox"
-                checked={hideDuration}
-                onChange={(e) => {
-                  const next = e.target.checked;
-                  setHideDuration(next);
-                  if (embedded) commitDraft({ hideDuration: next || undefined });
-                }}
-                className="size-4 rounded border-violet-300"
-              />
-              曲時間を表示しない（コピー用テキスト・曲順一覧）
-            </label>
+              <label className="grid gap-1 text-sm font-semibold text-violet-900">
+                セトリ名
+                <input
+                  value={name}
+                  onChange={(e) => {
+                    const nextName = e.target.value;
+                    setName(nextName);
+                    if (embedded) commitDraft({ name: nextName });
+                  }}
+                  className="rounded-xl border border-violet-200 px-3 py-2"
+                />
+              </label>
+              <label className="grid gap-1 text-sm font-semibold text-violet-900">
+                テーマ・メモ
+                <input
+                  value={theme}
+                  onChange={(e) => {
+                    const nextTheme = e.target.value;
+                    setTheme(nextTheme);
+                    if (embedded) {
+                      commitDraft({
+                        theme: nextTheme.trim() || undefined,
+                      });
+                    }
+                  }}
+                  className="rounded-xl border border-violet-200 px-3 py-2"
+                  placeholder="カラオケ練習、誕生日配信、切ない回 など"
+                />
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
+                <input
+                  type="checkbox"
+                  checked={hideArtist}
+                  onChange={(e) => {
+                    const next = e.target.checked;
+                    setHideArtist(next);
+                    if (embedded) commitDraft({ hideArtist: next || undefined });
+                  }}
+                  className="size-4 rounded border-violet-300"
+                />
+                アーティスト名を表示しない（コピー用テキスト・曲順一覧）
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-violet-900">
+                <input
+                  type="checkbox"
+                  checked={hideDuration}
+                  onChange={(e) => {
+                    const next = e.target.checked;
+                    setHideDuration(next);
+                    if (embedded) commitDraft({ hideDuration: next || undefined });
+                  }}
+                  className="size-4 rounded border-violet-300"
+                />
+                曲時間を表示しない（コピー用テキスト・曲順一覧）
+              </label>
             </div>
             <p className="mt-4 text-sm text-violet-700">
-            選択中: {selectedSongs.length}曲
-            {hideDuration || totalSec <= 0 ? null : <> / 合計 {formatDuration(totalSec)}</>}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {embedded ? (
-              <p className="text-sm text-violet-600">曲順・セトリ情報の変更は自動で保存されます</p>
-            ) : (
-              <RowActionButton
-                type="button"
-                variant="primary"
-                onClick={handleSave}
-                disabled={songIds.length === 0}
-              >
-                セトリを保存
-              </RowActionButton>
-            )}
-            <CopySetlistButton text={exportText} />
+              選択中: {selectedSongs.length}曲
+              {hideDuration || totalSec <= 0 ? null : <> / 合計 {formatDuration(totalSec)}</>}
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {embedded ? (
+                <p className="text-sm text-violet-600">
+                  曲順・セトリ情報の変更は自動で保存されます
+                </p>
+              ) : (
+                <RowActionButton
+                  type="button"
+                  variant="primary"
+                  onClick={handleSave}
+                  disabled={songIds.length === 0}
+                >
+                  セトリを保存
+                </RowActionButton>
+              )}
+              <CopySetlistButton text={exportText} />
             </div>
           </div>
 
           <h3 className="text-lg font-bold text-violet-950">曲順（ドラッグで並べ替え）</h3>
           <div>
-          {selectedSongs.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-violet-200 px-4 py-6 text-center text-sm text-violet-600">
-              下の登録曲一覧から追加してください。
-            </p>
-          ) : (
-            <ol className="grid gap-2 px-1 py-1">
-              {selectedSongs.map((song, index) => {
-                return (
-                  <li
-                    key={song.id}
-                    draggable
-                    onDragStart={() => setDragIndex(index)}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={() => handleDrop(index)}
-                    className="flex items-start gap-3 rounded-xl border border-fuchsia-200 bg-fuchsia-50/70 px-3 py-2"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="leading-snug font-bold break-words text-violet-950">
-                        {index + 1}. {song.title}
-                      </p>
-                      {hideArtist ? (
-                        hideDuration || song.durationSec <= 0 ? null : (
-                          <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
-                            {formatDuration(song.durationSec)}
-                          </p>
-                        )
-                      ) : (
-                        <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
-                          {hideDuration
-                            ? song.artist
-                            : `${song.artist}${formatSongDurationLabel(song.durationSec)}`}
+            {selectedSongs.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-violet-200 px-4 py-6 text-center text-sm text-violet-600">
+                下の登録曲一覧から追加してください。
+              </p>
+            ) : (
+              <ol className="grid gap-2 px-1 py-1">
+                {selectedSongs.map((song, index) => {
+                  return (
+                    <li
+                      key={song.id}
+                      draggable
+                      onDragStart={() => setDragIndex(index)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={() => handleDrop(index)}
+                      className="flex items-start gap-3 rounded-xl border border-fuchsia-200 bg-fuchsia-50/70 px-3 py-2"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="leading-snug font-bold break-words text-violet-950">
+                          {index + 1}. {song.title}
                         </p>
-                      )}
-                    </div>
-                    <div className="flex shrink-0 items-center gap-1.5 self-start">
-                      <RowActionButton
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="上へ移動"
-                        onClick={() => moveSong(index, -1)}
-                      >
-                        ↑
-                      </RowActionButton>
-                      <RowActionButton
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="下へ移動"
-                        onClick={() => moveSong(index, 1)}
-                      >
-                        ↓
-                      </RowActionButton>
-                      <RowActionButton
-                        type="button"
-                        variant="danger"
-                        size="sm"
-                        onClick={() => toggleSong(song.id)}
-                      >
-                        外す
-                      </RowActionButton>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          )}
+                        {hideArtist ? (
+                          hideDuration || song.durationSec <= 0 ? null : (
+                            <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
+                              {formatDuration(song.durationSec)}
+                            </p>
+                          )
+                        ) : (
+                          <p className="mt-0.5 text-sm leading-snug break-words text-violet-700">
+                            {hideDuration
+                              ? song.artist
+                              : `${song.artist}${formatSongDurationLabel(song.durationSec)}`}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1.5 self-start">
+                        <RowActionButton
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label="上へ移動"
+                          onClick={() => moveSong(index, -1)}
+                        >
+                          ↑
+                        </RowActionButton>
+                        <RowActionButton
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label="下へ移動"
+                          onClick={() => moveSong(index, 1)}
+                        >
+                          ↓
+                        </RowActionButton>
+                        <RowActionButton
+                          type="button"
+                          variant="danger"
+                          size="sm"
+                          onClick={() => toggleSong(song.id)}
+                        >
+                          外す
+                        </RowActionButton>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
           </div>
         </section>
 

@@ -58,10 +58,7 @@ export default function LibraryPage() {
                 setData((prev) => {
                   const { data: next, added } = importSongsFromHits(prev, hits);
                   if (added > 0) {
-                    window.setTimeout(
-                      () => window.alert(`${added}曲を曲庫に追加しました`),
-                      0,
-                    );
+                    window.setTimeout(() => window.alert(`${added}曲を曲庫に追加しました`), 0);
                   }
                   return next;
                 });

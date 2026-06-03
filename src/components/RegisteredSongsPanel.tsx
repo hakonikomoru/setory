@@ -61,7 +61,9 @@ export default function RegisteredSongsPanel({
           </h2>
         </header>
       ) : null}
-      <div className={`${showHeader ? "mt-3" : ""} rounded-2xl border border-violet-100 bg-white/90 p-4 shadow-sm`}>
+      <div
+        className={`${showHeader ? "mt-3" : ""} rounded-2xl border border-violet-100 bg-white/90 p-4 shadow-sm`}
+      >
         <label className="grid gap-1 text-sm font-semibold text-violet-900">
           曲名で検索
           <SearchInput
@@ -72,7 +74,9 @@ export default function RegisteredSongsPanel({
         </label>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs text-violet-600">
-            {trimmedQuery ? `${songs.length}件表示（全${totalCount}曲）` : `全${totalCount}曲を表示`}
+            {trimmedQuery
+              ? `${songs.length}件表示（全${totalCount}曲）`
+              : `全${totalCount}曲を表示`}
           </p>
           <div className="flex items-center gap-2" role="group" aria-label="追加順で並べ替え">
             <span className="text-sm font-semibold text-violet-700">追加順</span>

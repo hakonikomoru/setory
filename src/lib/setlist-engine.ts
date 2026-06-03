@@ -12,7 +12,10 @@ export function formatSongDurationLabel(durationSec: number): string {
   return `（${formatDuration(durationSec)}）`;
 }
 
-export function formatSongDurationFields(durationSec: number): { minutes: string; seconds: string } {
+export function formatSongDurationFields(durationSec: number): {
+  minutes: string;
+  seconds: string;
+} {
   if (durationSec <= 0) return { minutes: "0", seconds: "0" };
   return {
     minutes: String(Math.floor(durationSec / 60)),

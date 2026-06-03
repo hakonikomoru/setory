@@ -1,11 +1,41 @@
 #!/bin/sh
 set -e
 
-node scripts/sync-project-docs.mjs 2>/dev/null || true
+run_script() {
+  if [ -f yarn.lock ] && command -v yarn >/dev/null 2>&1; then
+    yarn "$1" --silent 2>/dev/null || yarn "$1"
+  else
+    npm run "$1" --silent 2>/dev/null || npm run "$1"
+  fi
+}
 
-if git diff --quiet -- docs/project-sync.md 2>/dev/null; then
-  exit 0
+# --- project-sync ---
+if [ -f scripts/sync-project-docs.ts ]; then
+  run_script sync:project-docs 2>/dev/null || npx tsx scripts/sync-project-docs.ts
+elif [ -f scripts/sync-project-docs.mjs ]; then
+  node scripts/sync-project-docs.mjs 2>/dev/null || true
 fi
 
-git add docs/project-sync.md
-echo "pre-commit: docs/project-sync.md を自動更新してステージしました"
+STAGED=0
+for DOC in docs/project-sync.md docs/system-architecture.md; do
+  if [ -f "$DOC" ] && ! git diff --quiet -- "$DOC" 2>/dev/null; then
+    git add "$DOC"
+    STAGED=1
+  fi
+done
+if [ "$STAGED" -eq 1 ]; then
+  echo "pre-commit: 構成ドキュメントを自動更新してステージしました"
+fi
+
+# --- quality gate ---
+if [ -f package.json ] && node -e "process.exit(require('./package.json').scripts?.['precommit:check'] ? 0 : 1)" 2>/dev/null; then
+  echo "pre-commit: lint / format / test を実行中..."
+  run_script precommit:check
+elif [ -f pyproject.toml ] && command -v ruff >/dev/null 2>&1; then
+  echo "pre-commit: ruff / pytest を実行中..."
+  ruff check .
+  ruff format --check .
+  if [ -d tests ] || ls test_*.py tests/test_*.py 2>/dev/null | grep -q .; then
+    pytest -q
+  fi
+fi

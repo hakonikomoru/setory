@@ -12,7 +12,7 @@ export default function Footer() {
             href={credit.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-violet-800 underline decoration-violet-200 underline-offset-2 transition hover:text-violet-950 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:ring-offset-2"
+            className="font-medium text-violet-800 underline decoration-violet-200 underline-offset-2 transition hover:text-violet-950 focus:ring-2 focus:ring-violet-200 focus:ring-offset-2 focus:outline-none"
           >
             {credit.name}
           </a>

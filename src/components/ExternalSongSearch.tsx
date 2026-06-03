@@ -73,9 +73,12 @@ export default function ExternalSongSearch({
     setLoading(true);
     setError(null);
 
-    fetch(`/api/songs/search?${musicBrainzSearchParams(debouncedTitle, debouncedArtist, { max: "100" })}`, {
-      signal: controller.signal,
-    })
+    fetch(
+      `/api/songs/search?${musicBrainzSearchParams(debouncedTitle, debouncedArtist, { max: "100" })}`,
+      {
+        signal: controller.signal,
+      },
+    )
       .then(async (response) => {
         const payload = (await response.json()) as {
           results?: ExternalSongHit[];
@@ -174,7 +177,9 @@ export default function ExternalSongSearch({
     setDeepLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/songs/search?${searchQueryString({ deep: "1", max: "200" })}`);
+      const response = await fetch(
+        `/api/songs/search?${searchQueryString({ deep: "1", max: "200" })}`,
+      );
       const payload = (await response.json()) as {
         results?: ExternalSongHit[];
         error?: string;
@@ -207,123 +212,123 @@ export default function ExternalSongSearch({
       )}
 
       <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 shadow-sm">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="grid gap-1 text-sm font-semibold text-violet-900">
-          曲名
-          <SearchInput
-            value={titleQuery}
-            onChange={setTitleQuery}
-            placeholder="例: 夜に駆ける"
-            inputClassName="bg-white"
-            clearLabel="曲名検索をクリア"
-          />
-        </label>
-        <label className="grid gap-1 text-sm font-semibold text-violet-900">
-          アーティスト
-          <SearchInput
-            value={artistQuery}
-            onChange={setArtistQuery}
-            placeholder="例: YOASOBI"
-            inputClassName="bg-white"
-            clearLabel="アーティスト検索をクリア"
-          />
-        </label>
-      </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1 text-sm font-semibold text-violet-900">
+            曲名
+            <SearchInput
+              value={titleQuery}
+              onChange={setTitleQuery}
+              placeholder="例: 夜に駆ける"
+              inputClassName="bg-white"
+              clearLabel="曲名検索をクリア"
+            />
+          </label>
+          <label className="grid gap-1 text-sm font-semibold text-violet-900">
+            アーティスト
+            <SearchInput
+              value={artistQuery}
+              onChange={setArtistQuery}
+              placeholder="例: YOASOBI"
+              inputClassName="bg-white"
+              clearLabel="アーティスト検索をクリア"
+            />
+          </label>
+        </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {importableHits.length > 0 ? (
-          <RowActionButton type="button" variant="primary" onClick={handleImportAll}>
-            {importTarget === "libraryAndSetlist"
-              ? "表示中の曲をすべてセトリに追加"
-              : "表示中の未追加曲をすべて追加"}
-            （{importableHits.length}曲）
-          </RowActionButton>
-        ) : null}
-        {searchReady ? (
-          <RowActionButton
-            type="button"
-            variant="secondary"
-            disabled={deepLoading || loading}
-            onClick={loadDeep}
-          >
-            {deepLoading ? "取得中..." : "まとめて200件取得"}
-          </RowActionButton>
-        ) : null}
-      </div>
-
-      <p className="mt-2 text-xs text-violet-600">
-        {loading
-          ? "検索中..."
-          : !searchReady
-            ? "曲名またはアーティストを2文字以上入力すると検索します"
-            : error
-              ? error
-              : importTarget === "libraryAndSetlist"
-                ? `${results.length}件表示・セトリ未追加 ${importableHits.length}曲`
-                : `${results.length}件表示・未追加 ${importableHits.length}曲`}
-      </p>
-
-      {results.length > 0 ? (
-        <>
-          <ul className="mt-4 grid max-h-96 gap-2 overflow-y-auto">
-            {results.map((hit) => {
-              const inLibrary = isSongInLibrary(librarySongs, hit.title, hit.artist);
-              const inSetlist =
-                importTarget === "libraryAndSetlist" &&
-                isSongInSetlist(librarySongs, setlistSongIds, hit.title, hit.artist);
-              const disabled = importTarget === "libraryAndSetlist" ? inSetlist : inLibrary;
-              const statusLabel = disabled
-                ? importTarget === "libraryAndSetlist"
-                  ? "セトリに追加済み"
-                  : "追加済み"
-                : importLabel;
-              return (
-                <li
-                  key={hit.externalId}
-                  className="flex min-w-0 items-center gap-2 rounded-xl border border-violet-100 bg-white px-3 py-2"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-bold break-words text-violet-950">{hit.title}</p>
-                    <p className="text-sm break-words text-violet-700">
-                      {hit.artist}（{formatDuration(hit.durationSec)}）
-                      {importTarget === "libraryAndSetlist" && inLibrary && !inSetlist
-                        ? " ・ 曲庫に登録済み"
-                        : ""}
-                    </p>
-                  </div>
-                  <RowActionButton
-                    type="button"
-                    variant={disabled ? "muted" : "primary"}
-                    size="sm"
-                    disabled={disabled}
-                    onClick={() => handleImport(hit)}
-                  >
-                    {statusLabel}
-                  </RowActionButton>
-                </li>
-              );
-            })}
-          </ul>
-          {hasMore ? (
-            <button
-              type="button"
-              disabled={loadingMore}
-              onClick={loadMore}
-              className="mt-3 w-full rounded-xl border border-violet-200 bg-white py-2 text-sm font-semibold text-violet-800 disabled:opacity-40"
-            >
-              {loadingMore ? "読み込み中..." : "さらに100件読み込む"}
-            </button>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {importableHits.length > 0 ? (
+            <RowActionButton type="button" variant="primary" onClick={handleImportAll}>
+              {importTarget === "libraryAndSetlist"
+                ? "表示中の曲をすべてセトリに追加"
+                : "表示中の未追加曲をすべて追加"}
+              （{importableHits.length}曲）
+            </RowActionButton>
           ) : null}
-        </>
-      ) : null}
+          {searchReady ? (
+            <RowActionButton
+              type="button"
+              variant="secondary"
+              disabled={deepLoading || loading}
+              onClick={loadDeep}
+            >
+              {deepLoading ? "取得中..." : "まとめて200件取得"}
+            </RowActionButton>
+          ) : null}
+        </div>
 
-      <p className="mt-4 text-xs text-violet-500">
-        曲情報提供:{" "}
-        <a href="https://musicbrainz.org/" target="_blank" rel="noreferrer" className="underline">
-          MusicBrainz
-        </a>
-        （CC0 / オープンデータ）
-      </p>
+        <p className="mt-2 text-xs text-violet-600">
+          {loading
+            ? "検索中..."
+            : !searchReady
+              ? "曲名またはアーティストを2文字以上入力すると検索します"
+              : error
+                ? error
+                : importTarget === "libraryAndSetlist"
+                  ? `${results.length}件表示・セトリ未追加 ${importableHits.length}曲`
+                  : `${results.length}件表示・未追加 ${importableHits.length}曲`}
+        </p>
+
+        {results.length > 0 ? (
+          <>
+            <ul className="mt-4 grid max-h-96 gap-2 overflow-y-auto">
+              {results.map((hit) => {
+                const inLibrary = isSongInLibrary(librarySongs, hit.title, hit.artist);
+                const inSetlist =
+                  importTarget === "libraryAndSetlist" &&
+                  isSongInSetlist(librarySongs, setlistSongIds, hit.title, hit.artist);
+                const disabled = importTarget === "libraryAndSetlist" ? inSetlist : inLibrary;
+                const statusLabel = disabled
+                  ? importTarget === "libraryAndSetlist"
+                    ? "セトリに追加済み"
+                    : "追加済み"
+                  : importLabel;
+                return (
+                  <li
+                    key={hit.externalId}
+                    className="flex min-w-0 items-center gap-2 rounded-xl border border-violet-100 bg-white px-3 py-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold break-words text-violet-950">{hit.title}</p>
+                      <p className="text-sm break-words text-violet-700">
+                        {hit.artist}（{formatDuration(hit.durationSec)}）
+                        {importTarget === "libraryAndSetlist" && inLibrary && !inSetlist
+                          ? " ・ 曲庫に登録済み"
+                          : ""}
+                      </p>
+                    </div>
+                    <RowActionButton
+                      type="button"
+                      variant={disabled ? "muted" : "primary"}
+                      size="sm"
+                      disabled={disabled}
+                      onClick={() => handleImport(hit)}
+                    >
+                      {statusLabel}
+                    </RowActionButton>
+                  </li>
+                );
+              })}
+            </ul>
+            {hasMore ? (
+              <button
+                type="button"
+                disabled={loadingMore}
+                onClick={loadMore}
+                className="mt-3 w-full rounded-xl border border-violet-200 bg-white py-2 text-sm font-semibold text-violet-800 disabled:opacity-40"
+              >
+                {loadingMore ? "読み込み中..." : "さらに100件読み込む"}
+              </button>
+            ) : null}
+          </>
+        ) : null}
+
+        <p className="mt-4 text-xs text-violet-500">
+          曲情報提供:{" "}
+          <a href="https://musicbrainz.org/" target="_blank" rel="noreferrer" className="underline">
+            MusicBrainz
+          </a>
+          （CC0 / オープンデータ）
+        </p>
       </div>
     </section>
   );

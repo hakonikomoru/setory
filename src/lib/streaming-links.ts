@@ -1,10 +1,6 @@
 import type { Song } from "@/types/setlist";
 
-export type StreamingServiceId =
-  | "youtube-music"
-  | "spotify"
-  | "apple-music"
-  | "amazon-music";
+export type StreamingServiceId = "youtube-music" | "spotify" | "apple-music" | "amazon-music";
 
 export type StreamingService = {
   id: StreamingServiceId;
@@ -40,8 +36,7 @@ export const STREAMING_SERVICES: StreamingService[] = [
     id: "youtube-music",
     label: "YouTube Music",
     buttonLabel: "YT Music",
-    buildSearchUrl: (query) =>
-      `https://music.youtube.com/search?q=${encodeURIComponent(query)}`,
+    buildSearchUrl: (query) => `https://music.youtube.com/search?q=${encodeURIComponent(query)}`,
   },
   {
     id: "spotify",

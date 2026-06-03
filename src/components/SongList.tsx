@@ -47,12 +47,7 @@ function SongRowActions({
         </RowActionButton>
       ) : null}
       {onDelete ? (
-        <RowActionButton
-          type="button"
-          variant="danger"
-          size="sm"
-          onClick={() => onDelete(song.id)}
-        >
+        <RowActionButton type="button" variant="danger" size="sm" onClick={() => onDelete(song.id)}>
           削除
         </RowActionButton>
       ) : null}
@@ -136,7 +131,9 @@ export default function SongList({
                   {song.title}
                 </p>
                 {artist ? (
-                  <p className="mt-0.5 text-xs leading-snug break-words text-violet-700">{artist}</p>
+                  <p className="mt-0.5 text-xs leading-snug break-words text-violet-700">
+                    {artist}
+                  </p>
                 ) : null}
                 {song.durationSec > 0 ? (
                   <p className="mt-1 text-xs text-violet-500">{formatDuration(song.durationSec)}</p>
@@ -161,12 +158,12 @@ export default function SongList({
               <div className="min-w-0 flex-1">
                 <p className="text-sm leading-snug font-bold break-words text-violet-950">
                   {song.title}
-                  {artist ? (
-                    <span className="font-normal text-violet-700"> / {artist}</span>
-                  ) : null}
+                  {artist ? <span className="font-normal text-violet-700"> / {artist}</span> : null}
                 </p>
                 {song.durationSec > 0 ? (
-                  <p className="mt-0.5 text-xs text-violet-500">{formatDuration(song.durationSec)}</p>
+                  <p className="mt-0.5 text-xs text-violet-500">
+                    {formatDuration(song.durationSec)}
+                  </p>
                 ) : null}
               </div>
               <SongRowActions

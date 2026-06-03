@@ -39,9 +39,7 @@ function TemplateSongLineList({
   if (lines.length === 0) return null;
 
   const badgeClass =
-    variant === "addable"
-      ? "bg-violet-100 text-violet-800"
-      : "bg-amber-100 text-amber-900";
+    variant === "addable" ? "bg-violet-100 text-violet-800" : "bg-amber-100 text-amber-900";
 
   return (
     <div className="grid gap-1.5">
@@ -52,7 +50,9 @@ function TemplateSongLineList({
             key={`${variant}-${line.sourceLine}-${line.title}-${line.artist}`}
             className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5"
           >
-            <span className="shrink-0 font-mono tabular-nums text-violet-500">{line.sourceLine}行目</span>
+            <span className="shrink-0 font-mono text-violet-500 tabular-nums">
+              {line.sourceLine}行目
+            </span>
             <span className="min-w-0 flex-1 font-medium text-violet-950">
               {formatTemplateSongLine(line)}
             </span>
@@ -99,7 +99,9 @@ export default function TemplateSongImport({
   );
 
   function formatSkippedLinesForDialog(lines: ClassifiedTemplateSongLine[]): string {
-    return lines.map((line) => `${line.sourceLine}行目: ${formatTemplateSongLine(line)}`).join("\n");
+    return lines
+      .map((line) => `${line.sourceLine}行目: ${formatTemplateSongLine(line)}`)
+      .join("\n");
   }
 
   function handleAdd() {
@@ -182,7 +184,9 @@ export default function TemplateSongImport({
           {addableLines.length === 0 ? (
             <p className="text-xs text-amber-800">すべて登録済みのため、新規追加はありません。</p>
           ) : (
-            <p className="text-xs text-violet-600">{addableLines.length}曲を追加できます（尺は未設定）</p>
+            <p className="text-xs text-violet-600">
+              {addableLines.length}曲を追加できます（尺は未設定）
+            </p>
           )}
         </div>
       ) : (

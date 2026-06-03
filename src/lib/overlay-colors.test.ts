@@ -69,19 +69,15 @@ describe("resolveOverlayTextColor", () => {
     ["cute", "#831843"],
   ] as const)("uses %s theme primary color", (theme, expected) => {
     expect(themeOverlayTextColor(theme)).toBe(expected);
-    expect(resolveOverlayTextColor({ ...baseSetlist, overlayTheme: theme })).toBe(
-      expected,
-    );
+    expect(resolveOverlayTextColor({ ...baseSetlist, overlayTheme: theme })).toBe(expected);
   });
 });
 
 describe("overlayClassWithoutTextColor", () => {
   it("removes color utilities but keeps size", () => {
-    expect(
-      overlayClassWithoutTextColor(
-        "text-3xl font-black text-violet-950 drop-shadow-sm",
-      ),
-    ).toBe("text-3xl font-black drop-shadow-sm");
+    expect(overlayClassWithoutTextColor("text-3xl font-black text-violet-950 drop-shadow-sm")).toBe(
+      "text-3xl font-black drop-shadow-sm",
+    );
   });
 });
 

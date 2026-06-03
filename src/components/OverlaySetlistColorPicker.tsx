@@ -193,7 +193,11 @@ export default function OverlaySetlistColorPicker({
               </RowActionButton>
             ))}
           {widthCustom ? (
-            <RowActionButton type="button" variant="secondary" onClick={() => onWidthChange(undefined)}>
+            <RowActionButton
+              type="button"
+              variant="secondary"
+              onClick={() => onWidthChange(undefined)}
+            >
               全幅に戻す
             </RowActionButton>
           ) : null}

@@ -11,7 +11,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "sync:project-docs": "node scripts/sync-project-docs.mjs",
-    "sync:project-docs:check": "node scripts/sync-project-docs.mjs --check"
+    "sync:project-docs:check": "node scripts/sync-project-docs.mjs --check",
+    "precommit:check": "npm run lint && npm run format:check && npm run test"
   },
   "dependencies": {
     "@tailwindcss/postcss": "latest",

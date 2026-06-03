@@ -49,7 +49,9 @@ export function classifyTemplateSongLines(
   return results;
 }
 
-export function formatTemplateSongLine(line: Pick<ParsedTemplateSongLine, "title" | "artist">): string {
+export function formatTemplateSongLine(
+  line: Pick<ParsedTemplateSongLine, "title" | "artist">,
+): string {
   const artist = line.artist.trim();
   return artist ? `${line.title.trim()} / ${artist}` : line.title.trim();
 }
@@ -81,7 +83,10 @@ export function prepareTemplateSongImport(
   return { newSongs, skipped, resolved };
 }
 
-export function buildTemplateImportNotice({ newSongs, skipped }: TemplateSongImportResult): string | null {
+export function buildTemplateImportNotice({
+  newSongs,
+  skipped,
+}: TemplateSongImportResult): string | null {
   if (newSongs.length === 0 && skipped.length === 0) return null;
   if (skipped.length === 0) return `${newSongs.length}曲を追加しました。`;
   if (newSongs.length === 0) {

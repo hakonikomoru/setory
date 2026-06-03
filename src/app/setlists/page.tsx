@@ -72,11 +72,7 @@ export default function SetlistsPage() {
                       </RowActionButton>
                     </div>
                   </div>
-                  <SetlistSongDisplay
-                    className="mt-4"
-                    setlist={setlist}
-                    songs={data.songs}
-                  />
+                  <SetlistSongDisplay className="mt-4" setlist={setlist} songs={data.songs} />
                 </li>
               );
             })}

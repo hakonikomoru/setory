@@ -18,11 +18,7 @@ export default function CopySetlistButton({ text, label = "セトリをコピー
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      className={rowActionButtonClass("secondary", "md")}
-    >
+    <button type="button" onClick={handleCopy} className={rowActionButtonClass("secondary", "md")}>
       {copied ? "コピーしました" : label}
     </button>
   );

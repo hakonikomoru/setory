@@ -1,11 +1,7 @@
 "use client";
 
 import SongStreamingSearchLinks from "@/components/SongStreamingSearchLinks";
-import {
-  formatDuration,
-  formatSongDurationLabel,
-  getSongsFromSetlist,
-} from "@/lib/setlist-engine";
+import { formatDuration, formatSongDurationLabel, getSongsFromSetlist } from "@/lib/setlist-engine";
 import type { Setlist, Song } from "@/types/setlist";
 
 type Props = {
@@ -14,11 +10,7 @@ type Props = {
   className?: string;
 };
 
-function songDetailSuffix(
-  song: Song,
-  hideArtist: boolean,
-  hideDuration: boolean,
-): string {
+function songDetailSuffix(song: Song, hideArtist: boolean, hideDuration: boolean): string {
   const artist = song.artist.trim();
   if (!hideArtist && artist) {
     return hideDuration ? artist : `${artist}${formatSongDurationLabel(song.durationSec)}`;

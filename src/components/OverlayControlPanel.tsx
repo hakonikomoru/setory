@@ -143,99 +143,96 @@ export default function OverlayControlPanel() {
               <div className="grid shrink-0 gap-3">
                 <h2 className="text-lg font-bold text-violet-950">曲の切り替え</h2>
                 <section className="overflow-visible rounded-2xl border border-violet-100 bg-white/90 p-5 shadow-sm">
-                <label className="grid gap-1 text-sm font-semibold text-violet-900">
-                  操作するセトリ
-                  <select
-                    value={selectedId ?? ""}
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        router.push(`/overlay?id=${encodeURIComponent(e.target.value)}`);
+                  <label className="grid gap-1 text-sm font-semibold text-violet-900">
+                    操作するセトリ
+                    <select
+                      value={selectedId ?? ""}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          router.push(`/overlay?id=${encodeURIComponent(e.target.value)}`);
+                        }
+                      }}
+                      className="w-full rounded-xl border border-violet-200 bg-white px-3 py-2"
+                    >
+                      {data.setlists.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.name}（{item.songIds.length}曲）
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <RowActionButton
+                      type="button"
+                      variant="secondary"
+                      size="lg"
+                      disabled={!canRewind}
+                      title={
+                        overlaySongs.currentIndex === 0 && setlist.overlaySuppressNext !== false
+                          ? "1曲目で NEXT を隠しているときは戻れません"
+                          : overlaySongs.currentIndex === 0
+                            ? "NEXT を隠す"
+                            : undefined
                       }
-                    }}
-                    className="w-full rounded-xl border border-violet-200 bg-white px-3 py-2"
-                  >
-                    {data.setlists.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name}（{item.songIds.length}曲）
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <RowActionButton
-                    type="button"
-                    variant="secondary"
-                    size="lg"
-                    disabled={!canRewind}
-                    title={
-                      overlaySongs.currentIndex === 0 && setlist.overlaySuppressNext !== false
-                        ? "1曲目で NEXT を隠しているときは戻れません"
-                        : overlaySongs.currentIndex === 0
-                          ? "NEXT を隠す"
-                          : undefined
-                    }
-                    onClick={() =>
-                      applyOverlayNavigation(navigateOverlayPrev(setlist, data.songs))
-                    }
-                  >
-                    前の曲
-                  </RowActionButton>
-                  <RowActionButton
-                    type="button"
-                    variant="primary"
-                    size="lg"
-                    disabled={overlaySongs.ordered.length === 0}
-                    onClick={() =>
-                      applyOverlayNavigation(navigateOverlayNext(setlist, data.songs))
-                    }
-                  >
-                    次の曲
-                  </RowActionButton>
-                </div>
-                <ol className="mt-4 max-h-[min(24rem,50vh)] list-none space-y-2 overflow-y-auto overscroll-contain px-1 py-1">
-                  {overlaySongs.ordered.map((song, index) => {
-                    const isCurrent = setlist.currentSongId === song.id;
-                    const line = formatSetlistSongLine(song, index, {
-                      hideDuration: Boolean(setlist.hideDuration),
-                      hideArtist: Boolean(setlist.hideArtist),
-                    });
-                    return (
-                      <li
-                        key={song.id}
-                        className="flex min-w-0 items-center gap-2 px-px"
-                      >
-                        <div
-                          className={`min-w-0 flex-1 rounded-xl border px-3 py-2 ${
-                            isCurrent
-                              ? "border-violet-500 bg-violet-100 ring-2 ring-violet-400 ring-inset"
-                              : "border-violet-100 bg-violet-50/50"
-                          }`}
-                        >
-                          <p
-                            className="truncate text-sm leading-snug font-bold text-violet-950"
-                            title={line}
+                      onClick={() =>
+                        applyOverlayNavigation(navigateOverlayPrev(setlist, data.songs))
+                      }
+                    >
+                      前の曲
+                    </RowActionButton>
+                    <RowActionButton
+                      type="button"
+                      variant="primary"
+                      size="lg"
+                      disabled={overlaySongs.ordered.length === 0}
+                      onClick={() =>
+                        applyOverlayNavigation(navigateOverlayNext(setlist, data.songs))
+                      }
+                    >
+                      次の曲
+                    </RowActionButton>
+                  </div>
+                  <ol className="mt-4 max-h-[min(24rem,50vh)] list-none space-y-2 overflow-y-auto overscroll-contain px-1 py-1">
+                    {overlaySongs.ordered.map((song, index) => {
+                      const isCurrent = setlist.currentSongId === song.id;
+                      const line = formatSetlistSongLine(song, index, {
+                        hideDuration: Boolean(setlist.hideDuration),
+                        hideArtist: Boolean(setlist.hideArtist),
+                      });
+                      return (
+                        <li key={song.id} className="flex min-w-0 items-center gap-2 px-px">
+                          <div
+                            className={`min-w-0 flex-1 rounded-xl border px-3 py-2 ${
+                              isCurrent
+                                ? "border-violet-500 bg-violet-100 ring-2 ring-violet-400 ring-inset"
+                                : "border-violet-100 bg-violet-50/50"
+                            }`}
                           >
-                            {line}
-                            {isCurrent ? (
-                              <span className="ml-2 rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
-                                現在
-                              </span>
-                            ) : null}
-                          </p>
-                        </div>
-                        <RowActionButton
-                          type="button"
-                          variant={isCurrent ? "accent" : "secondary"}
-                          size="sm"
-                          className="shrink-0"
-                          onClick={() => setCurrentSongId(song.id)}
-                        >
-                          {isCurrent ? "歌唱中" : "現在の曲"}
-                        </RowActionButton>
-                      </li>
-                    );
-                  })}
-                </ol>
+                            <p
+                              className="truncate text-sm leading-snug font-bold text-violet-950"
+                              title={line}
+                            >
+                              {line}
+                              {isCurrent ? (
+                                <span className="ml-2 rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">
+                                  現在
+                                </span>
+                              ) : null}
+                            </p>
+                          </div>
+                          <RowActionButton
+                            type="button"
+                            variant={isCurrent ? "accent" : "secondary"}
+                            size="sm"
+                            className="shrink-0"
+                            onClick={() => setCurrentSongId(song.id)}
+                          >
+                            {isCurrent ? "歌唱中" : "現在の曲"}
+                          </RowActionButton>
+                        </li>
+                      );
+                    })}
+                  </ol>
                 </section>
               </div>
 

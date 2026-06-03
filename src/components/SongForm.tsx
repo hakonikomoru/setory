@@ -14,12 +14,7 @@ type Props = {
   onCancel?: () => void;
 };
 
-export default function SongForm({
-  initial,
-  onSave,
-  saveIntent = "library",
-  onCancel,
-}: Props) {
+export default function SongForm({ initial, onSave, saveIntent = "library", onCancel }: Props) {
   const addToSetlist = saveIntent === "setlist" && !initial;
   const [title, setTitle] = useState(initial?.title ?? "");
   const [artist, setArtist] = useState(initial?.artist ?? "");
