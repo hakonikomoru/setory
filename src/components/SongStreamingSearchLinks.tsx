@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import RowActionButton from "@/components/RowActionButton";
 import StreamingServiceIcon from "@/components/StreamingServiceIcon";
-import { buildSongSearchQuery, STREAMING_SERVICES } from "@/lib/streaming-links";
+import { buildSongSearchQuery, STREAMING_SERVICES, streamingSearchUrl } from "@/lib/streaming-links";
 import type { Song } from "@/types/setlist";
 
 type Props = {
@@ -29,7 +29,7 @@ function SearchIcon({ className = "" }: { className?: string }) {
 
 /** 保存セトリなどで、各配信サービスの検索ページへ遷移するメニュー */
 export default function SongStreamingSearchLinks({ song, className = "" }: Props) {
-  const query = buildSongSearchQuery(song);
+  const query = buildSongSearchQuery(song, "youtube-music");
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -82,7 +82,7 @@ export default function SongStreamingSearchLinks({ song, className = "" }: Props
             <li key={service.id} role="none">
               <a
                 role="menuitem"
-                href={service.buildSearchUrl(query)}
+                href={streamingSearchUrl(service.id, song)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-violet-900 transition hover:bg-violet-50"

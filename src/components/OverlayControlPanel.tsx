@@ -10,9 +10,11 @@ import { formatSetlistSongLine } from "@/lib/setlist-engine";
 import {
   buildObsDisplayUrl,
   canNavigateOverlayPrev,
+  DEFAULT_OVERLAY_PREVIEW_BACKDROP,
   navigateOverlayNext,
   navigateOverlayPrev,
   resolveOverlaySongs,
+  type OverlayPreviewBackdrop,
 } from "@/lib/overlay";
 import { upsertSetlist } from "@/lib/storage";
 import { useAppData } from "@/lib/use-app-data";
@@ -23,6 +25,9 @@ export default function OverlayControlPanel() {
   const searchParams = useSearchParams();
   const selectedId = searchParams.get("id");
   const { data, setData, ready } = useAppData();
+  const [previewBackdrop, setPreviewBackdrop] = useState<OverlayPreviewBackdrop>(
+    DEFAULT_OVERLAY_PREVIEW_BACKDROP,
+  );
   const [previewBackgroundMaxWidthPx, setPreviewBackgroundMaxWidthPx] = useState<
     number | undefined
   >();
@@ -136,6 +141,8 @@ export default function OverlayControlPanel() {
             <OverlayPreviewFrame
               setlist={setlist}
               songs={data.songs}
+              backdrop={previewBackdrop}
+              onBackdropChange={setPreviewBackdrop}
               onPreviewBackgroundMaxWidthPx={handlePreviewBackgroundWidth}
             />
 
@@ -243,6 +250,9 @@ export default function OverlayControlPanel() {
                 overlayMode={setlist.overlayMode ?? "currentAndNext"}
                 overlayTheme={setlist.overlayTheme ?? "simple"}
                 obsDisplayUrl={buildObsDisplayUrl(setlist.id)}
+                previewDisplayUrl={buildObsDisplayUrl(setlist.id, undefined, {
+                  backdrop: previewBackdrop,
+                })}
                 previewBackgroundMaxWidthPx={previewBackgroundMaxWidthPx}
                 onChange={(patch) => patchSetlist(patch)}
               />

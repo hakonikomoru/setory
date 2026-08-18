@@ -12,7 +12,10 @@ type Props = {
   overlayVisible: boolean;
   overlayMode: OverlayMode;
   overlayTheme: OverlayTheme;
+  /** OBS ブラウザソース用（透過・bg なし） */
   obsDisplayUrl?: string;
+  /** プレビュー確認用（背景色付き） */
+  previewDisplayUrl?: string;
   previewBackgroundMaxWidthPx?: number;
   onChange: (patch: {
     overlayVisible?: boolean;
@@ -41,11 +44,13 @@ export default function OverlaySettings({
   overlayMode: mode,
   overlayTheme: theme,
   obsDisplayUrl,
+  previewDisplayUrl,
   previewBackgroundMaxWidthPx,
   onChange,
 }: Props) {
   const [copiedObs, setCopiedObs] = useState(false);
   const obsUrl = obsDisplayUrl ?? buildObsDisplayUrl(setlistId);
+  const previewUrl = previewDisplayUrl ?? obsUrl;
   const controlUrl = buildOverlayControlUrl(setlistId);
 
   async function copyObsUrl() {
@@ -113,7 +118,7 @@ export default function OverlaySettings({
           </select>
           <span className="text-xs font-normal text-violet-600">
             {OVERLAY_THEME_OPTIONS.find((item) => item.value === theme)?.description}
-            （文字色とは別設定です）
+            （「アニメ」付きはプレビューでもループ再生。文字色とは別設定です）
           </span>
         </label>
 
@@ -157,6 +162,9 @@ export default function OverlaySettings({
 
         <div className="mt-4">
           <p className="text-sm font-semibold text-violet-900">OBS 表示用 URL（透過・操作なし）</p>
+          <p className="mt-1 text-xs text-violet-600">
+            クロマキーは不要です。ブラウザソースのまま透過で載せてください（緑背景だと文字縁も抜けやすいです）。
+          </p>
           <code className="mt-1 block rounded-xl bg-white px-3 py-2 text-xs break-all text-violet-800">
             {obsUrl}
           </code>
@@ -164,7 +172,7 @@ export default function OverlaySettings({
             <RowActionButton type="button" variant="primary" onClick={copyObsUrl}>
               {copiedObs ? "コピーしました" : "OBS用 URL をコピー"}
             </RowActionButton>
-            <RowActionAnchor href={obsUrl} target="_blank" rel="noreferrer" variant="secondary">
+            <RowActionAnchor href={previewUrl} target="_blank" rel="noreferrer" variant="secondary">
               表示のみを開く
             </RowActionAnchor>
             <RowActionAnchor href={controlUrl} variant="secondary">
@@ -174,7 +182,8 @@ export default function OverlaySettings({
         </div>
 
         <p className="mt-3 text-xs text-violet-600">
-          OBS ではソースの幅 800〜1000px 程度・背景色を透過にしてください。
+          「表示のみを開く」は左のプレビュー背景付きです。OBS 用コピーは透過（`bg` なし）。ソース幅は
+          800〜1000px 程度を推奨します。
         </p>
       </section>
     </div>

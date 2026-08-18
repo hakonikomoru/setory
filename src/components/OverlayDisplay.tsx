@@ -164,7 +164,7 @@ export default function OverlayDisplay({ setlist, songs, compact = false }: Prop
 
   return frame(
     <div className={`grid max-w-full min-w-0 ${blockGap}`}>
-      <div className={`min-w-0 ${nowBlockClass}`}>
+      <div className={`overlay-now-block min-w-0 ${nowBlockClass}`}>
         <p className={`overlay-now-label whitespace-nowrap ${tc(styles.label)}`}>
           {OVERLAY_SECTION_LABELS.now}
         </p>

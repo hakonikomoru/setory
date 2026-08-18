@@ -57,7 +57,7 @@ function TemplateSongLineList({
               {formatTemplateSongLine(line)}
             </span>
             <span className={`shrink-0 rounded-full px-2 py-0.5 font-semibold ${badgeClass}`}>
-              {variant === "addable" ? "追加" : "登録済み"}
+              {variant === "addable" ? "新規" : "登録済み"}
             </span>
           </li>
         ))}
@@ -82,6 +82,8 @@ export default function TemplateSongImport({
     skipped: ClassifiedTemplateSongLine[];
   } | null>(null);
 
+  const setlistMode = Boolean(onImportMany);
+
   const parsedWithSource = useMemo(() => parseTemplateSongLinesWithSource(text), [text]);
 
   const classified = useMemo(
@@ -97,6 +99,8 @@ export default function TemplateSongImport({
     () => classified.filter((line) => line.status === "skipped"),
     [classified],
   );
+
+  const canSubmit = setlistMode ? classified.length > 0 : addableLines.length > 0;
 
   function formatSkippedLinesForDialog(lines: ClassifiedTemplateSongLine[]): string {
     return lines
@@ -124,7 +128,7 @@ export default function TemplateSongImport({
 
     const { newSongs, resolved } = importResult;
 
-    if (newSongs.length === 0) {
+    if (!setlistMode && newSongs.length === 0) {
       setResultNotice({
         message: buildTemplateImportNotice(importResult) ?? "",
         skipped: skippedLines,
@@ -132,12 +136,31 @@ export default function TemplateSongImport({
       return;
     }
 
-    const message =
-      importResult.skipped.length > 0
-        ? `${newSongs.length}曲を追加します。\n\n登録済みのためスキップ:\n${formatSkippedLinesForDialog(skippedLines)}\n\nよろしいですか？`
-        : newSongs.length === 1
+    if (setlistMode && resolved.length === 0) {
+      setError("追加できる行がありません。曲名を入力してください。");
+      return;
+    }
+
+    let message: string;
+    if (setlistMode) {
+      if (newSongs.length === 0) {
+        message = `登録済みの${resolved.length}曲を、入力順どおりセトリに追加しますか？\n（曲庫への重複追加はありません）`;
+      } else if (importResult.skipped.length > 0) {
+        message = `新規${newSongs.length}曲を曲庫に登録し、合計${resolved.length}曲を入力順どおりセトリに追加します。\n\n登録済みのため曲庫追加をスキップ:\n${formatSkippedLinesForDialog(skippedLines)}\n\nよろしいですか？`;
+      } else {
+        message =
+          resolved.length === 1
+            ? `「${formatTemplateSongLine(newSongs[0])}」を曲庫に登録し、セトリに追加しますか？`
+            : `${resolved.length}曲を曲庫に登録し、セトリに追加しますか？`;
+      }
+    } else if (importResult.skipped.length > 0) {
+      message = `${newSongs.length}曲を追加します。\n\n登録済みのためスキップ:\n${formatSkippedLinesForDialog(skippedLines)}\n\nよろしいですか？`;
+    } else {
+      message =
+        newSongs.length === 1
           ? `「${formatTemplateSongLine(newSongs[0])}」を追加しますか？`
           : `${newSongs.length}曲を一括で追加しますか？`;
+    }
 
     if (!window.confirm(message)) return;
 
@@ -147,11 +170,13 @@ export default function TemplateSongImport({
 
     setText("");
     setResultNotice({
-      message: buildTemplateImportNotice(importResult) ?? "",
+      message: buildTemplateImportNotice(importResult, { setlist: setlistMode }) ?? "",
       skipped: skippedLines,
     });
-    onAfterAdd?.(newSongs.length);
+    onAfterAdd?.(setlistMode ? resolved.length : newSongs.length);
   }
+
+  const submitCount = setlistMode ? classified.length : addableLines.length;
 
   return (
     <div className="grid gap-3 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 shadow-sm">
@@ -175,13 +200,32 @@ export default function TemplateSongImport({
       {classified.length > 0 ? (
         <div className="grid gap-3 rounded-xl border border-violet-100 bg-white/60 p-3">
           <p className="text-xs font-semibold text-violet-800">取り込みプレビュー</p>
-          <TemplateSongLineList title="追加する行" lines={addableLines} variant="addable" />
           <TemplateSongLineList
-            title="登録済みのため取り込めない行"
+            title={setlistMode ? "曲庫に新規追加する行" : "追加する行"}
+            lines={addableLines}
+            variant="addable"
+          />
+          <TemplateSongLineList
+            title={
+              setlistMode
+                ? "登録済み（セトリには入力順で追加・曲庫へは追加しない）"
+                : "登録済みのため取り込めない行"
+            }
             lines={skippedLines}
             variant="skipped"
           />
-          {addableLines.length === 0 ? (
+          {setlistMode ? (
+            addableLines.length === 0 ? (
+              <p className="text-xs text-amber-800">
+                すべて登録済みです。入力順どおりセトリに追加できます（曲庫への重複追加はありません）。
+              </p>
+            ) : (
+              <p className="text-xs text-violet-600">
+                新規{addableLines.length}曲を曲庫に登録し、合計{classified.length}
+                曲を入力順どおりセトリに追加します（尺は未設定）
+              </p>
+            )
+          ) : addableLines.length === 0 ? (
             <p className="text-xs text-amber-800">すべて登録済みのため、新規追加はありません。</p>
           ) : (
             <p className="text-xs text-violet-600">
@@ -200,7 +244,7 @@ export default function TemplateSongImport({
           <p className="text-sm font-semibold text-violet-900">{resultNotice.message}</p>
           {resultNotice.skipped.length > 0 ? (
             <TemplateSongLineList
-              title="スキップした行"
+              title={setlistMode ? "曲庫追加をスキップした行" : "スキップした行"}
               lines={resultNotice.skipped}
               variant="skipped"
             />
@@ -213,10 +257,10 @@ export default function TemplateSongImport({
           type="button"
           variant="primary"
           onClick={handleAdd}
-          disabled={addableLines.length === 0}
+          disabled={!canSubmit}
         >
           {addButtonLabel}
-          {addableLines.length > 0 ? `（${addableLines.length}曲）` : ""}
+          {submitCount > 0 ? `（${submitCount}曲）` : ""}
         </RowActionButton>
       </div>
     </div>

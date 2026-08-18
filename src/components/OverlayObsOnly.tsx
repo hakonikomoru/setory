@@ -3,12 +3,18 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import OverlayDisplay from "@/components/OverlayDisplay";
+import {
+  getOverlayPreviewBackdropOption,
+  isOverlayPreviewBackdrop,
+} from "@/lib/overlay-preview-backdrop";
 import { useOverlayData } from "@/lib/use-overlay-data";
 
-/** OBS ブラウザソース用（?obs=1・表示のみ・透過） */
+/** OBS / 表示のみ（?obs=1）。`bg` があればプレビュー背景色、なければ透過 */
 export default function OverlayObsOnly() {
   const searchParams = useSearchParams();
   const setlistId = searchParams.get("id");
+  const bgParam = searchParams.get("bg");
+  const backdrop = bgParam && isOverlayPreviewBackdrop(bgParam) ? bgParam : null;
   const { setlist, data, ready } = useOverlayData(setlistId);
 
   useEffect(() => {
@@ -20,5 +26,12 @@ export default function OverlayObsOnly() {
     return null;
   }
 
-  return <OverlayDisplay setlist={setlist} songs={data.songs} />;
+  const display = <OverlayDisplay setlist={setlist} songs={data.songs} />;
+
+  if (!backdrop) {
+    return display;
+  }
+
+  const { bgClass } = getOverlayPreviewBackdropOption(backdrop);
+  return <div className={`min-h-screen min-w-0 ${bgClass}`}>{display}</div>;
 }

@@ -83,11 +83,22 @@ export function prepareTemplateSongImport(
   return { newSongs, skipped, resolved };
 }
 
-export function buildTemplateImportNotice({
-  newSongs,
-  skipped,
-}: TemplateSongImportResult): string | null {
+export function buildTemplateImportNotice(
+  { newSongs, skipped, resolved }: TemplateSongImportResult,
+  options?: { setlist?: boolean },
+): string | null {
   if (newSongs.length === 0 && skipped.length === 0) return null;
+
+  if (options?.setlist) {
+    if (newSongs.length === 0) {
+      return `${resolved.length}曲をセトリに追加しました（すべて登録済みのため曲庫への追加はありません）。`;
+    }
+    if (skipped.length === 0) {
+      return `${resolved.length}曲を曲庫に登録し、セトリに追加しました。`;
+    }
+    return `新規${newSongs.length}曲を曲庫に登録し、入力順どおり${resolved.length}曲をセトリに追加しました。登録済みの曲は曲庫へ重複追加していません。`;
+  }
+
   if (skipped.length === 0) return `${newSongs.length}曲を追加しました。`;
   if (newSongs.length === 0) {
     if (skipped.length === 1) {

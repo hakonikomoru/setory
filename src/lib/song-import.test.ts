@@ -88,4 +88,17 @@ describe("buildTemplateImportNotice", () => {
       }),
     ).toContain("すでに登録済み");
   });
+
+  it("describes setlist import that only reuses library songs", () => {
+    expect(
+      buildTemplateImportNotice(
+        {
+          newSongs: [],
+          skipped: [{ title: "夜に駆ける", artist: "YOASOBI" }],
+          resolved: [existingSong],
+        },
+        { setlist: true },
+      ),
+    ).toContain("セトリに追加しました");
+  });
 });

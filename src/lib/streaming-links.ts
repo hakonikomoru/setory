@@ -24,11 +24,18 @@ export function buildAmazonMusicSearchUrl(query: string): string {
   return `https://music.amazon.co.jp/search/${pathSegment}?${params.toString()}`;
 }
 
-/** 配信サービス検索用クエリ（曲名のみ。曲名が空のときはアーティスト名） */
-export function buildSongSearchQuery(song: Pick<Song, "title" | "artist">): string {
+/** 配信サービス検索用クエリ。YouTube Music は曲名＋歌手名、他は曲名のみ（空ならアーティスト名） */
+export function buildSongSearchQuery(
+  song: Pick<Song, "title" | "artist">,
+  serviceId?: StreamingServiceId,
+): string {
   const title = song.title.trim();
+  const artist = song.artist.trim();
+  if (serviceId === "youtube-music") {
+    return [title, artist].filter(Boolean).join(" ");
+  }
   if (title) return title;
-  return song.artist.trim();
+  return artist;
 }
 
 export const STREAMING_SERVICES: StreamingService[] = [
@@ -65,5 +72,5 @@ export function streamingSearchUrl(
 ): string {
   const service = STREAMING_SERVICES.find((item) => item.id === serviceId);
   if (!service) throw new Error(`Unknown streaming service: ${serviceId}`);
-  return service.buildSearchUrl(buildSongSearchQuery(song));
+  return service.buildSearchUrl(buildSongSearchQuery(song, serviceId));
 }

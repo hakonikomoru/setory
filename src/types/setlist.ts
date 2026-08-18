@@ -1,6 +1,16 @@
 export type OverlayMode = "current" | "currentAndNext" | "fullSetlist";
 
-export type OverlayTheme = "simple" | "minimal" | "bold" | "cute" | "dark" | "komoru";
+export type OverlayTheme =
+  | "simple"
+  | "minimal"
+  | "bold"
+  | "cute"
+  | "dark"
+  | "komoru"
+  | "pulse"
+  | "shimmer"
+  | "aurora"
+  | "signal";
 
 export type Song = {
   id: string;

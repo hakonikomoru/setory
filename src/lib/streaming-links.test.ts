@@ -14,16 +14,28 @@ describe("buildSongSearchQuery", () => {
   it("falls back to artist when title is empty", () => {
     expect(buildSongSearchQuery({ title: "", artist: "YOASOBI" })).toBe("YOASOBI");
   });
+
+  it("uses title and artist for YouTube Music", () => {
+    expect(buildSongSearchQuery({ title: "夜に駆ける", artist: "YOASOBI" }, "youtube-music")).toBe(
+      "夜に駆ける YOASOBI",
+    );
+  });
+
+  it("omits empty parts for YouTube Music", () => {
+    expect(buildSongSearchQuery({ title: "夜に駆ける", artist: "" }, "youtube-music")).toBe(
+      "夜に駆ける",
+    );
+    expect(buildSongSearchQuery({ title: "", artist: "YOASOBI" }, "youtube-music")).toBe("YOASOBI");
+  });
 });
 
 describe("streamingSearchUrl", () => {
   const song = { title: "夜に駆ける", artist: "YOASOBI" };
 
-  it("builds YouTube Music search URL", () => {
+  it("builds YouTube Music search URL with title and artist", () => {
     const url = streamingSearchUrl("youtube-music", song);
     expect(url).toMatch(/^https:\/\/music\.youtube\.com\/search\?q=/);
-    expect(decodeURIComponent(url)).toContain("夜に駆ける");
-    expect(decodeURIComponent(url)).not.toContain("YOASOBI");
+    expect(decodeURIComponent(url)).toContain("夜に駆ける YOASOBI");
   });
 
   it("builds Spotify search URL", () => {

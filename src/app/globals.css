@@ -82,6 +82,55 @@ html.overlay-page body {
   }
 }
 
+@keyframes overlay-now-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    opacity: 0.82;
+    filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.35));
+  }
+}
+
+@keyframes overlay-now-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes overlay-now-aurora {
+  0%,
+  100% {
+    color: #a5f3fc;
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.35);
+  }
+  33% {
+    color: #c4b5fd;
+    text-shadow: 0 0 12px rgba(167, 139, 250, 0.45);
+  }
+  66% {
+    color: #f9a8d4;
+    text-shadow: 0 0 12px rgba(244, 114, 182, 0.4);
+  }
+}
+
+@keyframes overlay-now-signal {
+  0%,
+  100% {
+    border-left-color: rgba(192, 38, 211, 0.95);
+    box-shadow: inset 4px 0 0 0 rgba(192, 38, 211, 0.15);
+  }
+  50% {
+    border-left-color: rgba(232, 121, 249, 0.35);
+    box-shadow: inset 4px 0 0 0 rgba(232, 121, 249, 0.05);
+  }
+}
+
 .overlay-now-label {
   display: inline-flex;
   align-items: center;
@@ -102,6 +151,45 @@ html.overlay-page body {
   animation: overlay-now-dot 2.2s ease-in-out infinite;
 }
 
+.overlay-theme-pulse .overlay-now-title-text {
+  animation: overlay-now-pulse 2.8s ease-in-out infinite;
+}
+
+.overlay-theme-shimmer .overlay-now-title-text {
+  background-image: linear-gradient(
+    90deg,
+    currentColor 0%,
+    currentColor 35%,
+    rgba(255, 255, 255, 0.95) 50%,
+    currentColor 65%,
+    currentColor 100%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: overlay-now-shimmer 3.2s linear infinite;
+}
+
+.overlay-theme-aurora .overlay-now-label {
+  animation: overlay-now-aurora 4.5s ease-in-out infinite;
+}
+
+.overlay-theme-aurora .overlay-now-label::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: overlay-now-dot 2.4s ease-in-out infinite;
+}
+
+.overlay-theme-signal .overlay-now-block {
+  animation: overlay-now-signal 1.8s ease-in-out infinite;
+}
+
 .overlay-now-title-track {
   position: relative;
   width: 100%;
@@ -116,7 +204,18 @@ html.overlay-page body {
 
 @media (prefers-reduced-motion: reduce) {
   .overlay-theme-komoru .overlay-now-label,
-  .overlay-theme-komoru .overlay-now-label::before {
+  .overlay-theme-komoru .overlay-now-label::before,
+  .overlay-theme-pulse .overlay-now-title-text,
+  .overlay-theme-shimmer .overlay-now-title-text,
+  .overlay-theme-aurora .overlay-now-label,
+  .overlay-theme-aurora .overlay-now-label::before,
+  .overlay-theme-signal .overlay-now-block {
     animation: none;
+  }
+
+  .overlay-theme-shimmer .overlay-now-title-text {
+    background-image: none;
+    color: inherit;
+    -webkit-text-fill-color: currentColor;
   }
 }

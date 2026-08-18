@@ -1,4 +1,5 @@
 import { isOverlayTheme } from "@/lib/overlay-theme";
+import type { OverlayPreviewBackdrop } from "@/lib/overlay-preview-backdrop";
 import { getSongsFromSetlist, type SetlistLineDisplayOptions } from "@/lib/setlist-engine";
 import type { OverlayMode, OverlayTheme, Setlist, Song } from "@/types/setlist";
 
@@ -8,6 +9,14 @@ export {
   OVERLAY_THEME_OPTIONS,
   OVERLAY_THEMES,
 } from "@/lib/overlay-theme";
+
+export {
+  DEFAULT_OVERLAY_PREVIEW_BACKDROP,
+  getOverlayPreviewBackdropOption,
+  isOverlayPreviewBackdrop,
+  OVERLAY_PREVIEW_BACKDROP_OPTIONS,
+  type OverlayPreviewBackdrop,
+} from "@/lib/overlay-preview-backdrop";
 
 export const DEFAULT_OVERLAY_VISIBLE = true;
 export const DEFAULT_OVERLAY_MODE: OverlayMode = "currentAndNext";
@@ -123,9 +132,17 @@ export function buildOverlayControlUrl(setlistId: string, origin?: string): stri
   return `${appOrigin(origin)}/overlay?id=${encodeURIComponent(setlistId)}`;
 }
 
-/** OBS ブラウザソース用（表示のみ・透過） */
-export function buildObsDisplayUrl(setlistId: string, origin?: string): string {
-  return `${appOrigin(origin)}/overlay?obs=1&id=${encodeURIComponent(setlistId)}`;
+/** OBS / 表示のみ URL（bg 指定時はプレビュー背景色を反映、省略時は透過） */
+export function buildObsDisplayUrl(
+  setlistId: string,
+  origin?: string,
+  options?: { backdrop?: OverlayPreviewBackdrop },
+): string {
+  let url = `${appOrigin(origin)}/overlay?obs=1&id=${encodeURIComponent(setlistId)}`;
+  if (options?.backdrop) {
+    url += `&bg=${encodeURIComponent(options.backdrop)}`;
+  }
+  return url;
 }
 
 /** @deprecated buildObsDisplayUrl を OBS 用、buildOverlayControlUrl を操作画面用に */

@@ -3,9 +3,7 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
-
-最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`db2f30a`・2026-05-27・`npm run sync:project-docs` 自動反映）
-
+最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`0d7f6fd`・2026-08-12・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -24,7 +22,6 @@
 > `<!-- sync:auto:... -->` は **`npm run sync:project-docs`** が上書きします（手編集しない）。
 
 <!-- sync:auto:directory-tree:start -->
-
 ```
 setory/
 ├── public/
@@ -37,13 +34,11 @@ setory/
 │   │   ├── api/
 │   │   ├── builder/
 │   │   ├── globals.css
-│   │   ├── go/
 │   │   ├── layout.tsx
 │   │   ├── library/
 │   │   ├── overlay/
 │   │   ├── page.tsx
-│   │   ├── setlists/
-│   │   └── suggest/
+│   │   └── setlists/
 │   ├── components/
 │   │   ├── AppNav.tsx
 │   │   ├── AppShell.tsx
@@ -75,6 +70,7 @@ setory/
 │   │   ├── musicbrainz.ts
 │   │   ├── overlay-colors.test.ts
 │   │   ├── overlay-colors.ts
+│   │   ├── overlay-preview-backdrop.ts
 │   │   ├── overlay-theme.test.ts
 │   │   ├── overlay-theme.ts
 │   │   ├── overlay.test.ts
@@ -97,21 +93,18 @@ setory/
 │   └── types/
 │       └── setlist.ts
 ```
-
 <!-- sync:auto:directory-tree:end -->
 
 ### 2.1 App Router（自動生成）
 
 <!-- sync:auto:pages:start -->
-
-| パス        | ファイル            |
-| ----------- | ------------------- |
-| `/`         | `page.tsx`          |
-| `/builder`  | `builder/page.tsx`  |
-| `/library`  | `library/page.tsx`  |
-| `/overlay`  | `overlay/page.tsx`  |
-| `/setlists` | `setlists/page.tsx` |
-
+| パス | ファイル |
+|------|----------|
+| `/` | `page.tsx` |
+| `/builder` | `builder\page.tsx` |
+| `/library` | `library\page.tsx` |
+| `/overlay` | `overlay\page.tsx` |
+| `/setlists` | `setlists\page.tsx` |
 <!-- sync:auto:pages:end -->
 
 ---
@@ -120,6 +113,10 @@ setory/
 
 - プロダクト方針・環境変数・デプロイ手順
 - 削除した機能の説明が残っていないか、変更のたびに確認する
+- テンプレートで曲追加（セトリ）: 登録済み曲は曲庫へ重複追加せず、入力順の `resolved` でセトリ末尾に追加できる（曲庫ページは従来どおり新規のみ）
+- オーバーレイ見た目: `komoru` / `pulse` / `shimmer` / `aurora` / `signal` は CSS の infinite アニメ（プレビューでもループ。`prefers-reduced-motion` で停止）
+- 表示のみ URL（`?obs=1&bg=...`）: プレビュー背景確認用。「OBS用 URL をコピー」は透過（`bg` なし・クロマキー不要）
+- 配信で検索: YouTube Music のみ `曲名 歌手名`、他サービスは曲名のみ
 
 ### 制作クレジット（komolab 共通）
 

@@ -50,7 +50,18 @@ describe("overlay defaults", () => {
   });
 
   it("accepts all current overlay themes", () => {
-    for (const theme of ["simple", "minimal", "bold", "cute", "dark", "komoru"] as const) {
+    for (const theme of [
+      "simple",
+      "minimal",
+      "bold",
+      "cute",
+      "dark",
+      "komoru",
+      "pulse",
+      "shimmer",
+      "aurora",
+      "signal",
+    ] as const) {
       expect(overlayTheme({ ...baseSetlist, overlayTheme: theme })).toBe(theme);
     }
   });
@@ -106,6 +117,15 @@ describe("overlay URLs", () => {
 
   it("encodes setlist id in query", () => {
     expect(buildObsDisplayUrl("a b", origin)).toBe("https://setory.example/overlay?obs=1&id=a%20b");
+  });
+
+  it("includes preview backdrop as bg query when provided", () => {
+    expect(buildObsDisplayUrl("abc", origin, { backdrop: "white" })).toBe(
+      "https://setory.example/overlay?obs=1&id=abc&bg=white",
+    );
+    expect(buildObsDisplayUrl("abc", origin, { backdrop: "black" })).toBe(
+      "https://setory.example/overlay?obs=1&id=abc&bg=black",
+    );
   });
 });
 

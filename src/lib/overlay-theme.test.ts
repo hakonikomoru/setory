@@ -8,7 +8,18 @@ import {
 } from "@/lib/overlay-theme";
 import type { OverlayTheme } from "@/types/setlist";
 
-const ALL_THEMES: OverlayTheme[] = ["simple", "minimal", "bold", "cute", "dark", "komoru"];
+const ALL_THEMES: OverlayTheme[] = [
+  "simple",
+  "minimal",
+  "bold",
+  "cute",
+  "dark",
+  "komoru",
+  "pulse",
+  "shimmer",
+  "aurora",
+  "signal",
+];
 
 describe("isOverlayTheme", () => {
   it.each(ALL_THEMES)("accepts %s", (theme) => {
@@ -51,9 +62,24 @@ describe("OVERLAY_THEMES", () => {
     }
   });
 
-  it("uses komoru-only root class for neon theme", () => {
+  it("uses animated root classes for motion themes", () => {
     expect(OVERLAY_THEMES.komoru.rootClass).toBe("overlay-theme-komoru");
+    expect(OVERLAY_THEMES.pulse.rootClass).toBe("overlay-theme-pulse");
+    expect(OVERLAY_THEMES.shimmer.rootClass).toBe("overlay-theme-shimmer");
+    expect(OVERLAY_THEMES.aurora.rootClass).toBe("overlay-theme-aurora");
+    expect(OVERLAY_THEMES.signal.rootClass).toBe("overlay-theme-signal");
     expect(OVERLAY_THEMES.simple.rootClass).toBe("overlay-theme-simple");
+  });
+
+  it("marks animated theme options in the picker list", () => {
+    const animated = OVERLAY_THEME_OPTIONS.filter((item) => item.label.includes("アニメ"));
+    expect(animated.map((item) => item.value)).toEqual([
+      "komoru",
+      "pulse",
+      "shimmer",
+      "aurora",
+      "signal",
+    ]);
   });
 
   it("gives bold theme a left border on NOW block", () => {
