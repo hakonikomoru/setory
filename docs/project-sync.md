@@ -3,7 +3,7 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`0d7f6fd`・2026-08-12・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`1ff3d04`・2026-11-18・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -36,9 +36,13 @@ setory/
 │   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   ├── library/
+│   │   ├── opengraph-image.tsx
 │   │   ├── overlay/
 │   │   ├── page.tsx
-│   │   └── setlists/
+│   │   ├── robots.ts
+│   │   ├── setlists/
+│   │   ├── sitemap.ts
+│   │   └── twitter-image.tsx
 │   ├── components/
 │   │   ├── AppNav.tsx
 │   │   ├── AppShell.tsx
@@ -101,10 +105,10 @@ setory/
 | パス | ファイル |
 |------|----------|
 | `/` | `page.tsx` |
-| `/builder` | `builder\page.tsx` |
-| `/library` | `library\page.tsx` |
-| `/overlay` | `overlay\page.tsx` |
-| `/setlists` | `setlists\page.tsx` |
+| `/builder` | `builder/page.tsx` |
+| `/library` | `library/page.tsx` |
+| `/overlay` | `overlay/page.tsx` |
+| `/setlists` | `setlists/page.tsx` |
 <!-- sync:auto:pages:end -->
 
 ---
@@ -117,6 +121,7 @@ setory/
 - オーバーレイ見た目: `komoru` / `pulse` / `shimmer` / `aurora` / `signal` は CSS の infinite アニメ（プレビューでもループ。`prefers-reduced-motion` で停止）
 - 表示のみ URL（`?obs=1&bg=...`）: プレビュー背景確認用。「OBS用 URL をコピー」は透過（`bg` なし・クロマキー不要）
 - 配信で検索: YouTube Music のみ `曲名 歌手名`、他サービスは曲名のみ
+- SEO: `sitemap.ts` / `robots.ts` / `opengraph-image.tsx`（`twitter-image.tsx` も同じ画像）を App Router で生成。トップに canonical と JSON-LD（WebSite・WebApplication）。絶対 URL は `NEXT_PUBLIC_SITE_URL`、未設定なら `https://setory.vercel.app`
 
 ### 制作クレジット（komolab 共通）
 
