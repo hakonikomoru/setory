@@ -1,5 +1,43 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Fragment } from "react";
+import { siteConfig } from "@/config/site";
+import { SITE_DESCRIPTION, SITE_TITLE, absoluteUrl } from "@/lib/site-metadata";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${absoluteUrl("/")}#website`,
+      name: SITE_TITLE,
+      url: absoluteUrl("/"),
+      description: SITE_DESCRIPTION,
+      inLanguage: "ja",
+      publisher: { "@id": `${siteConfig.credit.href}#komolab` },
+    },
+    {
+      "@type": "WebApplication",
+      name: SITE_TITLE,
+      url: absoluteUrl("/"),
+      description: SITE_DESCRIPTION,
+      inLanguage: "ja",
+      applicationCategory: "MultimediaApplication",
+      isPartOf: { "@id": `${absoluteUrl("/")}#website` },
+      creator: { "@id": `${siteConfig.credit.href}#komolab` },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${siteConfig.credit.href}#komolab`,
+      name: siteConfig.credit.name,
+      url: siteConfig.credit.href,
+    },
+  ],
+};
 
 type Feature = {
   id: string;
@@ -86,6 +124,10 @@ function FeatureCard({ feature }: { feature: Feature }) {
 export default function Home() {
   return (
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl flex-col px-4 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <section className="rounded-[2rem] border border-violet-100 bg-white/90 p-8 shadow-xl shadow-violet-100/60 sm:p-12">
         <p className="mb-4 inline-flex rounded-full bg-fuchsia-100 px-4 py-2 text-sm font-bold text-fuchsia-800">
           配信・カラオケ・歌練習
