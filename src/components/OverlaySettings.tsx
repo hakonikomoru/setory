@@ -182,8 +182,8 @@ export default function OverlaySettings({
         </div>
 
         <p className="mt-3 text-xs text-violet-600">
-          「表示のみを開く」は左のプレビュー背景付きです。OBS 用コピーは透過（`bg` なし）。ソース幅は
-          800〜1000px 程度を推奨します。
+          「表示のみを開く」は左のプレビュー背景付きです。OBS 用コピーは透過（`bg`
+          なし）。ソース幅は 800〜1000px 程度を推奨します。
         </p>
       </section>
     </div>

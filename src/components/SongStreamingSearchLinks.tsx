@@ -3,7 +3,11 @@
 import { useEffect, useId, useRef, useState } from "react";
 import RowActionButton from "@/components/RowActionButton";
 import StreamingServiceIcon from "@/components/StreamingServiceIcon";
-import { buildSongSearchQuery, STREAMING_SERVICES, streamingSearchUrl } from "@/lib/streaming-links";
+import {
+  buildSongSearchQuery,
+  STREAMING_SERVICES,
+  streamingSearchUrl,
+} from "@/lib/streaming-links";
 import type { Song } from "@/types/setlist";
 
 type Props = {

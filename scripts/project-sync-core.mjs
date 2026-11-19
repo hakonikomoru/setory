@@ -1,6 +1,6 @@
-import { execSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import prettier from "prettier";
 
 export function markerStart(id) {
   return `<!-- sync:auto:${id}:start -->`;
@@ -24,21 +24,13 @@ export function replaceMarkedSection(content, id, body) {
   return `${before}\n${normalized}${after}`;
 }
 
-export function getGitCommit(cwd) {
-  try {
-    return execSync("git rev-parse --short HEAD", {
-      cwd,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-  } catch {
-    return "unknown";
-  }
-}
-
-export function generateMetaLine(repo, commit, via = "npm run sync:project-docs") {
-  const date = new Date().toISOString().slice(0, 10);
-  return `最終更新の想定リポジトリ: \`${repo}\`（\`main\`・\`${commit}\`・${date}・\`${via}\` 自動反映）`;
+/**
+ * meta 行。**実行のたびに変わる値（commit ハッシュ・生成日）を入れない。**
+ * 入れると、コミットや日付が変わっただけで `--check` が「古いです」と言い続ける
+ * （2026-11-19 まで実際にそうなっていた）。生成日時と対象コミットは git log で分かる。
+ */
+export function generateMetaLine(repo, via = "npm run sync:project-docs") {
+  return `最終更新の想定リポジトリ: \`${repo}\`（\`main\`・\`${via}\` 自動反映。生成日時と対象コミットは \`git log -1 -- docs/project-sync.md\`）`;
 }
 
 function listSorted(dir) {
@@ -192,16 +184,25 @@ export function generateSrcTable(rows) {
   return lines.join("\n");
 }
 
-export function runSync(config, options = {}) {
+/**
+ * 生成した Markdown を prettier（リポジトリの prettier 設定）で整形する。
+ * これを通さずに書き出すと `npm run format:check` と書き戻し合うため、
+ * 書き出し・`--check` の比較は必ずこの関数の結果で行う。
+ */
+export async function formatProjectDoc(content, docPath) {
+  const options = (await prettier.resolveConfig(docPath)) ?? {};
+  return prettier.format(content, { ...options, filepath: docPath, parser: "markdown" });
+}
+
+export async function runSync(config, options = {}) {
   const { check = false } = options;
   const root = config.root ?? join(import.meta.dirname, "..");
   const docPath = join(root, config.docPath ?? "docs/project-sync.md");
   let content = readFileSync(docPath, "utf8");
-  const commit = getGitCommit(root);
   const markers = config.markers ?? ["meta", "directory-tree"];
 
   if (markers.includes("meta")) {
-    content = replaceMarkedSection(content, "meta", generateMetaLine(config.repo, commit));
+    content = replaceMarkedSection(content, "meta", generateMetaLine(config.repo));
   }
   if (markers.includes("directory-tree")) {
     content = replaceMarkedSection(
@@ -236,8 +237,9 @@ export function runSync(config, options = {}) {
     content = replaceMarkedSection(content, "src-tree", generateSrcTable(rows));
   }
 
+  const formatted = await formatProjectDoc(content, docPath);
   const previous = readFileSync(docPath, "utf8");
-  if (content === previous) {
+  if (formatted === previous) {
     console.log("docs/project-sync.md は最新です");
     return true;
   }
@@ -245,7 +247,7 @@ export function runSync(config, options = {}) {
     console.error("docs/project-sync.md が古いです。npm run sync:project-docs を実行してください");
     return false;
   }
-  writeFileSync(docPath, content, "utf8");
+  writeFileSync(docPath, formatted, "utf8");
   console.log("docs/project-sync.md を更新しました");
   return true;
 }

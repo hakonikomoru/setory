@@ -253,12 +253,7 @@ export default function TemplateSongImport({
       ) : null}
 
       <div>
-        <RowActionButton
-          type="button"
-          variant="primary"
-          onClick={handleAdd}
-          disabled={!canSubmit}
-        >
+        <RowActionButton type="button" variant="primary" onClick={handleAdd} disabled={!canSubmit}>
           {addButtonLabel}
           {submitCount > 0 ? `（${submitCount}曲）` : ""}
         </RowActionButton>

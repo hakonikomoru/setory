@@ -3,7 +3,9 @@
 > ChatGPT / 他 AI 向けの同期用ドキュメント。実装前に読むこと。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`1ff3d04`・2026-11-18・`npm run sync:project-docs` 自動反映）
+
+最終更新の想定リポジトリ: `hakonikomoru/setory`（`main`・`npm run sync:project-docs` 自動反映。生成日時と対象コミットは `git log -1 -- docs/project-sync.md`）
+
 <!-- sync:auto:meta:end -->
 
 ---
@@ -22,12 +24,14 @@
 > `<!-- sync:auto:... -->` は **`npm run sync:project-docs`** が上書きします（手編集しない）。
 
 <!-- sync:auto:directory-tree:start -->
+
 ```
 setory/
 ├── public/
 │   └── favicon.svg
 ├── scripts/
 │   ├── project-sync-core.mjs
+│   ├── project-sync-core.test.mjs
 │   └── sync-project-docs.mjs
 ├── src/
 │   ├── app/
@@ -97,18 +101,21 @@ setory/
 │   └── types/
 │       └── setlist.ts
 ```
+
 <!-- sync:auto:directory-tree:end -->
 
 ### 2.1 App Router（自動生成）
 
 <!-- sync:auto:pages:start -->
-| パス | ファイル |
-|------|----------|
-| `/` | `page.tsx` |
-| `/builder` | `builder/page.tsx` |
-| `/library` | `library/page.tsx` |
-| `/overlay` | `overlay/page.tsx` |
+
+| パス        | ファイル            |
+| ----------- | ------------------- |
+| `/`         | `page.tsx`          |
+| `/builder`  | `builder/page.tsx`  |
+| `/library`  | `library/page.tsx`  |
+| `/overlay`  | `overlay/page.tsx`  |
 | `/setlists` | `setlists/page.tsx` |
+
 <!-- sync:auto:pages:end -->
 
 ---
